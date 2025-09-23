@@ -1,0 +1,113 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: './frontend/package-lock.json'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Lint code
+      run: npm run lint
+
+    - name: Build application
+      run: npm run build
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-dist
+        path: ./frontend/dist/
+
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: './backend/package-lock.json'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run tests
+      run: npm test
+
+    - name: Build CDK
+      run: npm run build
+
+    - name: CDK Synth
+      run: npx cdk synth
+
+    - name: Upload CDK artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: cdk-dist
+        path: ./backend/cdk.out/
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: [frontend, backend]
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download frontend artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: frontend-dist
+        path: ./frontend/dist/
+
+    - name: Download CDK artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: cdk-dist
+        path: ./backend/cdk.out/
+
+    # Note: AWS credentials would be configured via GitHub secrets
+    # - name: Configure AWS credentials
+    #   uses: aws-actions/configure-aws-credentials@v4
+    #   with:
+    #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     aws-region: us-east-1
+
+    # - name: Deploy CDK Stack
+    #   working-directory: ./backend
+    #   run: npx cdk deploy --require-approval never
+
+    # - name: Deploy to S3
+    #   working-directory: ./frontend
+    #   run: aws s3 sync dist/ s3://${{ secrets.S3_BUCKET_NAME }} --delete

@@ -1,0 +1,54 @@
+{
+  "nav": {
+    "home": "Home",
+    "games": "Games",
+    "admin": "Admin",
+    "logout": "Logout"
+  },
+  "login": {
+    "title": "Login to Scratch Game Platform",
+    "studentId": "Student ID",
+    "password": "Password",
+    "showPassword": "Show Password",
+    "loginButton": "Login",
+    "invalidCredentials": "Invalid credentials"
+  },
+  "games": {
+    "title": "Games",
+    "filterByTag": "Filter by Tag",
+    "filterByLevel": "Filter by Level",
+    "tags": {
+      "chinese": "Chinese Language",
+      "english": "English",
+      "mathematics": "Mathematics"
+    },
+    "levels": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate", 
+      "advanced": "Advanced"
+    },
+    "playGame": "Play Game",
+    "gameTime": "Game Time",
+    "score": "Score"
+  },
+  "admin": {
+    "title": "Admin Management",
+    "uploadFile": "Upload Excel/CSV File",
+    "bulkUpload": "Bulk Upload",
+    "addStudent": "Add Student",
+    "updateStudent": "Update Student",
+    "deleteStudent": "Delete Student",
+    "downloadData": "Download Activity Data"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search"
+  }
+}
