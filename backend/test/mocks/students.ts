@@ -1,0 +1,137 @@
+/**
+ * Mock Student Data
+ * 10 student records with various classes and marks
+ */
+
+import * as crypto from 'crypto';
+
+function hashPassword(password: string): string {
+  return crypto.createHash('sha256').update(password).digest('hex');
+}
+
+export const mockStudents = [
+  {
+    student_id: 'STU001',
+    name_1: 'John Chan',
+    name_2: '陳大文',
+    marks: 150,
+    class: '1A',
+    class_no: '01',
+    last_login: '2024-01-15T09:30:00.000Z',
+    last_update: '2024-01-15T09:30:00.000Z',
+    teacher_id: 'TCH001',
+    password: hashPassword('student123'),
+  },
+  {
+    student_id: 'STU002',
+    name_1: 'Mary Wong',
+    name_2: '黃小明',
+    marks: 280,
+    class: '1A',
+    class_no: '02',
+    last_login: '2024-01-16T10:15:00.000Z',
+    last_update: '2024-01-16T10:15:00.000Z',
+    teacher_id: 'TCH001',
+    password: hashPassword('student123'),
+  },
+  {
+    student_id: 'STU003',
+    name_1: 'Peter Lee',
+    name_2: '李小龍',
+    marks: 450,
+    class: '1A',
+    class_no: '03',
+    last_login: '2024-01-17T08:45:00.000Z',
+    last_update: '2024-01-17T08:45:00.000Z',
+    teacher_id: 'TCH001',
+    password: hashPassword('student123'),
+  },
+  {
+    student_id: 'STU004',
+    name_1: 'Sarah Lam',
+    name_2: '林美華',
+    marks: 620,
+    class: '1B',
+    class_no: '01',
+    last_login: '2024-01-18T11:20:00.000Z',
+    last_update: '2024-01-18T11:20:00.000Z',
+    teacher_id: 'TCH002',
+    password: hashPassword('student123'),
+  },
+  {
+    student_id: 'STU005',
+    name_1: 'David Cheng',
+    name_2: '鄭志明',
+    marks: 340,
+    class: '1B',
+    class_no: '02',
+    last_login: '2024-01-19T14:00:00.000Z',
+    last_update: '2024-01-19T14:00:00.000Z',
+    teacher_id: 'TCH002',
+    password: hashPassword('student123'),
+  },
+  {
+    student_id: 'STU006',
+    name_1: 'Emily Ng',
+    name_2: '吳雅文',
+    marks: 780,
+    class: '2A',
+    class_no: '01',
+    last_login: '2024-01-20T09:00:00.000Z',
+    last_update: '2024-01-20T09:00:00.000Z',
+    teacher_id: 'TCH001',
+    password: hashPassword('student123'),
+  },
+  {
+    student_id: 'STU007',
+    name_1: 'Michael Tsang',
+    name_2: '曾俊傑',
+    marks: 520,
+    class: '2A',
+    class_no: '02',
+    last_login: '2024-01-21T10:30:00.000Z',
+    last_update: '2024-01-21T10:30:00.000Z',
+    teacher_id: 'TCH001',
+    password: hashPassword('student123'),
+  },
+  {
+    student_id: 'STU008',
+    name_1: 'Jessica Liu',
+    name_2: '劉嘉欣',
+    marks: 890,
+    class: '2B',
+    class_no: '01',
+    last_login: '2024-01-22T13:45:00.000Z',
+    last_update: '2024-01-22T13:45:00.000Z',
+    teacher_id: 'TCH003',
+    password: hashPassword('student123'),
+  },
+  {
+    student_id: 'STU009',
+    name_1: 'Kevin Tam',
+    name_2: '譚偉強',
+    marks: 410,
+    class: '2B',
+    class_no: '02',
+    last_login: '2024-01-23T15:20:00.000Z',
+    last_update: '2024-01-23T15:20:00.000Z',
+    teacher_id: 'TCH003',
+    password: hashPassword('student123'),
+  },
+  {
+    student_id: 'STU010',
+    name_1: 'Cindy Ho',
+    name_2: '何思穎',
+    marks: 950,
+    class: '2B',
+    class_no: '03',
+    last_login: '2024-01-24T08:00:00.000Z',
+    last_update: '2024-01-24T08:00:00.000Z',
+    teacher_id: 'TCH003',
+    password: hashPassword('student123'),
+  },
+];
+
+// Export password for testing purposes
+export const MOCK_STUDENT_PASSWORD = 'student123';
+export const MOCK_STUDENT_PASSWORD_HASH = hashPassword('student123');
