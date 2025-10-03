@@ -1,0 +1,70 @@
+{
+  "app": {
+    "title": "學趣天地",
+    "schoolName": "Ho Yu College"
+  },
+  "nav": {
+    "login": "登入",
+    "logout": "登出",
+    "marks": "分數"
+  },
+  "login": {
+    "title": "登入",
+    "studentId": "學生編號",
+    "teacherId": "教師編號",
+    "password": "密碼",
+    "showPassword": "顯示密碼",
+    "loginButton": "登入",
+    "loginPrompt": "請登入以繼續"
+  },
+  "homepage": {
+    "title": "遊戲庫",
+    "filters": {
+      "subject": "科目",
+      "difficulty": "難度",
+      "all": "全部"
+    },
+    "subjects": {
+      "chineseLanguage": "中文",
+      "englishLanguage": "英文",
+      "mathematics": "數學",
+      "humanitiesAndScience": "人文與科學"
+    },
+    "difficulties": {
+      "beginner": "初級",
+      "intermediate": "中級",
+      "advanced": "高級"
+    },
+    "playButton": "玩"
+  },
+  "game": {
+    "backToHome": "返回主頁"
+  },
+  "admin": {
+    "title": "管理儀表板",
+    "uploadStudents": "上傳學生資料",
+    "uploadTeachers": "上傳教師資料",
+    "uploadGames": "上傳遊戲列表",
+    "downloadData": "下載學生活動資料",
+    "fileUpload": {
+      "selectFile": "選擇檔案",
+      "upload": "上傳",
+      "formats": "支援格式：Excel (.xlsx, .xls) 或 CSV (.csv)",
+      "maxSize": "最大檔案大小：10 MB",
+      "maxRows": "最大行數：10,000"
+    }
+  },
+  "timer": {
+    "warning": "您已玩了一小時。請休息一下！",
+    "continue": "繼續",
+    "logout": "登出"
+  },
+  "errors": {
+    "loginFailed": "登入失敗。請檢查您的憑證。",
+    "unauthorized": "您無權訪問此頁面。",
+    "fileUploadFailed": "檔案上傳失敗。請重試。",
+    "invalidFileFormat": "無效的檔案格式。",
+    "fileTooLarge": "檔案大小超過最大限制。",
+    "tooManyRows": "檔案包含太多行。"
+  }
+}

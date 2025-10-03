@@ -15,10 +15,13 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.902.0",
+    "@aws-sdk/lib-dynamodb": "^3.902.0",
     "aws-cdk-lib": "^2.216.0",
     "constructs": "^10.4.2"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.153",
     "@types/node": "^24.5.2",
     "aws-cdk": "^2.1029.2",
     "source-map-support": "^0.5.21",
