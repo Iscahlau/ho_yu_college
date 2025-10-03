@@ -4,6 +4,8 @@ This is a Scratch game platform web application designed for primary school use.
 
 **ALWAYS reference these instructions first and fallback to search or bash commands only when you encounter unexpected information that does not match the info here.**
 
+> **Note**: For a quick project overview and setup summary, see the main [README.md](../README.md). This file contains detailed development instructions, validated command timings, and comprehensive troubleshooting guidance.
+
 ## Project Architecture
 - **Frontend**: React with Vite, Material UI, i18Next for internationalization
 - **Backend**: AWS CDK for infrastructure as code, API Gateway, Lambda, DynamoDB, S3
