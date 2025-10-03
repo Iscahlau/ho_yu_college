@@ -4,6 +4,8 @@ This is a Scratch game platform web application designed for primary school use.
 
 **ALWAYS reference these instructions first and fallback to search or bash commands only when you encounter unexpected information that does not match the info here.**
 
+> **Note**: For a quick project overview and setup summary, see the main [README.md](../README.md). This file contains detailed development instructions, validated command timings, and comprehensive troubleshooting guidance.
+
 ## Project Architecture
 - **Frontend**: React with Vite, Material UI, i18Next for internationalization
 - **Backend**: AWS CDK for infrastructure as code, API Gateway, Lambda, DynamoDB, S3
@@ -252,5 +254,13 @@ cd ../backend && npm run build && npx cdk synth
 3. Use the exact timeout values specified in these instructions
 4. Test both frontend and backend components after changes
 5. Verify end-to-end functionality when possible
+
+### Testing Strategy
+Currently, the project does not have automated test infrastructure set up. When adding tests:
+- **Frontend**: Consider using Vitest (built into Vite) or Jest with React Testing Library
+- **Backend**: Consider using Jest or AWS CDK's built-in testing utilities
+- **E2E Tests**: Consider Playwright or Cypress for end-to-end testing
+- Always write tests for new features and bug fixes
+- Maintain test coverage above 70% when test infrastructure is established
 
 Always follow these instructions for consistent and reliable development workflow.
