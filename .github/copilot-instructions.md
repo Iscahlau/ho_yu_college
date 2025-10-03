@@ -255,4 +255,12 @@ cd ../backend && npm run build && npx cdk synth
 4. Test both frontend and backend components after changes
 5. Verify end-to-end functionality when possible
 
+### Testing Strategy
+Currently, the project does not have automated test infrastructure set up. When adding tests:
+- **Frontend**: Consider using Vitest (built into Vite) or Jest with React Testing Library
+- **Backend**: Consider using Jest or AWS CDK's built-in testing utilities
+- **E2E Tests**: Consider Playwright or Cypress for end-to-end testing
+- Always write tests for new features and bug fixes
+- Maintain test coverage above 70% when test infrastructure is established
+
 Always follow these instructions for consistent and reliable development workflow.
