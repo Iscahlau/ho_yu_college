@@ -1,0 +1,70 @@
+{
+  "app": {
+    "title": "學趣天地",
+    "schoolName": "Ho Yu College"
+  },
+  "nav": {
+    "login": "Login",
+    "logout": "Logout",
+    "marks": "Marks"
+  },
+  "login": {
+    "title": "Login",
+    "studentId": "Student ID",
+    "teacherId": "Teacher ID",
+    "password": "Password",
+    "showPassword": "Show Password",
+    "loginButton": "Login",
+    "loginPrompt": "Please login to continue"
+  },
+  "homepage": {
+    "title": "Game Library",
+    "filters": {
+      "subject": "Subject",
+      "difficulty": "Difficulty",
+      "all": "All"
+    },
+    "subjects": {
+      "chineseLanguage": "Chinese Language",
+      "englishLanguage": "English Language",
+      "mathematics": "Mathematics",
+      "humanitiesAndScience": "Humanities and Science"
+    },
+    "difficulties": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "playButton": "Play"
+  },
+  "game": {
+    "backToHome": "Back to Home"
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "uploadStudents": "Upload Student Data",
+    "uploadTeachers": "Upload Teacher Data",
+    "uploadGames": "Upload Game List",
+    "downloadData": "Download Student Activity Data",
+    "fileUpload": {
+      "selectFile": "Select File",
+      "upload": "Upload",
+      "formats": "Supported formats: Excel (.xlsx, .xls) or CSV (.csv)",
+      "maxSize": "Maximum file size: 10 MB",
+      "maxRows": "Maximum rows: 10,000"
+    }
+  },
+  "timer": {
+    "warning": "You have been playing for one hour. Please take a rest!",
+    "continue": "Continue",
+    "logout": "Logout"
+  },
+  "errors": {
+    "loginFailed": "Login failed. Please check your credentials.",
+    "unauthorized": "You are not authorized to access this page.",
+    "fileUploadFailed": "File upload failed. Please try again.",
+    "invalidFileFormat": "Invalid file format.",
+    "fileTooLarge": "File size exceeds maximum limit.",
+    "tooManyRows": "File contains too many rows."
+  }
+}
