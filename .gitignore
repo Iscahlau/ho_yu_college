@@ -66,6 +66,11 @@ cdk.out/
 # TypeScript
 *.tsbuildinfo
 
+# Test build artifacts
+test/**/*.js
+test/**/*.d.ts
+!test/**/*.test.js
+
 # Temporary folders
 tmp/
 temp/
