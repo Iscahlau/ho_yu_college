@@ -20,7 +20,7 @@ export const mockStudents = [
     last_login: '2024-01-15T09:30:00.000Z',
     last_update: '2024-01-15T09:30:00.000Z',
     teacher_id: 'TCH001',
-    password: hashPassword('student123'),
+    password: hashPassword('123'),
   },
   {
     student_id: 'STU002',
@@ -32,7 +32,7 @@ export const mockStudents = [
     last_login: '2024-01-16T10:15:00.000Z',
     last_update: '2024-01-16T10:15:00.000Z',
     teacher_id: 'TCH001',
-    password: hashPassword('student123'),
+    password: hashPassword('123'),
   },
   {
     student_id: 'STU003',
@@ -44,7 +44,7 @@ export const mockStudents = [
     last_login: '2024-01-17T08:45:00.000Z',
     last_update: '2024-01-17T08:45:00.000Z',
     teacher_id: 'TCH001',
-    password: hashPassword('student123'),
+    password: hashPassword('123'),
   },
   {
     student_id: 'STU004',
@@ -56,7 +56,7 @@ export const mockStudents = [
     last_login: '2024-01-18T11:20:00.000Z',
     last_update: '2024-01-18T11:20:00.000Z',
     teacher_id: 'TCH002',
-    password: hashPassword('student123'),
+    password: hashPassword('123'),
   },
   {
     student_id: 'STU005',
@@ -68,7 +68,7 @@ export const mockStudents = [
     last_login: '2024-01-19T14:00:00.000Z',
     last_update: '2024-01-19T14:00:00.000Z',
     teacher_id: 'TCH002',
-    password: hashPassword('student123'),
+    password: hashPassword('123'),
   },
   {
     student_id: 'STU006',
@@ -80,7 +80,7 @@ export const mockStudents = [
     last_login: '2024-01-20T09:00:00.000Z',
     last_update: '2024-01-20T09:00:00.000Z',
     teacher_id: 'TCH001',
-    password: hashPassword('student123'),
+    password: hashPassword('123'),
   },
   {
     student_id: 'STU007',
@@ -92,7 +92,7 @@ export const mockStudents = [
     last_login: '2024-01-21T10:30:00.000Z',
     last_update: '2024-01-21T10:30:00.000Z',
     teacher_id: 'TCH001',
-    password: hashPassword('student123'),
+    password: hashPassword('123'),
   },
   {
     student_id: 'STU008',
@@ -104,7 +104,7 @@ export const mockStudents = [
     last_login: '2024-01-22T13:45:00.000Z',
     last_update: '2024-01-22T13:45:00.000Z',
     teacher_id: 'TCH003',
-    password: hashPassword('student123'),
+    password: hashPassword('123'),
   },
   {
     student_id: 'STU009',
@@ -116,7 +116,7 @@ export const mockStudents = [
     last_login: '2024-01-23T15:20:00.000Z',
     last_update: '2024-01-23T15:20:00.000Z',
     teacher_id: 'TCH003',
-    password: hashPassword('student123'),
+    password: hashPassword('123'),
   },
   {
     student_id: 'STU010',
@@ -128,10 +128,10 @@ export const mockStudents = [
     last_login: '2024-01-24T08:00:00.000Z',
     last_update: '2024-01-24T08:00:00.000Z',
     teacher_id: 'TCH003',
-    password: hashPassword('student123'),
+    password: hashPassword('123'),
   },
 ];
 
 // Export password for testing purposes
-export const MOCK_STUDENT_PASSWORD = 'student123';
-export const MOCK_STUDENT_PASSWORD_HASH = hashPassword('student123');
+export const MOCK_STUDENT_PASSWORD = '123';
+export const MOCK_STUDENT_PASSWORD_HASH = hashPassword('123');
