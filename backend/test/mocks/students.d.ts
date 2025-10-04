@@ -14,5 +14,5 @@ export declare const mockStudents: {
     teacher_id: string;
     password: string;
 }[];
-export declare const MOCK_STUDENT_PASSWORD = "student123";
+export declare const MOCK_STUDENT_PASSWORD = "123";
 export declare const MOCK_STUDENT_PASSWORD_HASH: string;

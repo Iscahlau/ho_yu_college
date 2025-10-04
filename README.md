@@ -33,6 +33,25 @@ A web-based platform designed for primary schools to facilitate Scratch game lea
 - npm v10+
 - AWS CLI (for backend deployment)
 
+### Local Development with Mock Server
+
+For local development without AWS deployment:
+
+```bash
+# Terminal 1: Start mock server
+cd backend
+npm install
+npm run mock-server  # Runs on http://localhost:3000
+
+# Terminal 2: Start frontend
+cd frontend
+npm install
+echo "VITE_API_URL=http://localhost:3000" > .env.local
+npm run dev  # Runs on http://localhost:5173
+```
+
+See [Mock Server Documentation](backend/mock-server/README.md) for more details.
+
 ### Frontend Setup
 ```bash
 cd frontend
