@@ -13,7 +13,7 @@ export const mockGames = [
     teacher_id: 'TCH001',
     last_update: '2024-01-10T10:00:00.000Z',
     scratch_id: '123456789',
-    scratch_api: 'https://scratch.mit.edu/projects/123456789',
+    scratch_api: 'https://scratch.mit.edu/projects/1207260630',
     accumulated_click: 15,
   },
   {
@@ -25,7 +25,7 @@ export const mockGames = [
     teacher_id: 'TCH001',
     last_update: '2024-01-11T11:00:00.000Z',
     scratch_id: '234567890',
-    scratch_api: 'https://scratch.mit.edu/projects/234567890',
+    scratch_api: 'https://scratch.mit.edu/projects/1207260630',
     accumulated_click: 28,
   },
   {
@@ -37,7 +37,7 @@ export const mockGames = [
     teacher_id: 'TCH001',
     last_update: '2024-01-12T09:30:00.000Z',
     scratch_id: '345678901',
-    scratch_api: 'https://scratch.mit.edu/projects/345678901',
+    scratch_api: 'https://scratch.mit.edu/projects/922059032',
     accumulated_click: 45,
   },
   {
@@ -49,7 +49,7 @@ export const mockGames = [
     teacher_id: 'TCH002',
     last_update: '2024-01-13T14:20:00.000Z',
     scratch_id: '456789012',
-    scratch_api: 'https://scratch.mit.edu/projects/456789012',
+    scratch_api: 'https://scratch.mit.edu/projects/922059032',
     accumulated_click: 62,
   },
   {
@@ -61,7 +61,7 @@ export const mockGames = [
     teacher_id: 'TCH001',
     last_update: '2024-01-14T10:45:00.000Z',
     scratch_id: '567890123',
-    scratch_api: 'https://scratch.mit.edu/projects/567890123',
+    scratch_api: 'https://scratch.mit.edu/projects/922059032',
     accumulated_click: 34,
   },
   {
@@ -73,7 +73,7 @@ export const mockGames = [
     teacher_id: 'TCH002',
     last_update: '2024-01-15T13:00:00.000Z',
     scratch_id: '678901234',
-    scratch_api: 'https://scratch.mit.edu/projects/678901234',
+    scratch_api: 'https://scratch.mit.edu/projects/922059032',
     accumulated_click: 19,
   },
   {
@@ -85,7 +85,7 @@ export const mockGames = [
     teacher_id: 'TCH001',
     last_update: '2024-01-16T09:15:00.000Z',
     scratch_id: '789012345',
-    scratch_api: 'https://scratch.mit.edu/projects/789012345',
+    scratch_api: 'https://scratch.mit.edu/projects/922059032',
     accumulated_click: 78,
   },
   {
@@ -97,7 +97,7 @@ export const mockGames = [
     teacher_id: 'TCH001',
     last_update: '2024-01-17T11:30:00.000Z',
     scratch_id: '890123456',
-    scratch_api: 'https://scratch.mit.edu/projects/890123456',
+    scratch_api: 'https://scratch.mit.edu/projects/922059032',
     accumulated_click: 52,
   },
   {
@@ -109,7 +109,7 @@ export const mockGames = [
     teacher_id: 'TCH003',
     last_update: '2024-01-18T15:00:00.000Z',
     scratch_id: '901234567',
-    scratch_api: 'https://scratch.mit.edu/projects/901234567',
+    scratch_api: 'https://scratch.mit.edu/projects/1222261862',
     accumulated_click: 89,
   },
   {
@@ -121,7 +121,7 @@ export const mockGames = [
     teacher_id: 'TCH003',
     last_update: '2024-01-19T08:45:00.000Z',
     scratch_id: '012345678',
-    scratch_api: 'https://scratch.mit.edu/projects/012345678',
+    scratch_api: 'https://scratch.mit.edu/projects/1222261862',
     accumulated_click: 95,
   },
   {
@@ -133,7 +133,7 @@ export const mockGames = [
     teacher_id: 'TCH003',
     last_update: '2024-01-20T10:00:00.000Z',
     scratch_id: '123450987',
-    scratch_api: 'https://scratch.mit.edu/projects/123450987',
+    scratch_api: 'https://scratch.mit.edu/projects/1222024739',
     accumulated_click: 103,
   },
   {
@@ -145,7 +145,7 @@ export const mockGames = [
     teacher_id: 'TCH001',
     last_update: '2024-01-21T12:30:00.000Z',
     scratch_id: '234561098',
-    scratch_api: 'https://scratch.mit.edu/projects/234561098',
+    scratch_api: 'https://scratch.mit.edu/projects/1222261862',
     accumulated_click: 67,
   },
   {
@@ -157,7 +157,7 @@ export const mockGames = [
     teacher_id: 'TCH001',
     last_update: '2024-01-22T09:00:00.000Z',
     scratch_id: '345672109',
-    scratch_api: 'https://scratch.mit.edu/projects/345672109',
+    scratch_api: 'https://scratch.mit.edu/projects/1222024739',
     accumulated_click: 41,
   },
   {
@@ -169,7 +169,7 @@ export const mockGames = [
     teacher_id: 'TCH002',
     last_update: '2024-01-23T11:15:00.000Z',
     scratch_id: '456783210',
-    scratch_api: 'https://scratch.mit.edu/projects/456783210',
+    scratch_api: 'https://scratch.mit.edu/projects/1207260630',
     accumulated_click: 56,
   },
   {
@@ -181,7 +181,7 @@ export const mockGames = [
     teacher_id: 'TCH002',
     last_update: '2024-01-24T13:45:00.000Z',
     scratch_id: '567894321',
-    scratch_api: 'https://scratch.mit.edu/projects/567894321',
+    scratch_api: 'https://scratch.mit.edu/projects/1207260630',
     accumulated_click: 72,
   },
   {
@@ -193,7 +193,7 @@ export const mockGames = [
     teacher_id: 'TCH001',
     last_update: '2024-01-25T10:20:00.000Z',
     scratch_id: '678905432',
-    scratch_api: 'https://scratch.mit.edu/projects/678905432',
+    scratch_api: 'https://scratch.mit.edu/projects/1207260630',
     accumulated_click: 38,
   },
   {
@@ -205,7 +205,7 @@ export const mockGames = [
     teacher_id: 'TCH001',
     last_update: '2024-01-26T14:00:00.000Z',
     scratch_id: '789016543',
-    scratch_api: 'https://scratch.mit.edu/projects/789016543',
+    scratch_api: 'https://scratch.mit.edu/projects/1207260630',
     accumulated_click: 84,
   },
   {
@@ -217,7 +217,7 @@ export const mockGames = [
     teacher_id: 'TCH003',
     last_update: '2024-01-27T09:30:00.000Z',
     scratch_id: '890127654',
-    scratch_api: 'https://scratch.mit.edu/projects/890127654',
+    scratch_api: 'https://scratch.mit.edu/projects/1207260630',
     accumulated_click: 91,
   },
   {
@@ -229,7 +229,7 @@ export const mockGames = [
     teacher_id: 'TCH003',
     last_update: '2024-01-28T11:00:00.000Z',
     scratch_id: '901238765',
-    scratch_api: 'https://scratch.mit.edu/projects/901238765',
+    scratch_api: 'https://scratch.mit.edu/projects/1207260630',
     accumulated_click: 76,
   },
   {
@@ -241,7 +241,7 @@ export const mockGames = [
     teacher_id: 'TCH003',
     last_update: '2024-01-29T15:30:00.000Z',
     scratch_id: '012349876',
-    scratch_api: 'https://scratch.mit.edu/projects/012349876',
+    scratch_api: 'https://scratch.mit.edu/projects/1207260630',
     accumulated_click: 110,
   },
 ];
