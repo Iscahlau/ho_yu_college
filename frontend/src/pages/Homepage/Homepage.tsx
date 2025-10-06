@@ -125,9 +125,6 @@ function Homepage() {
                         variant="outlined"
                       />
                     </Stack>
-                    <Typography variant="body2" color="text.secondary">
-                      Plays: {game.accumulatedClick}
-                    </Typography>
                   </CardContent>
                   <CardActions sx={{ p: 2, pt: 0 }}>
                     <Button 
