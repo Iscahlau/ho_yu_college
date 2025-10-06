@@ -68,5 +68,12 @@
     "invalidFileFormat": "Invalid file format.",
     "fileTooLarge": "File size exceeds maximum limit.",
     "tooManyRows": "File contains too many rows."
+  },
+  "footer": {
+    "schoolName": "Ho Yu College",
+    "allRightsReserved": "All rights reserved.",
+    "contactUs": "Contact Us",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
   }
 }

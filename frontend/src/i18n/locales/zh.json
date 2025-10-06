@@ -68,5 +68,12 @@
     "invalidFileFormat": "無效的檔案格式。",
     "fileTooLarge": "檔案大小超過最大限制。",
     "tooManyRows": "檔案包含太多行。"
+  },
+  "footer": {
+    "schoolName": "Ho Yu College",
+    "allRightsReserved": "版權所有。",
+    "contactUs": "聯絡我們",
+    "privacyPolicy": "私隱政策",
+    "termsOfService": "服務條款"
   }
 }

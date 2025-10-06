@@ -1,5 +1,6 @@
 import { Box } from '@mui/material';
 import Navbar from '../Navbar';
+import Footer from '../Footer';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -15,6 +16,7 @@ function Layout({ children }: LayoutProps) {
       <Box component="main" sx={{ flexGrow: 1, py: 3 }}>
         {children}
       </Box>
+      <Footer />
     </Box>
   );
 }
