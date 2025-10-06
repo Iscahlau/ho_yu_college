@@ -26,6 +26,21 @@ A web-based platform designed for primary schools to facilitate Scratch game lea
 - **Database**: DynamoDB
 - **Storage**: S3 (static hosting)
 
+### Data Model
+
+#### Games Table
+The Games table stores information about Scratch games assigned to students. A critical requirement is that the `game_id` field must match the last segment of the `scratch_api` URL to ensure consistency between the game identifier and its corresponding Scratch project.
+
+**Example:**
+- If `scratch_api` is `https://scratch.mit.edu/projects/1168960672`
+- Then `game_id` must be `1168960672`
+
+**General Format:**
+- `scratch_api`: `https://scratch.mit.edu/projects/{{gameId}}`
+- `game_id`: `{{gameId}}`
+
+This constraint is validated in the test suite to ensure data integrity.
+
 ## 🚀 Quick Start
 
 ### Prerequisites

@@ -91,6 +91,18 @@ The AWS infrastructure is defined using AWS CDK in the `lib/` directory:
 - **DynamoDB**: NoSQL database for data storage
 - **S3**: Static file hosting and storage
 
+### Data Model Requirements
+
+#### Games Table
+The Games table has a critical data consistency requirement:
+
+**Game ID and Scratch API Consistency:**
+- The `game_id` field must exactly match the last segment (project ID) of the `scratch_api` URL
+- **Example**: If `scratch_api` is `https://scratch.mit.edu/projects/1168960672`, then `game_id` must be `1168960672`
+- **General Format**: For `scratch_api` as `https://scratch.mit.edu/projects/{{gameId}}`, the `game_id` must be `{{gameId}}`
+
+This invariant is enforced in the test suite (`test/mocks.test.ts`) to ensure data integrity across all game records.
+
 ## Environment Variables
 
 Lambda functions use the following environment variables:
