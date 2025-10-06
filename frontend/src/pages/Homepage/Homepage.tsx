@@ -55,8 +55,12 @@ function Homepage() {
     loadGames();
   }, [dispatch]);
 
-  const handleGameClick = (gameId: string) => {
-    navigate(`/game/${gameId}`);
+  const handleGameClick = (game: Game) => {
+    // Extract Scratch project ID from scratch_api URL
+    // Format: https://scratch.mit.edu/projects/{scratchId}
+    const scratchIdMatch = game.scratchApi.match(/\/projects\/(\d+)/);
+    const scratchId = scratchIdMatch ? scratchIdMatch[1] : game.scratchId;
+    navigate(`/game/${scratchId}`);
   };
 
   return (
@@ -130,7 +134,7 @@ function Homepage() {
                     <Button 
                       variant="contained" 
                       fullWidth
-                      onClick={() => handleGameClick(game.gameId)}
+                      onClick={() => handleGameClick(game)}
                       sx={{
                         backgroundColor: '#BE86CD',
                         '&:hover': {
