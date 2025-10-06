@@ -9,13 +9,14 @@
     "marks": "分數"
   },
   "login": {
-    "title": "登入",
+    "title": "用戶登錄",
     "studentId": "學生編號",
     "teacherId": "教師編號",
     "password": "密碼",
     "showPassword": "顯示密碼",
     "loginButton": "登入",
-    "loginPrompt": "請登入以繼續"
+    "loginPrompt": "請輸入用戶名",
+    "passwordPrompt": "請輸入密碼"
   },
   "homepage": {
     "title": "遊戲庫",
@@ -25,17 +26,18 @@
       "all": "全部"
     },
     "subjects": {
-      "chineseLanguage": "中文",
-      "englishLanguage": "英文",
-      "mathematics": "數學",
-      "humanitiesAndScience": "人文與科學"
+      "Chinese Language": "中國語文科",
+      "English Language": "英國語文科",
+      "Mathematics": "數學科",
+      "General Studies": "常識科",
+      "Humanities and Science": "人文和科學科"
     },
     "difficulties": {
-      "beginner": "初級",
-      "intermediate": "中級",
-      "advanced": "高級"
+      "Beginner": "初級",
+      "Intermediate": "中級",
+      "Advanced": "高級"
     },
-    "playButton": "Play / 暢玩"
+    "playButton": "暢玩"
   },
   "game": {
     "backToHome": "返回主頁"
