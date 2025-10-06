@@ -26,4 +26,4 @@ Each Lambda function may require the following environment variables:
 
 ## Deployment
 
-Lambda functions are deployed as part of the CDK stack. See `lib/backend-stack.ts` for configuration.
+Lambda functions are deployed as part of the CDK stack. See `../aws/lib/backend-stack.ts` for configuration.

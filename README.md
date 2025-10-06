@@ -114,9 +114,10 @@ cd backend && npx cdk deploy
 │   │   ├── App.tsx    # Main component
 │   │   └── main.tsx   # Entry point
 │   └── package.json
-├── backend/            # AWS CDK infrastructure
+├── backend/            # Backend services
 │   ├── bin/           # CDK app entry
-│   ├── lib/           # Stack definitions
+│   ├── aws/           # AWS infrastructure code (CDK stacks)
+│   ├── lambda/        # Lambda function handlers
 │   └── package.json
 └── .github/
     └── copilot-instructions.md

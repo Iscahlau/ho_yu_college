@@ -7,8 +7,10 @@ This directory contains the backend infrastructure and services for the Ho Yu Co
 ```
 backend/
 ├── bin/              # CDK app entry point
-├── lib/              # CDK stack definitions
-├── lambda/           # Lambda function handlers
+├── aws/              # AWS infrastructure code (CDK stacks, excluding Lambda)
+│   ├── lib/          # CDK stack definitions
+│   └── README.md     # AWS infrastructure documentation
+├── lambda/           # Lambda function handlers (application logic)
 │   └── auth/         # Authentication handlers
 ├── mock-server/      # Local development mock server
 ├── test/             # Unit tests and mock data
@@ -19,6 +21,8 @@ backend/
 ├── package.json      # Dependencies and scripts
 └── tsconfig.json     # TypeScript configuration
 ```
+
+**Note**: AWS CDK infrastructure code is now organized in the `aws/` directory, while Lambda functions remain in `lambda/` to maintain clear separation between infrastructure definitions and application business logic.
 
 ## Development
 
@@ -84,12 +88,14 @@ Additional Lambda functions for games management, file upload, etc. will be adde
 
 ## Infrastructure
 
-The AWS infrastructure is defined using AWS CDK in the `lib/` directory:
+The AWS infrastructure is defined using AWS CDK in the `aws/lib/` directory:
 
 - **API Gateway**: RESTful API endpoints
 - **Lambda**: Serverless compute for business logic
 - **DynamoDB**: NoSQL database for data storage
 - **S3**: Static file hosting and storage
+
+See [aws/README.md](aws/README.md) for detailed infrastructure documentation.
 
 ### Data Model Requirements
 
