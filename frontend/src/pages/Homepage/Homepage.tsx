@@ -8,13 +8,15 @@ import {
   Card, 
   CardContent, 
   CardMedia, 
-  CardActionArea,
+  CardActions,
+  Button,
   CircularProgress,
   Alert,
   Chip,
   Stack
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { RootState, AppDispatch } from '../../store/store';
 import { setGames, setLoading, setError } from '../../store/slices/gamesSlice';
 import { fetchGames } from '../../services/gamesService';
@@ -27,6 +29,7 @@ import type { Game } from '../../store/slices/gamesSlice';
 function Homepage() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { filteredGames, loading, error } = useSelector((state: RootState) => state.games);
 
   useEffect(() => {
@@ -86,7 +89,7 @@ function Homepage() {
         {!loading && !error && filteredGames.length > 0 && (
           <Grid container spacing={3}>
             {filteredGames.map((game: Game) => (
-              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={game.gameId}>
+              <Grid size={{ xs: 12, sm: 6, md: 3 }} key={game.gameId}>
                 <Card 
                   sx={{ 
                     height: '100%',
@@ -94,37 +97,50 @@ function Homepage() {
                     flexDirection: 'column'
                   }}
                 >
-                  <CardActionArea onClick={() => handleGameClick(game.gameId)}>
-                    <CardMedia
-                      component="img"
-                      height="200"
-                      image={game.thumbnailUrl || 'https://via.placeholder.com/400x300?text=Game+Thumbnail'}
-                      alt={game.gameName}
-                      sx={{ objectFit: 'cover' }}
-                    />
-                    <CardContent>
-                      <Typography variant="h6" gutterBottom noWrap>
-                        {game.gameName}
-                      </Typography>
-                      <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-                        <Chip 
-                          label={game.subject} 
-                          size="small" 
-                          color="primary"
-                          variant="outlined"
-                        />
-                        <Chip 
-                          label={game.difficulty} 
-                          size="small" 
-                          color="secondary"
-                          variant="outlined"
-                        />
-                      </Stack>
-                      <Typography variant="body2" color="text.secondary">
-                        Plays: {game.accumulatedClick}
-                      </Typography>
-                    </CardContent>
-                  </CardActionArea>
+                  <CardMedia
+                    component="img"
+                    height="140"
+                    image={game.thumbnailUrl || 'https://via.placeholder.com/400x300?text=Game+Thumbnail'}
+                    alt={game.gameName}
+                    sx={{ objectFit: 'cover' }}
+                  />
+                  <CardContent sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6" gutterBottom noWrap>
+                      {game.gameName}
+                    </Typography>
+                    <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+                      <Chip 
+                        label={game.subject} 
+                        size="small" 
+                        color="primary"
+                        variant="outlined"
+                      />
+                      <Chip 
+                        label={game.difficulty} 
+                        size="small" 
+                        color="secondary"
+                        variant="outlined"
+                      />
+                    </Stack>
+                    <Typography variant="body2" color="text.secondary">
+                      Plays: {game.accumulatedClick}
+                    </Typography>
+                  </CardContent>
+                  <CardActions sx={{ p: 2, pt: 0 }}>
+                    <Button 
+                      variant="contained" 
+                      fullWidth
+                      onClick={() => handleGameClick(game.gameId)}
+                      sx={{
+                        backgroundColor: '#BE86CD',
+                        '&:hover': {
+                          backgroundColor: '#A76BB8',
+                        }
+                      }}
+                    >
+                      {t('homepage.playButton')}
+                    </Button>
+                  </CardActions>
                 </Card>
               </Grid>
             ))}
