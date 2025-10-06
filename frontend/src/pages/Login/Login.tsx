@@ -1,5 +1,6 @@
 import {useState} from 'react';
-import {Box, Typography, Container, TextField, Button, Paper, Alert} from '@mui/material';
+import {Box, Typography, Container, TextField, Button, Paper, Alert, IconButton} from '@mui/material';
+import {Visibility, VisibilityOff} from '@mui/icons-material';
 import {useNavigate} from 'react-router-dom';
 import {useDispatch} from 'react-redux';
 import {useTranslation} from 'react-i18next';
@@ -15,6 +16,7 @@ function Login() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -63,13 +65,35 @@ function Login() {
 
     return (
         <Container maxWidth="sm">
-            <Box sx={{mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                <Paper elevation={3} sx={{p: 4, width: '100%'}}>
-                    <Typography variant="h4" align="center" gutterBottom>
+            <Box sx={{
+                mt: 8,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                minHeight: '60vh',
+                justifyContent: 'center'
+            }}>
+                <Paper
+                    elevation={6}
+                    sx={{
+                        p: 4,
+                        width: '100%',
+                        maxWidth: 400,
+                        borderRadius: 4,
+                        background: 'linear-gradient(135deg, #89B5E1 0%, #A896D8 100%)',
+                    }}
+                >
+                    <Typography
+                        variant="h4"
+                        align="center"
+                        gutterBottom
+                        sx={{
+                            fontWeight: 'bold',
+                            color: '#000',
+                            mb: 3
+                        }}
+                    >
                         {t('login.title')}
-                    </Typography>
-                    <Typography variant="body2" align="center" color="text.secondary" sx={{mb: 3}}>
-                        {t('login.loginPrompt')}
                     </Typography>
                     {error && (
                         <Alert severity="error" sx={{mb: 2}}>
@@ -82,34 +106,104 @@ function Login() {
                             required
                             fullWidth
                             id="id"
-                            label={`${t('login.studentId')} / ${t('login.teacherId')}`}
                             name="id"
                             autoComplete="username"
                             autoFocus
                             value={id}
                             onChange={(e) => setId(e.target.value)}
                             disabled={loading}
+                            placeholder={t('login.loginPrompt')}
+                            sx={{
+                                mb: 2,
+                                '& .MuiOutlinedInput-root': {
+                                    backgroundColor: 'white',
+                                    borderRadius: 2,
+                                    '& fieldset': {
+                                        borderColor: 'transparent',
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: 'transparent',
+                                    },
+                                    '&.Mui-focused fieldset': {
+                                        borderColor: 'transparent',
+                                    },
+                                },
+                                '& .MuiInputBase-input': {
+                                    padding: '12px 16px',
+                                },
+                            }}
                         />
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            name="password"
-                            label={t('login.password')}
-                            type="password"
-                            id="password"
-                            autoComplete="current-password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            disabled={loading}
-                            placeholder={t('login.passwordPrompt')}
-                        />
+                        <Box sx={{position: 'relative', mb: 2}}>
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                name="password"
+                                type={showPassword ? "text" : "password"}
+                                id="password"
+                                autoComplete="current-password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                disabled={loading}
+                                placeholder={t('login.passwordPrompt')}
+                                sx={{
+                                    mb: 0,
+                                    '& .MuiOutlinedInput-root': {
+                                        backgroundColor: 'white',
+                                        borderRadius: 2,
+                                        paddingRight: '48px',
+                                        '& fieldset': {
+                                            borderColor: 'transparent',
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: 'transparent',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: 'transparent',
+                                        },
+                                    },
+                                    '& .MuiInputBase-input': {
+                                        padding: '12px 16px',
+                                    },
+                                }}
+                            />
+                            <IconButton
+                                onClick={() => setShowPassword(!showPassword)}
+                                onMouseDown={(e) => e.preventDefault()}
+                                edge="end"
+                                sx={{
+                                    position: 'absolute',
+                                    right: 8,
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    color: '#666',
+                                    marginTop: '8px',
+                                }}
+                            >
+                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                        </Box>
                         <Button
                             type="submit"
                             fullWidth
                             variant="contained"
-                            sx={{mt: 3, mb: 2}}
                             disabled={loading}
+                            sx={{
+                                mt: 2,
+                                mb: 1,
+                                py: 1.5,
+                                backgroundColor: '#E89158',
+                                borderRadius: 2,
+                                fontWeight: 'bold',
+                                fontSize: '1rem',
+                                textTransform: 'none',
+                                '&:hover': {
+                                    backgroundColor: '#D97F47',
+                                },
+                                '&:disabled': {
+                                    backgroundColor: '#D4A987',
+                                },
+                            }}
                         >
                             {loading ? `${t('login.loginButton')}...` : t('login.loginButton')}
                         </Button>
