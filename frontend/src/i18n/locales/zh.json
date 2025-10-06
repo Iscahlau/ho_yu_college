@@ -19,6 +19,7 @@
   },
   "homepage": {
     "title": "遊戲庫",
+    "allProjects": "全部項目",
     "filters": {
       "subject": "科目",
       "difficulty": "難度",
@@ -35,7 +36,11 @@
       "intermediate": "中級",
       "advanced": "高級"
     },
-    "playButton": "玩"
+    "playButton": "暢玩"
+  },
+  "footer": {
+    "copyright": "版權所有 © 2025 何俞謹主小學中學",
+    "createdBy": "由 Hundred Hui Studio 製作"
   },
   "game": {
     "backToHome": "返回主頁"

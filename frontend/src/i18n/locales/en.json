@@ -19,6 +19,7 @@
   },
   "homepage": {
     "title": "Game Library",
+    "allProjects": "All projects",
     "filters": {
       "subject": "Subject",
       "difficulty": "Difficulty",
@@ -36,6 +37,10 @@
       "advanced": "Advanced"
     },
     "playButton": "Play"
+  },
+  "footer": {
+    "copyright": "Copyright © 2025 Ho Yu College and Primary School",
+    "createdBy": "Created by Hundred Hui Studio"
   },
   "game": {
     "backToHome": "Back to Home"
