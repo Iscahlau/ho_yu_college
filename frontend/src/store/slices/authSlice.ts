@@ -16,10 +16,33 @@ interface AuthState {
   loginTime: number | null;
 }
 
-const initialState: AuthState = {
-  user: null,
-  isAuthenticated: false,
-  loginTime: null,
+// Load auth state from sessionStorage on initialization
+const loadAuthState = (): AuthState => {
+  try {
+    const serializedState = sessionStorage.getItem('authState');
+    if (serializedState) {
+      return JSON.parse(serializedState);
+    }
+  } catch (err) {
+    console.error('Failed to load auth state from sessionStorage:', err);
+  }
+  return {
+    user: null,
+    isAuthenticated: false,
+    loginTime: null,
+  };
+};
+
+const initialState: AuthState = loadAuthState();
+
+// Helper function to save auth state to sessionStorage
+const saveAuthState = (state: AuthState) => {
+  try {
+    const serializedState = JSON.stringify(state);
+    sessionStorage.setItem('authState', serializedState);
+  } catch (err) {
+    console.error('Failed to save auth state to sessionStorage:', err);
+  }
 };
 
 const authSlice = createSlice({
@@ -30,15 +53,19 @@ const authSlice = createSlice({
       state.user = action.payload;
       state.isAuthenticated = true;
       state.loginTime = Date.now();
+      saveAuthState(state);
     },
     logout: (state) => {
       state.user = null;
       state.isAuthenticated = false;
       state.loginTime = null;
+      // Clear sessionStorage on logout
+      sessionStorage.removeItem('authState');
     },
     updateMarks: (state, action: PayloadAction<number>) => {
       if (state.user) {
         state.user.marks = action.payload;
+        saveAuthState(state);
       }
     },
   },
