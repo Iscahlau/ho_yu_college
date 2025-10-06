@@ -206,25 +206,6 @@ function Login() {
                         >
                             {loading ? `${t('login.loginButton')}...` : t('login.loginButton')}
                         </Button>
-                        <Box sx={{textAlign: 'right', mt: 1}}>
-                            <Link
-                                href="#"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    // TODO: Implement forgot password functionality
-                                }}
-                                sx={{
-                                    color: '#000',
-                                    fontSize: '0.875rem',
-                                    textDecoration: 'none',
-                                    '&:hover': {
-                                        textDecoration: 'underline',
-                                    },
-                                }}
-                            >
-                                忘記密碼?
-                            </Link>
-                        </Box>
                     </Box>
                 </Paper>
             </Box>
