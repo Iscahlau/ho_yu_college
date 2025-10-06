@@ -7,6 +7,7 @@ A web-based platform designed for primary schools to facilitate Scratch game lea
 - **Teacher Portal**: Upload student data and game links via Excel files
 - **Student Portal**: Login to access games, play, and track records
 - **Game Management**: Filter and organize Scratch games
+- **Scratch Game Embedding**: Play Scratch games directly in the platform via iframe
 - **Multi-language Support**: Interface available in multiple languages (i18Next)
 - **Record Tracking**: Monitor student progress and game completion
 
@@ -87,6 +88,25 @@ npx cdk deploy     # Deploy to AWS (requires credentials)
 
 For detailed development instructions, build commands, troubleshooting, and best practices, see:
 - **[Copilot Instructions](.github/copilot-instructions.md)** - Comprehensive development guide with validated commands and timings
+
+### Game Page Usage
+
+The game page (`/game/:gameId`) embeds Scratch games using an iframe. The page is responsive and works on both desktop and mobile devices.
+
+**How to use:**
+1. Navigate to `/game/{scratchId}` where `{scratchId}` is the Scratch project ID
+2. Example: `/game/60917032` will embed the Scratch project with ID 60917032
+3. The URL format used is: `https://scratch.mit.edu/projects/{scratchId}/embed`
+
+**Implementation details:**
+- The gameId is extracted from the URL route parameter
+- The `getScratchEmbedUrl()` helper function (in `utils/helpers.ts`) generates the embed URL
+- The iframe uses responsive sizing with a 485:402 aspect ratio to maintain Scratch's default dimensions
+- If no gameId is provided, an error message is displayed
+
+**Configuration:**
+- The base Scratch embed URL can be configured via the `VITE_SCRATCH_EMBED_BASE` environment variable
+- Default: `https://scratch.mit.edu/projects`
 
 ## 🛠️ Development
 
