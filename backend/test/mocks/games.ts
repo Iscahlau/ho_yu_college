@@ -3,6 +3,7 @@
  * 20 game records with various subjects, difficulties, and student assignments
  */
 
+// Invariant: game_id must match the last segment of scratch_api.
 export const mockGames = [
   {
     game_id: '1207260630',
