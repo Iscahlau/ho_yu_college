@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Box, Typography, Container, TextField, Button, Paper, Alert, IconButton, Link} from '@mui/material';
+import {Box, Typography, Container, TextField, Button, Paper, Alert, IconButton} from '@mui/material';
 import {Visibility, VisibilityOff} from '@mui/icons-material';
 import {useNavigate} from 'react-router-dom';
 import {useDispatch} from 'react-redux';
@@ -177,6 +177,7 @@ function Login() {
                                     top: '50%',
                                     transform: 'translateY(-50%)',
                                     color: '#666',
+                                    marginTop: '8px',
                                 }}
                             >
                                 {showPassword ? <VisibilityOff /> : <Visibility />}
