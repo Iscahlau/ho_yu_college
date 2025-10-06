@@ -166,9 +166,9 @@ describe('Mock Games Data', () => {
     });
   });
 
-  test('game IDs should follow GAME### pattern', () => {
+  test('game IDs should be numeric strings', () => {
     mockGames.forEach((game: any) => {
-      expect(game.game_id).toMatch(/^GAME\d{3}$/);
+      expect(game.game_id).toMatch(/^\d+$/);
     });
   });
 
@@ -221,9 +221,17 @@ describe('Mock Games Data', () => {
     });
   });
 
-  test('scratch_api should be valid Scratch API URL', () => {
+  test('scratch_api should be valid Scratch project URL', () => {
     mockGames.forEach((game: any) => {
-      expect(game.scratch_api).toMatch(/^https:\/\/api\.scratch\.mit\.edu\/projects\/\d+$/);
+      expect(game.scratch_api).toMatch(/^https:\/\/scratch\.mit\.edu\/projects\/\d+$/);
+    });
+  });
+
+  test('game_id must match the last segment of scratch_api URL', () => {
+    mockGames.forEach((game: any) => {
+      const urlParts = game.scratch_api.split('/');
+      const projectId = urlParts[urlParts.length - 1];
+      expect(game.game_id).toBe(projectId);
     });
   });
 
