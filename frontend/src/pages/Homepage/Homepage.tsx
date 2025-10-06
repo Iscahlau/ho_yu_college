@@ -21,6 +21,7 @@ import { RootState, AppDispatch } from '../../store/store';
 import { setGames, setLoading, setError } from '../../store/slices/gamesSlice';
 import { fetchGames } from '../../services/gamesService';
 import type { Game } from '../../store/slices/gamesSlice';
+import FilterBar from '../../components/FilterBar';
 
 /**
  * Homepage - Displays game library with filters
@@ -67,6 +68,8 @@ function Homepage() {
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
           Browse and play Scratch games. Use filters to find games by subject and difficulty.
         </Typography>
+
+        <FilterBar />
 
         {loading && (
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
