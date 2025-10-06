@@ -39,7 +39,7 @@ function Navbar() {
         {/* Left section - School Logo */}
         <Box sx={{ display: 'flex', alignItems: 'center', minWidth: '200px' }}>
           <img 
-            src="/assets/images/school-logo.svg" 
+            src="/assets/images/hoyu_logo_light-400x85.png"
             alt="Ho Yu College Logo" 
             style={{ height: '50px', marginRight: '12px' }}
           />
