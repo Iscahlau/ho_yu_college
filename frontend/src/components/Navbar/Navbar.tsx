@@ -28,6 +28,7 @@ function Navbar() {
 
     const handleLogin = () => {
         navigate('/login');
+        setMobileMenuOpen(false);
     };
 
     const toggleLanguage = () => {
@@ -51,7 +52,7 @@ function Navbar() {
                 <Toolbar sx={{justifyContent: 'space-between', py: 0.5}}>
                     {/* Left section - Hamburger Menu (Mobile) and School Logo */}
                     <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
-                        {isMobile && isAuthenticated && (
+                        {isMobile && (
                             <IconButton
                                 color="inherit"
                                 onClick={toggleMobileMenu}
@@ -86,71 +87,73 @@ function Navbar() {
                         {t('app.title')}
                     </Typography>
 
-                    {/* Right section - User info and buttons */}
-                    <Box sx={{
-                        display: 'flex',
-                        gap: isMobile ? 0.5 : 1.5,
-                        alignItems: 'center',
-                        justifyContent: 'flex-end'
-                    }}>
-                        {/* Desktop: Show user info inline */}
-                        {!isMobile && isAuthenticated && user && (
-                            <Typography variant="body1" sx={{fontWeight: 500, whiteSpace: 'nowrap', mr: 1}} id='user-info'>
-                                <PermIdentityOutlinedIcon sx={{verticalAlign: 'middle', mr: 0.5}} /> 
-                                {user.name2} {user.id} {t('nav.marks')}:{user.marks}
-                            </Typography>
-                        )}
+                    {/* Right section - User info and buttons (Desktop only) */}
+                    {!isMobile && (
+                        <Box sx={{
+                            display: 'flex',
+                            gap: 1.5,
+                            alignItems: 'center',
+                            justifyContent: 'flex-end'
+                        }}>
+                            {/* Desktop: Show user info inline */}
+                            {isAuthenticated && user && (
+                                <Typography variant="body1" sx={{fontWeight: 500, whiteSpace: 'nowrap', mr: 1}} id='user-info'>
+                                    <PermIdentityOutlinedIcon sx={{verticalAlign: 'middle', mr: 0.5}} /> 
+                                    {user.name2} {user.id} {t('nav.marks')}:{user.marks}
+                                </Typography>
+                            )}
 
-                        <Button
-                            color="inherit"
-                            onClick={toggleLanguage}
-                            sx={{
-                                minWidth: 'auto',
-                                px: isMobile ? 1 : 1.5,
-                                fontSize: '0.875rem',
-                                borderRadius: '20px',
-                                border: '1px solid rgba(255,255,255,0.5)',
-                                '&:hover': {
-                                    backgroundColor: 'rgba(255,255,255,0.1)'
-                                }
-                            }}
-                        >
-                            {i18n.language === 'en' ? '中文' : 'English'}
-                        </Button>
-                        {isAuthenticated ? (
                             <Button
                                 color="inherit"
-                                onClick={handleLogout}
+                                onClick={toggleLanguage}
                                 sx={{
-                                    px: isMobile ? 1.5 : 2.5,
+                                    minWidth: 'auto',
+                                    px: 1.5,
                                     fontSize: '0.875rem',
                                     borderRadius: '20px',
-                                    backgroundColor: 'rgba(255,255,255,0.2)',
+                                    border: '1px solid rgba(255,255,255,0.5)',
                                     '&:hover': {
-                                        backgroundColor: 'rgba(255,255,255,0.3)'
+                                        backgroundColor: 'rgba(255,255,255,0.1)'
                                     }
                                 }}
                             >
-                                {t('nav.logout')}
+                                {i18n.language === 'en' ? '中文' : 'English'}
                             </Button>
-                        ) : (
-                            <Button
-                                color="inherit"
-                                onClick={handleLogin}
-                                sx={{
-                                    px: isMobile ? 1.5 : 2.5,
-                                    fontSize: '0.875rem',
-                                    borderRadius: '20px',
-                                    backgroundColor: 'rgba(255,255,255,0.2)',
-                                    '&:hover': {
-                                        backgroundColor: 'rgba(255,255,255,0.3)'
-                                    }
-                                }}
-                            >
-                                {t('nav.login')}
-                            </Button>
-                        )}
-                    </Box>
+                            {isAuthenticated ? (
+                                <Button
+                                    color="inherit"
+                                    onClick={handleLogout}
+                                    sx={{
+                                        px: 2.5,
+                                        fontSize: '0.875rem',
+                                        borderRadius: '20px',
+                                        backgroundColor: 'rgba(255,255,255,0.2)',
+                                        '&:hover': {
+                                            backgroundColor: 'rgba(255,255,255,0.3)'
+                                        }
+                                    }}
+                                >
+                                    {t('nav.logout')}
+                                </Button>
+                            ) : (
+                                <Button
+                                    color="inherit"
+                                    onClick={handleLogin}
+                                    sx={{
+                                        px: 2.5,
+                                        fontSize: '0.875rem',
+                                        borderRadius: '20px',
+                                        backgroundColor: 'rgba(255,255,255,0.2)',
+                                        '&:hover': {
+                                            backgroundColor: 'rgba(255,255,255,0.3)'
+                                        }
+                                    }}
+                                >
+                                    {t('nav.login')}
+                                </Button>
+                            )}
+                        </Box>
+                    )}
                 </Toolbar>
             </AppBar>
 
@@ -172,6 +175,7 @@ function Navbar() {
                     </Typography>
                     <Divider sx={{ mb: 2 }} />
                     
+                    {/* User info section (when authenticated) */}
                     {isAuthenticated && user && (
                         <>
                             <List>
@@ -199,8 +203,57 @@ function Navbar() {
                                     />
                                 </ListItem>
                             </List>
+                            <Divider sx={{ my: 2 }} />
                         </>
                     )}
+                    
+                    {/* Action buttons */}
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                        <Button
+                            variant="outlined"
+                            fullWidth
+                            onClick={toggleLanguage}
+                            sx={{
+                                borderColor: '#9575CD',
+                                color: '#9575CD',
+                                '&:hover': {
+                                    borderColor: '#7E57C2',
+                                    backgroundColor: 'rgba(149, 117, 205, 0.1)'
+                                }
+                            }}
+                        >
+                            {i18n.language === 'en' ? '中文' : 'English'}
+                        </Button>
+                        {isAuthenticated ? (
+                            <Button
+                                variant="contained"
+                                fullWidth
+                                onClick={handleLogout}
+                                sx={{
+                                    backgroundColor: '#9575CD',
+                                    '&:hover': {
+                                        backgroundColor: '#7E57C2'
+                                    }
+                                }}
+                            >
+                                {t('nav.logout')}
+                            </Button>
+                        ) : (
+                            <Button
+                                variant="contained"
+                                fullWidth
+                                onClick={handleLogin}
+                                sx={{
+                                    backgroundColor: '#9575CD',
+                                    '&:hover': {
+                                        backgroundColor: '#7E57C2'
+                                    }
+                                }}
+                            >
+                                {t('nav.login')}
+                            </Button>
+                        )}
+                    </Box>
                 </Box>
             </Drawer>
         </>
