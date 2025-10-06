@@ -182,11 +182,6 @@ function Navbar() {
                                 <ListItem>
                                     <ListItemText
                                         primary={
-                                            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#666' }}>
-                                                {t('nav.marks')}
-                                            </Typography>
-                                        }
-                                        secondary={
                                             <Box sx={{ mt: 1 }}>
                                                 <Typography variant="body1" sx={{ fontWeight: 500, display: 'flex', alignItems: 'center' }}>
                                                     <PermIdentityOutlinedIcon sx={{ mr: 1, color: '#9575CD' }} />
