@@ -32,6 +32,7 @@ function Homepage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { filteredGames, loading, error } = useSelector((state: RootState) => state.games);
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     const loadGames = async () => {
@@ -130,21 +131,23 @@ function Homepage() {
                       />
                     </Stack>
                   </CardContent>
-                  <CardActions sx={{ p: 2, pt: 0 }}>
-                    <Button 
-                      variant="contained" 
-                      fullWidth
-                      onClick={() => handleGameClick(game)}
-                      sx={{
-                        backgroundColor: '#BE86CD',
-                        '&:hover': {
-                          backgroundColor: '#A76BB8',
-                        }
-                      }}
-                    >
-                      {t('homepage.playButton')}
-                    </Button>
-                  </CardActions>
+                  {isAuthenticated && (
+                    <CardActions sx={{ p: 2, pt: 0 }}>
+                      <Button 
+                        variant="contained" 
+                        fullWidth
+                        onClick={() => handleGameClick(game)}
+                        sx={{
+                          backgroundColor: '#BE86CD',
+                          '&:hover': {
+                            backgroundColor: '#A76BB8',
+                          }
+                        }}
+                      >
+                        {t('homepage.playButton')}
+                      </Button>
+                    </CardActions>
+                  )}
                 </Card>
               </Grid>
             ))}
