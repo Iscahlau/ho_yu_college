@@ -1,5 +1,6 @@
 import {useState} from 'react';
-import {Box, Typography, Container, TextField, Button, Paper, Alert, Checkbox, Link} from '@mui/material';
+import {Box, Typography, Container, TextField, Button, Paper, Alert, IconButton, Link} from '@mui/material';
+import {Visibility, VisibilityOff} from '@mui/icons-material';
 import {useNavigate} from 'react-router-dom';
 import {useDispatch} from 'react-redux';
 import {useTranslation} from 'react-i18next';
@@ -166,20 +167,20 @@ function Login() {
                                     },
                                 }}
                             />
-                            <Checkbox
-                                checked={showPassword}
-                                onChange={(e) => setShowPassword(e.target.checked)}
+                            <IconButton
+                                onClick={() => setShowPassword(!showPassword)}
+                                onMouseDown={(e) => e.preventDefault()}
+                                edge="end"
                                 sx={{
                                     position: 'absolute',
                                     right: 8,
                                     top: '50%',
                                     transform: 'translateY(-50%)',
                                     color: '#666',
-                                    '&.Mui-checked': {
-                                        color: '#666',
-                                    },
                                 }}
-                            />
+                            >
+                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
                         </Box>
                         <Button
                             type="submit"
