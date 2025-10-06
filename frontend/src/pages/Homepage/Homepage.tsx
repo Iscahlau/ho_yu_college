@@ -113,13 +113,13 @@ function Homepage() {
                     </Typography>
                     <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
                       <Chip 
-                        label={game.subject} 
+                        label={t(`homepage.subjects.${game.subject}`)} 
                         size="small" 
                         color="primary"
                         variant="outlined"
                       />
                       <Chip 
-                        label={game.difficulty} 
+                        label={t(`homepage.difficulties.${game.difficulty}`)} 
                         size="small" 
                         color="secondary"
                         variant="outlined"

@@ -6,16 +6,17 @@
   "nav": {
     "login": "Login",
     "logout": "Logout",
-    "marks": "Marks"
+    "marks": "Score"
   },
   "login": {
-    "title": "Login",
+    "title": "User Login",
     "studentId": "Student ID",
     "teacherId": "Teacher ID",
     "password": "Password",
     "showPassword": "Show Password",
     "loginButton": "Login",
-    "loginPrompt": "Please login to continue"
+    "loginPrompt": "Please enter your username",
+    "passwordPrompt": "Please enter your password"
   },
   "homepage": {
     "title": "Game Library",
@@ -25,17 +26,18 @@
       "all": "All"
     },
     "subjects": {
-      "chineseLanguage": "Chinese Language",
-      "englishLanguage": "English Language",
-      "mathematics": "Mathematics",
-      "humanitiesAndScience": "Humanities and Science"
+      "Chinese Language": "Chinese Language",
+      "English Language": "English Language",
+      "Mathematics": "Mathematics",
+      "General Studies": "General Studies",
+      "Humanities and Science": "Humanities and Science"
     },
     "difficulties": {
-      "beginner": "Beginner",
-      "intermediate": "Intermediate",
-      "advanced": "Advanced"
+      "Beginner": "Beginner",
+      "Intermediate": "Intermediate",
+      "Advanced": "Advanced"
     },
-    "playButton": "Play / 暢玩"
+    "playButton": "Play"
   },
   "game": {
     "backToHome": "Back to Home"

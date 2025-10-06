@@ -2,6 +2,7 @@ import {useState} from 'react';
 import {Box, Typography, Container, TextField, Button, Paper, Alert} from '@mui/material';
 import {useNavigate} from 'react-router-dom';
 import {useDispatch} from 'react-redux';
+import {useTranslation} from 'react-i18next';
 import {login as loginAction} from '../../store/slices/authSlice';
 import {login} from '../../services/authService';
 
@@ -9,6 +10,7 @@ import {login} from '../../services/authService';
  * Login Page - Handles student and teacher authentication
  */
 function Login() {
+    const { t } = useTranslation();
     const [id, setId] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -64,10 +66,10 @@ function Login() {
             <Box sx={{mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                 <Paper elevation={3} sx={{p: 4, width: '100%'}}>
                     <Typography variant="h4" align="center" gutterBottom>
-                        Login
+                        {t('login.title')}
                     </Typography>
                     <Typography variant="body2" align="center" color="text.secondary" sx={{mb: 3}}>
-                        Enter your Student ID or Teacher ID to continue
+                        {t('login.loginPrompt')}
                     </Typography>
                     {error && (
                         <Alert severity="error" sx={{mb: 2}}>
@@ -80,7 +82,7 @@ function Login() {
                             required
                             fullWidth
                             id="id"
-                            label="Student ID / Teacher ID"
+                            label={`${t('login.studentId')} / ${t('login.teacherId')}`}
                             name="id"
                             autoComplete="username"
                             autoFocus
@@ -93,13 +95,14 @@ function Login() {
                             required
                             fullWidth
                             name="password"
-                            label="Password"
+                            label={t('login.password')}
                             type="password"
                             id="password"
                             autoComplete="current-password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             disabled={loading}
+                            placeholder={t('login.passwordPrompt')}
                         />
                         <Button
                             type="submit"
@@ -108,7 +111,7 @@ function Login() {
                             sx={{mt: 3, mb: 2}}
                             disabled={loading}
                         >
-                            {loading ? 'Logging in...' : 'Login'}
+                            {loading ? `${t('login.loginButton')}...` : t('login.loginButton')}
                         </Button>
                     </Box>
                 </Paper>
