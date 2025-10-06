@@ -69,11 +69,7 @@ function Navbar() {
                     minWidth: '200px',
                     justifyContent: 'flex-end'
                 }}>
-                    {isAuthenticated && user && (
-                        <Typography variant="body1" sx={{fontWeight: 500, whiteSpace: 'nowrap'}}>
-                            <PermIdentityOutlinedIcon /> {user.name2} {user.id} {t('nav.marks')}:{user.marks}
-                        </Typography>
-                    )}
+
                     <Button
                         color="inherit"
                         onClick={toggleLanguage}
@@ -122,6 +118,13 @@ function Navbar() {
                         >
                             {t('nav.login')}
                         </Button>
+                    )}
+                </Box>
+                <Box>
+                    {isAuthenticated && user && (
+                        <Typography variant="body1" sx={{fontWeight: 500, whiteSpace: 'nowrap'}} id='user-info'>
+                            <PermIdentityOutlinedIcon /> {user.name2} {user.id} {t('nav.marks')}:{user.marks}
+                        </Typography>
                     )}
                 </Box>
             </Toolbar>
