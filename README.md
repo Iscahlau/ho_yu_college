@@ -10,6 +10,7 @@ A web-based platform designed for primary schools to facilitate Scratch game lea
 - **Scratch Game Embedding**: Play Scratch games directly in the platform via iframe
 - **Multi-language Support**: Interface available in multiple languages (i18Next)
 - **Record Tracking**: Monitor student progress and game completion
+- **Click Tracking**: Automatic tracking of game plays with atomic concurrent-safe increments
 
 ## 🏗️ Architecture
 

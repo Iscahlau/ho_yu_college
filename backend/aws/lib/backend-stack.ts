@@ -80,6 +80,32 @@ export class BackendStack extends cdk.Stack {
       },
     });
 
+    // Lambda function for game click tracking
+    const gameClickLambda = new lambda.Function(this, 'GameClickFunction', {
+      functionName: 'ho-yu-game-click',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'click.handler',
+      code: lambda.Code.fromAsset('lambda/games'),
+      environment: {
+        GAMES_TABLE_NAME: gamesTable.tableName,
+      },
+      timeout: cdk.Duration.seconds(10),
+    });
+
+    // Grant Lambda permissions to read and update games table
+    gamesTable.grantReadWriteData(gameClickLambda);
+
+    // API Gateway resources and methods
+    const gamesResource = api.root.addResource('games');
+    const gameResource = gamesResource.addResource('{gameId}');
+    const clickResource = gameResource.addResource('click');
+
+    // POST /games/{gameId}/click - Increment click count
+    clickResource.addMethod(
+      'POST',
+      new apigateway.LambdaIntegration(gameClickLambda)
+    );
+
     // Output the API URL
     new cdk.CfnOutput(this, 'ApiUrl', {
       value: api.url,

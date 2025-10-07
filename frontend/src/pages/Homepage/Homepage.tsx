@@ -62,8 +62,8 @@ function Homepage() {
       }
     };
 
-    loadGames();
-  }, [dispatch]);
+        loadGames();
+    }, [dispatch]);
 
   // Enrich games with Scratch API data when games are loaded
   useEffect(() => {
@@ -103,36 +103,31 @@ function Homepage() {
     navigate(`/game/${scratchId}`);
   };
 
-  return (
-    <Container>
-      <Box sx={{ mt: 4, mb: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          學趣天地 - Game Library
-        </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-          Browse and play Scratch games. Use filters to find games by subject and difficulty.
-        </Typography>
+    return (
+        <Container>
 
-        <FilterBar />
+            <FilterBar/>
 
-        {loading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-            <CircularProgress />
-          </Box>
-        )}
+            <Box sx={{mt: 4, mb: 4}}>
 
-        {error && (
-          <Alert severity="error" sx={{ mt: 2 }}>
-            {error}
-          </Alert>
-        )}
+                {loading && (
+                    <Box sx={{display: 'flex', justifyContent: 'center', mt: 4}}>
+                        <CircularProgress/>
+                    </Box>
+                )}
 
-        {!loading && !error && filteredGames.length === 0 && (
-          <Alert severity="info" sx={{ mt: 2 }}>
-            No games found. Please check back later.
-          </Alert>
-        )}
+                {error && (
+                    <Alert severity="error" sx={{mt: 2}}>
+                        {error}
+                    </Alert>
+                )}
 
+                        {!loading && !error && filteredGames.length === 0 && (
+                    <Alert severity="info" sx={{mt: 2}}>
+                        No games found. Please check back later.
+                    </Alert>
+                )}
+        
         {!loading && !error && displayGames.length > 0 && (
           <Grid container spacing={3}>
             {displayGames.map((game: Game) => {

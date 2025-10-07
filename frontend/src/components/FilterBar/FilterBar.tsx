@@ -1,4 +1,4 @@
-import { Box, Chip, Stack, Typography } from '@mui/material';
+import { Box, Chip, Stack } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { setSubjectFilter, setDifficultyFilter, Subject, Difficulty } from '../../store/slices/gamesSlice';
@@ -21,55 +21,77 @@ function FilterBar() {
   };
 
   return (
-    <Box sx={{ mb: 3, p: 2, bgcolor: 'background.paper', borderRadius: 1, boxShadow: 1 }}>
+    <Box sx={{ mb: 3, bgcolor: 'background.paper', boxShadow: 1 }}>
       <Stack spacing={2}>
         {/* Subject Filters */}
-        <Box>
-          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-            {t('homepage.filters.subject')}
-          </Typography>
+        <Box sx={{ p: 1, bgcolor: '#FFEC8D' }}>
           <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
             <Chip
               label={t('homepage.filters.all')}
               onClick={() => handleSubjectClick('all')}
-              color="primary"
               variant={subject === 'all' ? 'filled' : 'outlined'}
-              sx={{ cursor: 'pointer' }}
+              sx={{ 
+                cursor: 'pointer',
+                backgroundColor: subject === 'all' ? '#000000' : 'transparent',
+                color: subject === 'all' ? '#FFEC8D' : '#000000',
+                borderColor: '#000000',
+                '&:hover': {
+                  backgroundColor: subject === 'all' ? '#333333' : 'rgba(0,0,0,0.1)'
+                }
+              }}
             />
             {SUBJECTS.map((subjectOption) => (
               <Chip
                 key={subjectOption}
                 label={t(`homepage.subjects.${subjectOption}`)}
                 onClick={() => handleSubjectClick(subjectOption)}
-                color="primary"
                 variant={subject === subjectOption ? 'filled' : 'outlined'}
-                sx={{ cursor: 'pointer' }}
+                sx={{ 
+                  cursor: 'pointer',
+                  backgroundColor: subject === subjectOption ? '#000000' : 'transparent',
+                  color: subject === subjectOption ? '#FFEC8D' : '#000000',
+                  borderColor: '#000000',
+                  '&:hover': {
+                    backgroundColor: subject === subjectOption ? '#333333' : 'rgba(0,0,0,0.1)'
+                  }
+                }}
               />
             ))}
           </Stack>
         </Box>
 
         {/* Difficulty Filters */}
-        <Box>
-          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-            {t('homepage.filters.difficulty')}
-          </Typography>
+        <Box sx={{ p: 1, bgcolor: '#A080FF' }}>
           <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
             <Chip
               label={t('homepage.filters.all')}
               onClick={() => handleDifficultyClick('all')}
-              color="secondary"
               variant={difficulty === 'all' ? 'filled' : 'outlined'}
-              sx={{ cursor: 'pointer' }}
+              sx={{ 
+                cursor: 'pointer',
+                backgroundColor: difficulty === 'all' ? '#FFFFFF' : 'transparent',
+                color: difficulty === 'all' ? '#A080FF' : '#FFFFFF',
+                borderColor: '#FFFFFF',
+                '&:hover': {
+                  backgroundColor: difficulty === 'all' ? '#F0F0F0' : 'rgba(255,255,255,0.1)'
+                }
+              }}
             />
             {DIFFICULTIES.map((difficultyOption) => (
               <Chip
                 key={difficultyOption}
                 label={t(`homepage.difficulties.${difficultyOption}`)}
                 onClick={() => handleDifficultyClick(difficultyOption)}
-                color="secondary"
                 variant={difficulty === difficultyOption ? 'filled' : 'outlined'}
-                sx={{ cursor: 'pointer' }}
+                sx={{ 
+                  cursor: 'pointer',
+                  backgroundColor: difficulty === difficultyOption ? '#FFFFFF' : 'transparent',
+                  color: difficulty === difficultyOption ? '#A080FF' : '#FFFFFF',
+                  borderColor: '#FFFFFF',
+                  '&:hover': {
+                    backgroundColor: difficulty === difficultyOption ? '#F0F0F0' : 'rgba(255,255,255,0.1)'
+                  }
+                }}
               />
             ))}
           </Stack>

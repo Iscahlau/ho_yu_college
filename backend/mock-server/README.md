@@ -97,8 +97,10 @@ Returns details for the specified game.
 
 ### Increment Game Click
 
+Increments the accumulated click count for a game when a student plays it.
+
 ```bash
-curl -X POST http://localhost:3000/games/GAME001/click
+curl -X POST http://localhost:3000/games/1207260630/click
 ```
 
 Response:
@@ -107,6 +109,26 @@ Response:
   "success": true,
   "accumulated_click": 16
 }
+```
+
+**Features**:
+- Thread-safe in-memory storage (simulates DynamoDB atomic updates)
+- Returns 404 if game doesn't exist
+- Returns updated click count immediately
+- Works with concurrent requests
+
+**Example workflow**:
+```bash
+# Get initial click count
+curl http://localhost:3000/games/1207260630 | grep accumulated_click
+
+# Click the game multiple times
+curl -X POST http://localhost:3000/games/1207260630/click
+curl -X POST http://localhost:3000/games/1207260630/click
+curl -X POST http://localhost:3000/games/1207260630/click
+
+# Verify new click count
+curl http://localhost:3000/games/1207260630 | grep accumulated_click
 ```
 
 ## Mock Credentials
