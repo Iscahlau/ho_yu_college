@@ -20,6 +20,7 @@
   },
   "homepage": {
     "title": "遊戲庫",
+    "gameListTitle": "遊戲列表",
     "filters": {
       "subject": "科目",
       "difficulty": "難度",
