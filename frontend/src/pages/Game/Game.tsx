@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Container, Alert, CircularProgress, Card, CardMedia, CardContent } from '@mui/material';
+import { Box, Container, Alert } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { getScratchEmbedUrl, getDefaultScratchThumbnail } from '../../utils/helpers';
+import { getScratchEmbedUrl } from '../../utils/helpers';
 import { fetchScratchProject } from '../../services/gamesService';
 import type { ScratchProject } from '../../types';
 
@@ -72,82 +72,10 @@ function Game() {
 
   // Generate the Scratch embed URL using the helper function
   const embedUrl = getScratchEmbedUrl(gameId);
-  const thumbnailUrl = projectData?.image || getDefaultScratchThumbnail(gameId);
-  const gameTitle = projectData?.title || `Scratch Game ${gameId}`;
 
   return (
     <Container maxWidth="lg">
       <Box sx={{ mt: 4 }}>
-        {/* Game Info Card */}
-        <Card sx={{ mb: 3 }}>
-          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' } }}>
-            {/* Thumbnail */}
-            <CardMedia
-              component="img"
-              sx={{ 
-                width: { xs: '100%', md: 250 }, 
-                height: { xs: 200, md: 'auto' },
-                objectFit: 'cover' 
-              }}
-              image={thumbnailUrl}
-              alt={gameTitle}
-            />
-            
-            {/* Game Details */}
-            <CardContent sx={{ flex: 1 }}>
-              <Typography variant="h4" gutterBottom>
-                {gameTitle}
-              </Typography>
-              
-              {loading && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <CircularProgress size={20} />
-                  <Typography variant="body2" color="text.secondary">
-                    Loading game details...
-                  </Typography>
-                </Box>
-              )}
-              
-              {error && (
-                <Alert severity="warning" sx={{ mt: 1 }}>
-                  {error}
-                </Alert>
-              )}
-              
-              {projectData && (
-                <>
-                  <Typography variant="body1" color="text.secondary" paragraph>
-                    Scratch Project ID: {gameId}
-                  </Typography>
-                  
-                  {projectData.description && (
-                    <Typography variant="body2" paragraph>
-                      {projectData.description}
-                    </Typography>
-                  )}
-                  
-                  {projectData.instructions && (
-                    <Box sx={{ mt: 2 }}>
-                      <Typography variant="subtitle2" gutterBottom>
-                        Instructions:
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {projectData.instructions}
-                      </Typography>
-                    </Box>
-                  )}
-                  
-                  {projectData.author && (
-                    <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
-                      Created by: {projectData.author.username}
-                    </Typography>
-                  )}
-                </>
-              )}
-            </CardContent>
-          </Box>
-        </Card>
-        
         {/* Responsive iframe container for Scratch game */}
         <Box
           sx={{
