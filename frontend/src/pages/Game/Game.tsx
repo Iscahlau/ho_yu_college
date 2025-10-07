@@ -1,6 +1,13 @@
-import { Box, Container, Alert } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Box, Container, Alert, Paper, Typography, Chip, Stack } from '@mui/material';
 import { useParams } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
+import { RootState, AppDispatch } from '../../store/store';
+import { setGames } from '../../store/slices/gamesSlice';
 import { getScratchEmbedUrl } from '../../utils/helpers';
+import { fetchGames } from '../../services/gamesService';
+import type { Game } from '../../store/slices/gamesSlice';
 
 /**
  * Game Page - Embeds and displays a single Scratch game
@@ -12,8 +19,43 @@ import { getScratchEmbedUrl } from '../../utils/helpers';
  * - Navigate to /game/{scratchId} where {scratchId} is the Scratch project ID
  * - Example: /game/123456789 will embed https://scratch.mit.edu/projects/123456789/embed
  */
-function Game() {
+function GamePage() {
   const { gameId } = useParams<{ gameId: string }>();
+  const { t } = useTranslation();
+  const dispatch = useDispatch<AppDispatch>();
+  const { games } = useSelector((state: RootState) => state.games);
+  const [gameInfo, setGameInfo] = useState<Game | null>(null);
+
+  // Load games from backend if not already loaded
+  useEffect(() => {
+    const loadGames = async () => {
+      if (games.length === 0) {
+        try {
+          const response = await fetchGames();
+          if (response.success && response.data) {
+            dispatch(setGames(response.data));
+          }
+        } catch (err) {
+          console.error('Error loading games:', err);
+        }
+      }
+    };
+
+    loadGames();
+  }, [games.length, dispatch]);
+
+  // Find game information from Redux store by matching scratchId
+  useEffect(() => {
+    if (gameId && games.length > 0) {
+      const foundGame = games.find(game => {
+        // Extract scratchId from scratch_api URL
+        const scratchIdMatch = game.scratchApi.match(/\/projects\/(\d+)/);
+        const scratchId = scratchIdMatch ? scratchIdMatch[1] : game.scratchId;
+        return scratchId === gameId;
+      });
+      setGameInfo(foundGame || null);
+    }
+  }, [gameId, games]);
 
   // If no gameId is provided, show an error message
   if (!gameId) {
@@ -64,9 +106,53 @@ function Game() {
             title={`Scratch Game ${gameId}`}
           />
         </Box>
+
+        {/* Game Information Box */}
+        {gameInfo && (
+          <Paper
+            elevation={0}
+            sx={{
+              mt: 3,
+              p: 3,
+              maxWidth: '900px',
+              margin: '24px auto 0',
+              bgcolor: 'white',
+              border: '1px solid #e0e0e0',
+              borderRadius: 2,
+            }}
+          >
+            <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
+              {gameInfo.gameName}
+            </Typography>
+            
+            <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+              <Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                  Subject
+                </Typography>
+                <Chip 
+                  label={t(`homepage.subjects.${gameInfo.subject}`)} 
+                  color="primary"
+                  variant="outlined"
+                />
+              </Box>
+              
+              <Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                  Difficulty
+                </Typography>
+                <Chip 
+                  label={t(`homepage.difficulties.${gameInfo.difficulty}`)} 
+                  color="secondary"
+                  variant="outlined"
+                />
+              </Box>
+            </Stack>
+          </Paper>
+        )}
       </Box>
     </Container>
   );
 }
 
-export default Game;
+export default GamePage;
