@@ -1,4 +1,4 @@
-import { Box, Container, Typography, Link } from '@mui/material';
+import { Box, Container, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -28,7 +28,7 @@ function Footer() {
           }}
         >
           <Typography variant="body2" sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-              Copyright© 2025 {t('footer.schoolName')}
+            Copyright© 2025 {t('footer.schoolName')}
           </Typography>
           <Box
             sx={{
@@ -38,12 +38,12 @@ function Footer() {
               justifyContent: 'center',
             }}
           >
-              <Typography variant="body2" sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+            <Typography variant="body2" sx={{ textAlign: { xs: 'center', md: 'left' } }}>
               {t('footer.createdBy')}
-              </Typography>
-              <Typography variant="body2" sx={{ textAlign: { xs: 'center', md: 'left', color: '#E6F094', } }}>
+            </Typography>
+            <Typography variant="body2" sx={{ textAlign: { xs: 'center', md: 'left' }, color: '#E6F094' }}>
               {t('footer.hundredKitStudio')}
-              </Typography>
+            </Typography>
           </Box>
         </Box>
       </Container>
