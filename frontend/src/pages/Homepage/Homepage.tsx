@@ -1,26 +1,26 @@
-import { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { 
-  Box, 
-  Typography, 
-  Container,
-  Grid,
-  Card, 
-  CardContent, 
-  CardMedia, 
-  CardActions,
-  Button,
-  CircularProgress,
-  Alert,
-  Chip,
-  Stack
+import {useEffect} from 'react';
+import {useSelector, useDispatch} from 'react-redux';
+import {
+    Box,
+    Typography,
+    Container,
+    Grid,
+    Card,
+    CardContent,
+    CardMedia,
+    CardActions,
+    Button,
+    CircularProgress,
+    Alert,
+    Chip,
+    Stack
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { RootState, AppDispatch } from '../../store/store';
-import { setGames, setLoading, setError } from '../../store/slices/gamesSlice';
-import { fetchGames } from '../../services/gamesService';
-import type { Game } from '../../store/slices/gamesSlice';
+import {useNavigate} from 'react-router-dom';
+import {useTranslation} from 'react-i18next';
+import {RootState, AppDispatch} from '../../store/store';
+import {setGames, setLoading, setError} from '../../store/slices/gamesSlice';
+import {fetchGames} from '../../services/gamesService';
+import type {Game} from '../../store/slices/gamesSlice';
 import FilterBar from '../../components/FilterBar';
 
 /**
@@ -28,71 +28,71 @@ import FilterBar from '../../components/FilterBar';
  * Accessible only after login
  */
 function Homepage() {
-  const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
-  const { t } = useTranslation();
-  const { filteredGames, loading, error } = useSelector((state: RootState) => state.games);
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
+    const {t} = useTranslation();
+    const {filteredGames, loading, error} = useSelector((state: RootState) => state.games);
+    const {isAuthenticated} = useSelector((state: RootState) => state.auth);
 
-  useEffect(() => {
-    const loadGames = async () => {
-      dispatch(setLoading(true));
-      dispatch(setError(null));
-      
-      try {
-        const response = await fetchGames();
-        if (response.success && response.data) {
-          dispatch(setGames(response.data));
-        } else {
-          dispatch(setError(response.error || 'Failed to load games'));
-        }
-      } catch (err) {
-        dispatch(setError('An unexpected error occurred'));
-      } finally {
-        dispatch(setLoading(false));
-      }
+    useEffect(() => {
+        const loadGames = async () => {
+            dispatch(setLoading(true));
+            dispatch(setError(null));
+
+            try {
+                const response = await fetchGames();
+                if (response.success && response.data) {
+                    dispatch(setGames(response.data));
+                } else {
+                    dispatch(setError(response.error || 'Failed to load games'));
+                }
+            } catch (err) {
+                dispatch(setError('An unexpected error occurred'));
+            } finally {
+                dispatch(setLoading(false));
+            }
+        };
+
+        loadGames();
+    }, [dispatch]);
+
+    const handleGameClick = (game: Game) => {
+        // Extract Scratch project ID from scratch_api URL
+        // Format: https://scratch.mit.edu/projects/{scratchId}
+        const scratchIdMatch = game.scratchApi.match(/\/projects\/(\d+)/);
+        const scratchId = scratchIdMatch ? scratchIdMatch[1] : game.scratchId;
+        navigate(`/game/${scratchId}`);
     };
 
-    loadGames();
-  }, [dispatch]);
+    return (
+        <Container>
+            <Box sx={{mt: 4, mb: 4}}>
+                <FilterBar/>
 
-  const handleGameClick = (game: Game) => {
-    // Extract Scratch project ID from scratch_api URL
-    // Format: https://scratch.mit.edu/projects/{scratchId}
-    const scratchIdMatch = game.scratchApi.match(/\/projects\/(\d+)/);
-    const scratchId = scratchIdMatch ? scratchIdMatch[1] : game.scratchId;
-    navigate(`/game/${scratchId}`);
-  };
+                <Typography variant="h4" gutterBottom>
+                    學趣天地 - Game Library
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{mb: 3}}>
+                    Browse and play Scratch games. Use filters to find games by subject and difficulty.
+                </Typography>
 
-  return (
-    <Container>
-      <Box sx={{ mt: 4, mb: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          學趣天地 - Game Library
-        </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-          Browse and play Scratch games. Use filters to find games by subject and difficulty.
-        </Typography>
+                {loading && (
+                    <Box sx={{display: 'flex', justifyContent: 'center', mt: 4}}>
+                        <CircularProgress/>
+                    </Box>
+                )}
 
-        <FilterBar />
+                {error && (
+                    <Alert severity="error" sx={{mt: 2}}>
+                        {error}
+                    </Alert>
+                )}
 
-        {loading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-            <CircularProgress />
-          </Box>
-        )}
-
-        {error && (
-          <Alert severity="error" sx={{ mt: 2 }}>
-            {error}
-          </Alert>
-        )}
-
-        {!loading && !error && filteredGames.length === 0 && (
-          <Alert severity="info" sx={{ mt: 2 }}>
-            No games found. Please check back later.
-          </Alert>
-        )}
+                {!loading && !error && filteredGames.length === 0 && (
+                    <Alert severity="info" sx={{mt: 2}}>
+                        No games found. Please check back later.
+                    </Alert>
+                )}
 
         {!loading && !error && filteredGames.length > 0 && (
           <Box

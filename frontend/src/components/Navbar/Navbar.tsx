@@ -47,7 +47,7 @@ function Navbar() {
             <AppBar
                 position="static"
                 sx={{
-                    backgroundColor: '#9575CD',
+                    backgroundColor: '#BE86CD',
                     boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                 }}
             >
@@ -123,15 +123,15 @@ function Navbar() {
                             </Button>
                             {isAuthenticated ? (
                                 <Button
-                                    color="inherit"
                                     onClick={handleLogout}
                                     sx={{
                                         px: 2.5,
                                         fontSize: '0.875rem',
                                         borderRadius: '20px',
-                                        backgroundColor: 'rgba(255,255,255,0.2)',
+                                        backgroundColor: '#FFFFFF',
+                                        color: '#BE86CD',
                                         '&:hover': {
-                                            backgroundColor: 'rgba(255,255,255,0.3)'
+                                            backgroundColor: 'rgba(255,255,255,0.9)'
                                         }
                                     }}
                                 >
@@ -139,15 +139,15 @@ function Navbar() {
                                 </Button>
                             ) : (
                                 <Button
-                                    color="inherit"
                                     onClick={handleLogin}
                                     sx={{
                                         px: 2.5,
                                         fontSize: '0.875rem',
                                         borderRadius: '20px',
-                                        backgroundColor: 'rgba(255,255,255,0.2)',
+                                        backgroundColor: '#FFFFFF',
+                                        color: '#BE86CD',
                                         '&:hover': {
-                                            backgroundColor: 'rgba(255,255,255,0.3)'
+                                            backgroundColor: 'rgba(255,255,255,0.9)'
                                         }
                                     }}
                                 >
@@ -172,7 +172,7 @@ function Navbar() {
                 }}
             >
                 <Box sx={{ p: 2 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#9575CD' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#BE86CD' }}>
                         {t('app.title')}
                     </Typography>
                     <Divider sx={{ mb: 2 }} />
@@ -186,7 +186,7 @@ function Navbar() {
                                         primary={
                                             <Box sx={{ mt: 1 }}>
                                                 <Typography variant="body1" sx={{ fontWeight: 500, display: 'flex', alignItems: 'center' }}>
-                                                    <PermIdentityOutlinedIcon sx={{ mr: 1, color: '#9575CD' }} />
+                                                    <PermIdentityOutlinedIcon sx={{ mr: 1, color: '#BE86CD' }} />
                                                     {user.name2}
                                                 </Typography>
                                                 <Typography variant="body2" color="text.secondary" sx={{ ml: 4 }}>
@@ -211,11 +211,11 @@ function Navbar() {
                             fullWidth
                             onClick={toggleLanguage}
                             sx={{
-                                borderColor: '#9575CD',
-                                color: '#9575CD',
+                                borderColor: '#BE86CD',
+                                color: '#BE86CD',
                                 '&:hover': {
-                                    borderColor: '#7E57C2',
-                                    backgroundColor: 'rgba(149, 117, 205, 0.1)'
+                                    borderColor: '#A76BB8',
+                                    backgroundColor: 'rgba(190, 134, 205, 0.1)'
                                 }
                             }}
                         >
@@ -227,9 +227,10 @@ function Navbar() {
                                 fullWidth
                                 onClick={handleLogout}
                                 sx={{
-                                    backgroundColor: '#9575CD',
+                                    backgroundColor: '#FFFFFF',
+                                    color: '#BE86CD',
                                     '&:hover': {
-                                        backgroundColor: '#7E57C2'
+                                        backgroundColor: 'rgba(255,255,255,0.9)'
                                     }
                                 }}
                             >
@@ -241,9 +242,10 @@ function Navbar() {
                                 fullWidth
                                 onClick={handleLogin}
                                 sx={{
-                                    backgroundColor: '#9575CD',
+                                    backgroundColor: '#FFFFFF',
+                                    color: '#BE86CD',
                                     '&:hover': {
-                                        backgroundColor: '#7E57C2'
+                                        backgroundColor: 'rgba(255,255,255,0.9)'
                                     }
                                 }}
                             >
