@@ -3,6 +3,7 @@ import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 import {useAppSelector, useAppDispatch} from '../../store/hooks';
 import {logout} from '../../store/slices/authSlice';
+import {logout as authServiceLogout} from '../../services/authService';
 import PermIdentityOutlinedIcon from '@mui/icons-material/PermIdentityOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 import {useState} from 'react';
@@ -21,6 +22,7 @@ function Navbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const handleLogout = () => {
+        authServiceLogout();
         dispatch(logout());
         navigate('/');
         setMobileMenuOpen(false);

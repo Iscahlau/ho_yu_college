@@ -27,6 +27,7 @@ export async function login(
  */
 export function logout(): void {
   // Clear any stored session data
+  sessionStorage.removeItem('authState');
   sessionStorage.clear();
   localStorage.removeItem('user');
 }
@@ -35,7 +36,15 @@ export function logout(): void {
  * Check if user is authenticated
  */
 export function isAuthenticated(): boolean {
-  // This will be implemented with proper session management
+  try {
+    const serializedState = sessionStorage.getItem('authState');
+    if (serializedState) {
+      const authState = JSON.parse(serializedState);
+      return authState.isAuthenticated === true && authState.user !== null;
+    }
+  } catch (err) {
+    console.error('Failed to check authentication status:', err);
+  }
   return false;
 }
 
