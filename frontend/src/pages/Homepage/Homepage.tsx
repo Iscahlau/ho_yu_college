@@ -129,85 +129,119 @@ function Homepage() {
                 )}
         
         {!loading && !error && displayGames.length > 0 && (
-          <Grid container spacing={3}>
-            {displayGames.map((game: Game) => {
-              // Extract Scratch ID for fallback thumbnail
-              const scratchIdMatch = game.scratchApi.match(/\/projects\/(\d+)/);
-              const scratchId = scratchIdMatch ? scratchIdMatch[1] : game.scratchId;
-              const fallbackThumbnail = getDefaultScratchThumbnail(scratchId);
-              
-              return (
-                <Grid size={{ xs: 12, sm: 6, md: 3 }} key={game.gameId}>
-                  <Card 
-                    sx={{ 
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      position: 'relative'
-                    }}
-                  >
-                    <CardMedia
-                      component="img"
-                      height="140"
-                      image={game.thumbnailUrl || fallbackThumbnail}
-                      alt={game.gameName}
-                      sx={{ objectFit: 'cover' }}
-                    />
-                    {enriching && (
-                      <Box
-                        sx={{
-                          position: 'absolute',
-                          top: 8,
-                          right: 8,
-                          bgcolor: 'rgba(255, 255, 255, 0.9)',
-                          borderRadius: 1,
-                          p: 0.5,
+          <Box
+            sx={{
+              bgcolor: 'rgba(255, 255, 255, 0.8)',
+              borderRadius: '20px',
+              mt: 3,
+              mb: 3,
+              overflow: 'hidden'
+            }}
+          >
+            {/* Title Section */}
+            <Box
+              sx={{
+                bgcolor: '#E95354',
+                height: '116px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <Typography
+                variant="h4"
+                sx={{
+                  color: '#FFFFFF',
+                  fontWeight: 600
+                }}
+              >
+                {t('homepage.gameListTitle')}
+              </Typography>
+            </Box>
+
+            {/* Game Cards Grid */}
+            <Box sx={{ p: 2 }}>
+              <Grid container spacing={3}>
+                {displayGames.map((game: Game) => {
+                  // Extract Scratch ID for fallback thumbnail
+                  const scratchIdMatch = game.scratchApi.match(/\/projects\/(\d+)/);
+                  const scratchId = scratchIdMatch ? scratchIdMatch[1] : game.scratchId;
+                  const fallbackThumbnail = getDefaultScratchThumbnail(scratchId);
+                  
+                  return (
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }} key={game.gameId}>
+                      <Card 
+                        sx={{ 
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          position: 'relative'
                         }}
                       >
-                        <CircularProgress size={16} />
-                      </Box>
-                    )}
-                    <CardContent sx={{ flexGrow: 1 }}>
-                      <Typography variant="h6" gutterBottom noWrap title={game.gameName}>
-                        {game.gameName}
-                      </Typography>
-                      <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-                        <Chip 
-                          label={t(`homepage.subjects.${game.subject}`)} 
-                          size="small" 
-                          color="primary"
-                          variant="outlined"
+                        <CardMedia
+                          component="img"
+                          height="140"
+                          image={game.thumbnailUrl || fallbackThumbnail}
+                          alt={game.gameName}
+                          sx={{ objectFit: 'cover' }}
                         />
-                        <Chip 
-                          label={t(`homepage.difficulties.${game.difficulty}`)} 
-                          size="small" 
-                          color="secondary"
-                          variant="outlined"
-                        />
-                      </Stack>
-                    </CardContent>
-                    {isAuthenticated && (
-                      <CardActions sx={{ p: 2, pt: 0 }}>
-                        <Button 
-                          variant="contained" 
-                          fullWidth
-                          onClick={() => handleGameClick(game)}
-                          sx={{
-                            backgroundColor: '#BE86CD',
-                            '&:hover': {
-                              backgroundColor: '#A76BB8',
-                            }
-                          }}
-                        >
-                          {t('homepage.playButton')}
-                        </Button>
-                      </CardActions>
-                    )}
-                  </Card>
-                </Grid>
-              );
-            })}
-          </Grid>
+                        {enriching && (
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              top: 8,
+                              right: 8,
+                              bgcolor: 'rgba(255, 255, 255, 0.9)',
+                              borderRadius: 1,
+                              p: 0.5,
+                            }}
+                          >
+                            <CircularProgress size={16} />
+                          </Box>
+                        )}
+                        <CardContent sx={{ flexGrow: 1 }}>
+                          <Typography variant="h6" gutterBottom noWrap title={game.gameName}>
+                            {game.gameName}
+                          </Typography>
+                          <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+                            <Chip 
+                              label={t(`homepage.subjects.${game.subject}`)} 
+                              size="small" 
+                              color="primary"
+                              variant="outlined"
+                            />
+                            <Chip 
+                              label={t(`homepage.difficulties.${game.difficulty}`)} 
+                              size="small" 
+                              color="secondary"
+                              variant="outlined"
+                            />
+                          </Stack>
+                        </CardContent>
+                        {isAuthenticated && (
+                          <CardActions sx={{ p: 2, pt: 0 }}>
+                            <Button 
+                              variant="contained" 
+                              fullWidth
+                              onClick={() => handleGameClick(game)}
+                              sx={{
+                                backgroundColor: '#BE86CD',
+                                '&:hover': {
+                                  backgroundColor: '#A76BB8',
+                                }
+                              }}
+                            >
+                              {t('homepage.playButton')}
+                            </Button>
+                          </CardActions>
+                        )}
+                      </Card>
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            </Box>
+          </Box>
         )}
       </Box>
     </Container>
