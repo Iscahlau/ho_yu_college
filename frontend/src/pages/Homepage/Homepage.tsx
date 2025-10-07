@@ -66,15 +66,10 @@ function Homepage() {
 
     return (
         <Container>
-            <Box sx={{mt: 4, mb: 4}}>
-                <FilterBar/>
 
-                <Typography variant="h4" gutterBottom>
-                    學趣天地 - Game Library
-                </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{mb: 3}}>
-                    Browse and play Scratch games. Use filters to find games by subject and difficulty.
-                </Typography>
+            <FilterBar/>
+
+            <Box sx={{mt: 4, mb: 4}}>
 
                 {loading && (
                     <Box sx={{display: 'flex', justifyContent: 'center', mt: 4}}>
@@ -94,101 +89,101 @@ function Homepage() {
                     </Alert>
                 )}
 
-        {!loading && !error && filteredGames.length > 0 && (
-          <Box
-            sx={{
-              backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              borderRadius: '20px',
-              mt: 3,
-              overflow: 'hidden',
-            }}
-          >
-            {/* Title Section */}
-            <Box
-              sx={{
-                backgroundColor: '#E95354',
-                height: '116px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Typography
-                variant="h4"
-                sx={{
-                  color: '#FFFFFF',
-                  fontWeight: 600,
-                }}
-              >
-                {t('homepage.gameListTitle')}
-              </Typography>
-            </Box>
-
-            {/* Game Cards Grid */}
-            <Box sx={{ p: 2 }}>
-              <Grid container spacing={3}>
-                {filteredGames.map((game: Game) => (
-                  <Grid size={{ xs: 12, sm: 6, md: 3 }} key={game.gameId}>
-                    <Card 
-                      sx={{ 
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column'
-                      }}
+                {!loading && !error && filteredGames.length > 0 && (
+                    <Box
+                        sx={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                            borderRadius: '20px',
+                            mt: 3,
+                            overflow: 'hidden',
+                        }}
                     >
-                      <CardMedia
-                        component="img"
-                        height="140"
-                        image={game.thumbnailUrl || 'https://via.placeholder.com/400x300?text=Game+Thumbnail'}
-                        alt={game.gameName}
-                        sx={{ objectFit: 'cover' }}
-                      />
-                      <CardContent sx={{ flexGrow: 1 }}>
-                        <Typography variant="h6" gutterBottom noWrap>
-                          {game.gameName}
-                        </Typography>
-                        <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-                          <Chip 
-                            label={t(`homepage.subjects.${game.subject}`)} 
-                            size="small" 
-                            color="primary"
-                            variant="outlined"
-                          />
-                          <Chip 
-                            label={t(`homepage.difficulties.${game.difficulty}`)} 
-                            size="small" 
-                            color="secondary"
-                            variant="outlined"
-                          />
-                        </Stack>
-                      </CardContent>
-                      {isAuthenticated && (
-                        <CardActions sx={{ p: 2, pt: 0 }}>
-                          <Button 
-                            variant="contained" 
-                            fullWidth
-                            onClick={() => handleGameClick(game)}
+                        {/* Title Section */}
+                        <Box
                             sx={{
-                              backgroundColor: '#BE86CD',
-                              '&:hover': {
-                                backgroundColor: '#A76BB8',
-                              }
+                                backgroundColor: '#E95354',
+                                height: '100px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
                             }}
-                          >
-                            {t('homepage.playButton')}
-                          </Button>
-                        </CardActions>
-                      )}
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
+                        >
+                            <Typography
+                                variant="h4"
+                                sx={{
+                                    color: '#FFFFFF',
+                                    fontWeight: 600,
+                                }}
+                            >
+                                {t('homepage.gameListTitle')}
+                            </Typography>
+                        </Box>
+
+                        {/* Game Cards Grid */}
+                        <Box sx={{p: 2}}>
+                            <Grid container spacing={3}>
+                                {filteredGames.map((game: Game) => (
+                                    <Grid size={{xs: 12, sm: 6, md: 3}} key={game.gameId}>
+                                        <Card
+                                            sx={{
+                                                height: '100%',
+                                                display: 'flex',
+                                                flexDirection: 'column'
+                                            }}
+                                        >
+                                            <CardMedia
+                                                component="img"
+                                                height="140"
+                                                image={game.thumbnailUrl || 'https://via.placeholder.com/400x300?text=Game+Thumbnail'}
+                                                alt={game.gameName}
+                                                sx={{objectFit: 'cover'}}
+                                            />
+                                            <CardContent sx={{flexGrow: 1}}>
+                                                <Typography variant="h6" gutterBottom noWrap>
+                                                    {game.gameName}
+                                                </Typography>
+                                                <Stack direction="row" spacing={1} sx={{mb: 1}}>
+                                                    <Chip
+                                                        label={t(`homepage.subjects.${game.subject}`)}
+                                                        size="small"
+                                                        color="primary"
+                                                        variant="outlined"
+                                                    />
+                                                    <Chip
+                                                        label={t(`homepage.difficulties.${game.difficulty}`)}
+                                                        size="small"
+                                                        color="secondary"
+                                                        variant="outlined"
+                                                    />
+                                                </Stack>
+                                            </CardContent>
+                                            {isAuthenticated && (
+                                                <CardActions sx={{p: 2, pt: 0}}>
+                                                    <Button
+                                                        variant="contained"
+                                                        fullWidth
+                                                        onClick={() => handleGameClick(game)}
+                                                        sx={{
+                                                            backgroundColor: '#BE86CD',
+                                                            '&:hover': {
+                                                                backgroundColor: '#A76BB8',
+                                                            }
+                                                        }}
+                                                    >
+                                                        {t('homepage.playButton')}
+                                                    </Button>
+                                                </CardActions>
+                                            )}
+                                        </Card>
+                                    </Grid>
+                                ))}
+                            </Grid>
+                        </Box>
+                    </Box>
+                )}
             </Box>
-          </Box>
-        )}
-      </Box>
-    </Container>
-  );
+        </Container>
+    );
 }
 
 export default Homepage;
