@@ -24,7 +24,7 @@ function FilterBar() {
     <Box sx={{ mb: 3, p: 2, bgcolor: 'background.paper', borderRadius: 1, boxShadow: 1 }}>
       <Stack spacing={2}>
         {/* Subject Filters */}
-        <Box>
+        <Box sx={{ p: 2, bgcolor: '#FFEC8D', borderRadius: 1 }}>
           <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
             {t('homepage.filters.subject')}
           </Typography>
@@ -50,7 +50,7 @@ function FilterBar() {
         </Box>
 
         {/* Difficulty Filters */}
-        <Box>
+        <Box sx={{ p: 2, bgcolor: '#A080FF', borderRadius: 1 }}>
           <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
             {t('homepage.filters.difficulty')}
           </Typography>

@@ -139,6 +139,7 @@ function Homepage() {
                         onClick={() => handleGameClick(game)}
                         sx={{
                           backgroundColor: '#BE86CD',
+                          color: '#FFFFFF',
                           '&:hover': {
                             backgroundColor: '#A76BB8',
                           }
