@@ -24,10 +24,10 @@ function FilterBar() {
     <Box sx={{ mb: 3, p: 2, bgcolor: 'background.paper', borderRadius: 1, boxShadow: 1 }}>
       <Stack spacing={2}>
         {/* Subject Filters */}
-        <Box sx={{ p: 2, bgcolor: '#FFEC8D', borderRadius: 1 }}>
-          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-            {t('homepage.filters.subject')}
-          </Typography>
+        <Box sx={{ p: 1, bgcolor: '#FFEC8D', borderRadius: 1 }}>
+          {/*<Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>*/}
+          {/*  {t('homepage.filters.subject')}*/}
+          {/*</Typography>*/}
           <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
             <Chip
               label={t('homepage.filters.all')}
@@ -50,10 +50,10 @@ function FilterBar() {
         </Box>
 
         {/* Difficulty Filters */}
-        <Box sx={{ p: 2, bgcolor: '#A080FF', borderRadius: 1 }}>
-          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-            {t('homepage.filters.difficulty')}
-          </Typography>
+        <Box sx={{ p: 1, bgcolor: '#A080FF', borderRadius: 1 }}>
+          {/*<Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>*/}
+          {/*  {t('homepage.filters.difficulty')}*/}
+          {/*</Typography>*/}
           <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
             <Chip
               label={t('homepage.filters.all')}
