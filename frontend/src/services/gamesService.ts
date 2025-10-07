@@ -121,6 +121,44 @@ export async function fetchScratchThumbnail(scratchId: string): Promise<string |
   return project?.image || null;
 }
 
+/**
+ * Enrich game data with Scratch API metadata
+ * Updates game name and thumbnail if they're missing or generic
+ * @param game - The game object to enrich
+ * @returns Enhanced game object with Scratch metadata
+ * 
+ * @example
+ * const enrichedGame = await enrichGameWithScratchData(game);
+ */
+export async function enrichGameWithScratchData(game: Game): Promise<Game> {
+  // Extract Scratch ID from game
+  const scratchIdMatch = game.scratchApi.match(/\/projects\/(\d+)/);
+  const scratchId = scratchIdMatch ? scratchIdMatch[1] : game.scratchId;
+  
+  if (!scratchId) {
+    return game;
+  }
+  
+  try {
+    const project = await fetchScratchProject(scratchId);
+    if (project) {
+      return {
+        ...game,
+        // Use Scratch title if game name is generic or missing
+        gameName: game.gameName.startsWith('Game ') || !game.gameName 
+          ? project.title 
+          : game.gameName,
+        // Use Scratch thumbnail if not set
+        thumbnailUrl: game.thumbnailUrl || project.image,
+      };
+    }
+  } catch (error) {
+    console.error(`Failed to enrich game ${game.gameId} with Scratch data:`, error);
+  }
+  
+  return game;
+}
+
 export default {
   fetchGames,
   fetchGameById,
@@ -128,4 +166,5 @@ export default {
   fetchScratchProject,
   fetchScratchGameName,
   fetchScratchThumbnail,
+  enrichGameWithScratchData,
 };

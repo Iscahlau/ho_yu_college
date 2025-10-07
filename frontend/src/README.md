@@ -88,6 +88,7 @@ All API calls are centralized in the `services/` directory:
 - `fetchScratchProject(id)` - Get Scratch metadata (title, image, description, etc.)
 - `fetchScratchGameName(id)` - Get game title from Scratch API
 - `fetchScratchThumbnail(id)` - Get thumbnail URL from Scratch API
+- `enrichGameWithScratchData(game)` - Enrich game data with Scratch API metadata
 
 ## Environment Variables
 
@@ -150,6 +151,25 @@ const id = extractScratchId('https://scratch.mit.edu/projects/123456');
 // Get default thumbnail URL (fallback)
 const thumbnailUrl = getDefaultScratchThumbnail('123456');
 // Returns: "https://cdn2.scratch.mit.edu/get_image/project/123456_480x360.png"
+```
+
+#### Enriching Game Data
+
+The `enrichGameWithScratchData()` function can automatically populate missing game names and thumbnails:
+
+```typescript
+import { enrichGameWithScratchData } from './services/gamesService';
+
+// Enrich a single game
+const enrichedGame = await enrichGameWithScratchData(game);
+
+// Enrich multiple games
+const games = await fetchGames();
+if (games.success && games.data) {
+  const enrichedGames = await Promise.all(
+    games.data.map(game => enrichGameWithScratchData(game))
+  );
+}
 ```
 
 ### API Response Format
