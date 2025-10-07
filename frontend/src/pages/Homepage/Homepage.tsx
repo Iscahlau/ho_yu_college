@@ -142,7 +142,7 @@ function Homepage() {
             <Box
               sx={{
                 bgcolor: '#E95354',
-                height: '116px',
+                height: '100px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
@@ -160,7 +160,7 @@ function Homepage() {
             </Box>
 
             {/* Game Cards Grid */}
-            <Box sx={{ p: 2 }}>
+            <Box sx={{ p: 4 }}>
               <Grid container spacing={3}>
                 {displayGames.map((game: Game) => {
                   // Extract Scratch ID for fallback thumbnail
