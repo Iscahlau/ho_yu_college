@@ -68,5 +68,10 @@
     "invalidFileFormat": "無效的檔案格式。",
     "fileTooLarge": "檔案大小超過最大限制。",
     "tooManyRows": "檔案包含太多行。"
+  },
+  "footer": {
+    "schoolName": "嗇色園主辦可譽中學暨可譽小學",
+    "createdBy": "Created by",
+    "hundredKitStudio": "Hundred Kit Studio"
   }
 }
