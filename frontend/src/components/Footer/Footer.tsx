@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
  */
 function Footer() {
   const { t } = useTranslation();
-  const currentYear = new Date().getFullYear();
 
   return (
     <Box
@@ -29,7 +28,7 @@ function Footer() {
           }}
         >
           <Typography variant="body2" sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-            © {currentYear} {t('footer.schoolName')}. {t('footer.allRightsReserved')}
+              Copyright© 2025 {t('footer.schoolName')}
           </Typography>
           <Box
             sx={{
@@ -39,30 +38,9 @@ function Footer() {
               justifyContent: 'center',
             }}
           >
-            <Link
-              href="#"
-              color="inherit"
-              underline="hover"
-              sx={{ fontSize: '0.875rem' }}
-            >
-              {t('footer.contactUs')}
-            </Link>
-            <Link
-              href="#"
-              color="inherit"
-              underline="hover"
-              sx={{ fontSize: '0.875rem' }}
-            >
-              {t('footer.privacyPolicy')}
-            </Link>
-            <Link
-              href="#"
-              color="inherit"
-              underline="hover"
-              sx={{ fontSize: '0.875rem' }}
-            >
+              <Typography variant="body2" sx={{ textAlign: { xs: 'center', md: 'left' } }}>
               {t('footer.termsOfService')}
-            </Link>
+              </Typography>
           </Box>
         </Box>
       </Container>

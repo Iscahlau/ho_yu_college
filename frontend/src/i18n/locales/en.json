@@ -70,10 +70,7 @@
     "tooManyRows": "File contains too many rows."
   },
   "footer": {
-    "schoolName": "Ho Yu College",
-    "allRightsReserved": "All rights reserved.",
-    "contactUs": "Contact Us",
-    "privacyPolicy": "Privacy Policy",
-    "termsOfService": "Terms of Service"
+    "schoolName": "嗇色園主辦可譽中學暨可譽小學",
+    "termsOfService": "Created by Hundred Kit Studio."
   }
 }
