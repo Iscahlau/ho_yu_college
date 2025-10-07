@@ -92,22 +92,58 @@ For detailed development instructions, build commands, troubleshooting, and best
 
 ### Game Page Usage
 
-The game page (`/game/:gameId`) embeds Scratch games using an iframe. The page is responsive and works on both desktop and mobile devices.
+The game page (`/game/:gameId`) embeds Scratch games using an iframe and automatically fetches game metadata from the Scratch API. The page is responsive and works on both desktop and mobile devices.
+
+**Features:**
+- Automatically fetches game name and thumbnail from Scratch API
+- Displays game description, instructions, and author information
+- Graceful fallback when API is unavailable
+- Responsive design for all devices
 
 **How to use:**
 1. Navigate to `/game/{scratchId}` where `{scratchId}` is the Scratch project ID
-2. Example: `/game/60917032` will embed the Scratch project with ID 60917032
-3. The URL format used is: `https://scratch.mit.edu/projects/{scratchId}/embed`
+2. Example: `/game/60917032` will display the game details and embed the Scratch project
+3. The page fetches metadata from: `https://api.scratch.mit.edu/projects/{scratchId}`
+4. The game is embedded using: `https://scratch.mit.edu/projects/{scratchId}/embed`
 
 **Implementation details:**
 - The gameId is extracted from the URL route parameter
-- The `getScratchEmbedUrl()` helper function (in `utils/helpers.ts`) generates the embed URL
-- The iframe uses responsive sizing with a 485:402 aspect ratio to maintain Scratch's default dimensions
-- If no gameId is provided, an error message is displayed
+- Metadata is fetched from the Scratch API on page load
+- Game card displays: thumbnail, title, description, instructions, and author
+- The `getScratchEmbedUrl()` helper function generates the embed URL
+- The iframe uses responsive sizing with a 485:402 aspect ratio
+- If API fails, shows warning but game remains playable with fallback values
 
 **Configuration:**
-- The base Scratch embed URL can be configured via the `VITE_SCRATCH_EMBED_BASE` environment variable
-- Default: `https://scratch.mit.edu/projects`
+- The Scratch API base URL can be configured via `VITE_SCRATCH_API_BASE` environment variable
+  - Default: `https://api.scratch.mit.edu/projects`
+- The Scratch embed base URL can be configured via `VITE_SCRATCH_EMBED_BASE` environment variable
+  - Default: `https://scratch.mit.edu/projects`
+
+### Scratch API Integration
+
+The platform integrates with the official Scratch API to retrieve game metadata:
+
+**Available Functions:**
+- `fetchScratchProject(id)` - Get complete project metadata
+- `fetchScratchGameName(id)` - Get only the game title
+- `fetchScratchThumbnail(id)` - Get only the thumbnail URL
+- `enrichGameWithScratchData(game)` - Automatically enrich game objects with Scratch data
+
+**API Response includes:**
+- `title` - Game name (e.g., "Castle Defender ⚔️")
+- `image` - Thumbnail URL (e.g., `https://cdn2.scratch.mit.edu/get_image/project/{id}_480x360.png`)
+- `description` - Game description
+- `instructions` - How to play instructions
+- `author.username` - Creator's Scratch username
+
+**Error Handling:**
+- Invalid project IDs return `null` with console logging
+- Network failures are caught and logged
+- UI shows warning messages but remains functional
+- Fallback values ensure the game is always playable
+
+For detailed API usage and code examples, see [Frontend Source Documentation](frontend/src/README.md).
 
 ## 🛠️ Development
 

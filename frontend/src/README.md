@@ -85,7 +85,10 @@ All API calls are centralized in the `services/` directory:
 - `fetchGames()` - Get all games
 - `fetchGameById(id)` - Get single game
 - `incrementGameClick(id)` - Update play count
-- `fetchScratchProject(id)` - Get Scratch metadata
+- `fetchScratchProject(id)` - Get Scratch metadata (title, image, description, etc.)
+- `fetchScratchGameName(id)` - Get game title from Scratch API
+- `fetchScratchThumbnail(id)` - Get thumbnail URL from Scratch API
+- `enrichGameWithScratchData(game)` - Enrich game data with Scratch API metadata
 
 ## Environment Variables
 
@@ -94,9 +97,115 @@ Environment variables are defined in `.env` and typed in `vite-env.d.ts`:
 - `VITE_API_URL` - Backend API base URL
 - `VITE_LOGIN_ENDPOINT` - Login endpoint path
 - `VITE_GAMES_ENDPOINT` - Games endpoint path
-- `VITE_SCRATCH_API_BASE` - Scratch API URL
+- `VITE_SCRATCH_API_BASE` - Scratch API URL (default: `https://api.scratch.mit.edu/projects`)
+- `VITE_SCRATCH_EMBED_BASE` - Scratch embed URL (default: `https://scratch.mit.edu/projects`)
 - `VITE_TIMER_WARNING` - Timer duration (ms)
 - `VITE_MAX_FILE_SIZE` - Upload size limit (bytes)
+
+## Scratch API Integration
+
+The application integrates with the Scratch API to fetch game metadata including titles, thumbnails, descriptions, and other project information.
+
+### Features
+
+- **Automatic Game Name Retrieval**: Game titles are fetched from Scratch API using the project ID
+- **Thumbnail Display**: Game thumbnails are retrieved and displayed in the UI
+- **Fallback Handling**: If the API is unavailable, the app uses default thumbnails and generic names
+- **Error Handling**: Graceful error handling with user-friendly messages
+
+### Usage
+
+#### Fetching Game Metadata
+
+```typescript
+import { fetchScratchProject, fetchScratchGameName, fetchScratchThumbnail } from './services/gamesService';
+
+// Get full project metadata
+const project = await fetchScratchProject('60917032');
+if (project) {
+  console.log(project.title);        // Game name
+  console.log(project.image);        // Thumbnail URL
+  console.log(project.description);  // Description
+  console.log(project.instructions); // Instructions
+  console.log(project.author.username); // Author
+}
+
+// Get just the game name
+const gameName = await fetchScratchGameName('60917032');
+// Returns: "Castle Defender ⚔️" or "Game 60917032" if failed
+
+// Get just the thumbnail URL
+const thumbnailUrl = await fetchScratchThumbnail('60917032');
+// Returns: "https://cdn2.scratch.mit.edu/get_image/project/60917032_480x360.png"
+```
+
+#### Helper Functions
+
+```typescript
+import { extractScratchId, getDefaultScratchThumbnail } from './utils/helpers';
+
+// Extract Scratch ID from URL
+const id = extractScratchId('https://scratch.mit.edu/projects/123456');
+// Returns: '123456'
+
+// Get default thumbnail URL (fallback)
+const thumbnailUrl = getDefaultScratchThumbnail('123456');
+// Returns: "https://cdn2.scratch.mit.edu/get_image/project/123456_480x360.png"
+```
+
+#### Enriching Game Data
+
+The `enrichGameWithScratchData()` function can automatically populate missing game names and thumbnails:
+
+```typescript
+import { enrichGameWithScratchData } from './services/gamesService';
+
+// Enrich a single game
+const enrichedGame = await enrichGameWithScratchData(game);
+
+// Enrich multiple games
+const games = await fetchGames();
+if (games.success && games.data) {
+  const enrichedGames = await Promise.all(
+    games.data.map(game => enrichGameWithScratchData(game))
+  );
+}
+```
+
+### API Response Format
+
+The Scratch API returns a `ScratchProject` object with the following structure:
+
+```typescript
+interface ScratchProject {
+  id: number;
+  title: string;
+  description: string;
+  instructions: string;
+  author: {
+    username: string;
+  };
+  image: string;  // Thumbnail URL
+}
+```
+
+### Error Handling
+
+The application handles API failures gracefully:
+
+1. **API Unavailable**: Shows a warning but continues to display the game with fallback data
+2. **Invalid Project ID**: Returns null and uses fallback values
+3. **Network Errors**: Logs errors to console and uses default values
+
+Example:
+```typescript
+const project = await fetchScratchProject('invalid-id');
+if (!project) {
+  // Use fallback values
+  const title = `Game ${scratchId}`;
+  const thumbnail = getDefaultScratchThumbnail(scratchId);
+}
+```
 
 ## Development
 
