@@ -11,7 +11,8 @@ backend/
 │   ├── lib/          # CDK stack definitions
 │   └── README.md     # AWS infrastructure documentation
 ├── lambda/           # Lambda function handlers (application logic)
-│   └── auth/         # Authentication handlers
+│   ├── auth/         # Authentication handlers
+│   └── games/        # Game management handlers
 ├── mock-server/      # Local development mock server
 ├── test/             # Unit tests and mock data
 │   ├── lambda/       # Lambda function tests
@@ -82,9 +83,23 @@ Mock data for testing is located in `test/mocks/`. See [test/README.md](test/REA
 
 Handles student and teacher authentication with password verification.
 
-### Future Lambda Functions
+### Game Management
 
-Additional Lambda functions for games management, file upload, etc. will be added to the `lambda/` directory.
+**Location**: `lambda/games/`
+
+#### Game Click Tracking (`click.ts`)
+
+Increments the accumulated click count when a student clicks to play a game.
+
+**Features**:
+- Atomic DynamoDB updates using `ADD` expression
+- Thread-safe handling of concurrent clicks
+- Validates game existence before updating
+- Returns updated click count
+
+**Endpoint**: `POST /games/{gameId}/click`
+
+See [lambda/games/README.md](lambda/games/README.md) for detailed documentation.
 
 ## Infrastructure
 
