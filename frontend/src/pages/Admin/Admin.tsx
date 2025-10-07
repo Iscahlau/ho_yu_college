@@ -1,14 +1,22 @@
-import { Box, Typography, Container, Paper, Button, Stack } from '@mui/material';
+import { Box, Typography, Container, Paper, Button, Stack, Alert } from '@mui/material';
 import { Upload, Download } from '@mui/icons-material';
+import { useAppSelector } from '../../store/hooks';
 
 /**
  * Admin Page - Management dashboard for teachers and admins
  * Accessible only by teachers and admins
  */
 function Admin() {
+  const user = useAppSelector((state) => state.auth.user);
+
   return (
     <Container maxWidth="lg">
       <Box sx={{ mt: 4 }}>
+        {/* User info alert */}
+        <Alert severity="success" sx={{ mb: 3 }}>
+          Welcome, {user?.name1} {user?.name2}! You are logged in as {user?.role}.
+        </Alert>
+
         <Typography variant="h4" gutterBottom>
           Admin Dashboard
         </Typography>
