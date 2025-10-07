@@ -11,7 +11,7 @@ function Footer() {
     <Box
       component="footer"
       sx={{
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#318B43',
         color: 'white',
         py: 3,
         mt: 'auto',
@@ -33,13 +33,16 @@ function Footer() {
           <Box
             sx={{
               display: 'flex',
-              gap: 3,
+              gap: 0.5,
               flexWrap: 'wrap',
               justifyContent: 'center',
             }}
           >
               <Typography variant="body2" sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-              {t('footer.termsOfService')}
+              {t('footer.createdBy')}
+              </Typography>
+              <Typography variant="body2" sx={{ textAlign: { xs: 'center', md: 'left', color: '#E6F094', } }}>
+              {t('footer.hundredKitStudio')}
               </Typography>
           </Box>
         </Box>
