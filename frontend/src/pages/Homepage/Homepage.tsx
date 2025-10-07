@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { 
   Box, 
@@ -19,21 +19,30 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { RootState, AppDispatch } from '../../store/store';
 import { setGames, setLoading, setError } from '../../store/slices/gamesSlice';
-import { fetchGames } from '../../services/gamesService';
+import { fetchGames, enrichGameWithScratchData } from '../../services/gamesService';
 import type { Game } from '../../store/slices/gamesSlice';
 import FilterBar from '../../components/FilterBar';
+import { getDefaultScratchThumbnail } from '../../utils/helpers';
 
 /**
  * Homepage - Displays game library with filters
  * Accessible only after login
+ * 
+ * Features:
+ * - Automatically fetches game metadata from Scratch API
+ * - Enriches game cards with real titles and thumbnails from Scratch
+ * - Falls back to default values if Scratch API is unavailable
  */
 function Homepage() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { filteredGames, loading, error } = useSelector((state: RootState) => state.games);
+  const { games, filteredGames, filters, loading, error } = useSelector((state: RootState) => state.games);
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const [enrichedGames, setEnrichedGames] = useState<Game[]>([]);
+  const [enriching, setEnriching] = useState(false);
 
+  // Load games from backend
   useEffect(() => {
     const loadGames = async () => {
       dispatch(setLoading(true));
@@ -55,6 +64,36 @@ function Homepage() {
 
     loadGames();
   }, [dispatch]);
+
+  // Enrich games with Scratch API data when games are loaded
+  useEffect(() => {
+    if (games.length > 0) {
+      const enrichGames = async () => {
+        setEnriching(true);
+        try {
+          const enrichedData = await Promise.all(
+            games.map(game => enrichGameWithScratchData(game))
+          );
+          setEnrichedGames(enrichedData);
+        } catch (err) {
+          console.error('Error enriching games with Scratch data:', err);
+          // Fall back to original games if enrichment fails
+          setEnrichedGames(games);
+        } finally {
+          setEnriching(false);
+        }
+      };
+
+      enrichGames();
+    }
+  }, [games]);
+
+  // Apply filters to enriched games
+  const displayGames = enrichedGames.length > 0 ? enrichedGames.filter((game) => {
+    const subjectMatch = filters.subject === 'all' || game.subject === filters.subject;
+    const difficultyMatch = filters.difficulty === 'all' || game.difficulty === filters.difficulty;
+    return subjectMatch && difficultyMatch;
+  }) : filteredGames;
 
   const handleGameClick = (game: Game) => {
     // Extract Scratch project ID from scratch_api URL
@@ -94,63 +133,85 @@ function Homepage() {
           </Alert>
         )}
 
-        {!loading && !error && filteredGames.length > 0 && (
+        {!loading && !error && displayGames.length > 0 && (
           <Grid container spacing={3}>
-            {filteredGames.map((game: Game) => (
-              <Grid size={{ xs: 12, sm: 6, md: 3 }} key={game.gameId}>
-                <Card 
-                  sx={{ 
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column'
-                  }}
-                >
-                  <CardMedia
-                    component="img"
-                    height="140"
-                    image={game.thumbnailUrl || 'https://via.placeholder.com/400x300?text=Game+Thumbnail'}
-                    alt={game.gameName}
-                    sx={{ objectFit: 'cover' }}
-                  />
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography variant="h6" gutterBottom noWrap>
-                      {game.gameName}
-                    </Typography>
-                    <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-                      <Chip 
-                        label={t(`homepage.subjects.${game.subject}`)} 
-                        size="small" 
-                        color="primary"
-                        variant="outlined"
-                      />
-                      <Chip 
-                        label={t(`homepage.difficulties.${game.difficulty}`)} 
-                        size="small" 
-                        color="secondary"
-                        variant="outlined"
-                      />
-                    </Stack>
-                  </CardContent>
-                  {isAuthenticated && (
-                    <CardActions sx={{ p: 2, pt: 0 }}>
-                      <Button 
-                        variant="contained" 
-                        fullWidth
-                        onClick={() => handleGameClick(game)}
+            {displayGames.map((game: Game) => {
+              // Extract Scratch ID for fallback thumbnail
+              const scratchIdMatch = game.scratchApi.match(/\/projects\/(\d+)/);
+              const scratchId = scratchIdMatch ? scratchIdMatch[1] : game.scratchId;
+              const fallbackThumbnail = getDefaultScratchThumbnail(scratchId);
+              
+              return (
+                <Grid size={{ xs: 12, sm: 6, md: 3 }} key={game.gameId}>
+                  <Card 
+                    sx={{ 
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      position: 'relative'
+                    }}
+                  >
+                    <CardMedia
+                      component="img"
+                      height="140"
+                      image={game.thumbnailUrl || fallbackThumbnail}
+                      alt={game.gameName}
+                      sx={{ objectFit: 'cover' }}
+                    />
+                    {enriching && (
+                      <Box
                         sx={{
-                          backgroundColor: '#BE86CD',
-                          '&:hover': {
-                            backgroundColor: '#A76BB8',
-                          }
+                          position: 'absolute',
+                          top: 8,
+                          right: 8,
+                          bgcolor: 'rgba(255, 255, 255, 0.9)',
+                          borderRadius: 1,
+                          p: 0.5,
                         }}
                       >
-                        {t('homepage.playButton')}
-                      </Button>
-                    </CardActions>
-                  )}
-                </Card>
-              </Grid>
-            ))}
+                        <CircularProgress size={16} />
+                      </Box>
+                    )}
+                    <CardContent sx={{ flexGrow: 1 }}>
+                      <Typography variant="h6" gutterBottom noWrap title={game.gameName}>
+                        {game.gameName}
+                      </Typography>
+                      <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+                        <Chip 
+                          label={t(`homepage.subjects.${game.subject}`)} 
+                          size="small" 
+                          color="primary"
+                          variant="outlined"
+                        />
+                        <Chip 
+                          label={t(`homepage.difficulties.${game.difficulty}`)} 
+                          size="small" 
+                          color="secondary"
+                          variant="outlined"
+                        />
+                      </Stack>
+                    </CardContent>
+                    {isAuthenticated && (
+                      <CardActions sx={{ p: 2, pt: 0 }}>
+                        <Button 
+                          variant="contained" 
+                          fullWidth
+                          onClick={() => handleGameClick(game)}
+                          sx={{
+                            backgroundColor: '#BE86CD',
+                            '&:hover': {
+                              backgroundColor: '#A76BB8',
+                            }
+                          }}
+                        >
+                          {t('homepage.playButton')}
+                        </Button>
+                      </CardActions>
+                    )}
+                  </Card>
+                </Grid>
+              );
+            })}
           </Grid>
         )}
       </Box>
