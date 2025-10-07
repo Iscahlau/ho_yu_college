@@ -1,7 +1,7 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {Box, Typography, Container, TextField, Button, Paper, Alert, IconButton} from '@mui/material';
 import {Visibility, VisibilityOff} from '@mui/icons-material';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useLocation} from 'react-router-dom';
 import {useDispatch} from 'react-redux';
 import {useTranslation} from 'react-i18next';
 import {login as loginAction} from '../../store/slices/authSlice';
@@ -18,7 +18,18 @@ function Login() {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
     const dispatch = useDispatch();
+
+    // Check for error message from navigation state (e.g., from ProtectedRoute)
+    useEffect(() => {
+        const state = location.state as { error?: string } | null;
+        if (state?.error) {
+            setError(state.error);
+            // Clear the state so the error doesn't persist on refresh
+            navigate(location.pathname, { replace: true, state: {} });
+        }
+    }, [location, navigate]);
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();

@@ -12,6 +12,7 @@ import Admin from './pages/Admin';
 
 // Components
 import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const theme = createTheme({
   palette: {
@@ -35,7 +36,14 @@ function App() {
               <Route path="/" element={<Homepage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/game/:gameId" element={<Game />} />
-              <Route path="/admin" element={<Admin />} />
+              <Route 
+                path="/admin" 
+                element={
+                  <ProtectedRoute allowedRoles={['admin', 'teacher']}>
+                    <Admin />
+                  </ProtectedRoute>
+                } 
+              />
             </Routes>
           </Layout>
         </Router>
