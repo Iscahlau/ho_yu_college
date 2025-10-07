@@ -71,6 +71,7 @@
   },
   "footer": {
     "schoolName": "嗇色園主辦可譽中學暨可譽小學",
-    "termsOfService": "Created by Hundred Kit Studio."
+    "createdBy": "Created by",
+    "hundredKitStudio": "Hundred Kit Studio"
   }
 }
