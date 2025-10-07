@@ -1,12 +1,21 @@
-import { Box, Typography, Container, Alert } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Box, Typography, Container, Alert, CircularProgress, Card, CardMedia, CardContent } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { getScratchEmbedUrl } from '../../utils/helpers';
+import { getScratchEmbedUrl, getDefaultScratchThumbnail } from '../../utils/helpers';
+import { fetchScratchProject } from '../../services/gamesService';
+import type { ScratchProject } from '../../types';
 
 /**
  * Game Page - Embeds and displays a single Scratch game
  * Accessible only after login
  * 
  * The game is identified by the gameId parameter in the URL route (/game/:gameId)
+ * 
+ * Features:
+ * - Fetches game metadata (title and thumbnail) from Scratch API
+ * - Displays game title and thumbnail before loading the game
+ * - Embeds the Scratch game in an iframe
+ * - Handles errors gracefully with user-friendly messages
  * 
  * Usage:
  * - Navigate to /game/{scratchId} where {scratchId} is the Scratch project ID
@@ -18,6 +27,35 @@ import { getScratchEmbedUrl } from '../../utils/helpers';
  */
 function Game() {
   const { gameId } = useParams<{ gameId: string }>();
+  const [projectData, setProjectData] = useState<ScratchProject | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!gameId) return;
+
+    const loadProjectData = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const project = await fetchScratchProject(gameId);
+        if (project) {
+          setProjectData(project);
+        } else {
+          // API failed, but we can still show the game with fallback data
+          setError('Could not load game details from Scratch API. Game will still be playable.');
+        }
+      } catch (err) {
+        console.error('Error loading Scratch project:', err);
+        setError('Failed to load game details. Game will still be playable.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProjectData();
+  }, [gameId]);
 
   // If no gameId is provided, show an error message
   if (!gameId) {
@@ -34,16 +72,81 @@ function Game() {
 
   // Generate the Scratch embed URL using the helper function
   const embedUrl = getScratchEmbedUrl(gameId);
+  const thumbnailUrl = projectData?.image || getDefaultScratchThumbnail(gameId);
+  const gameTitle = projectData?.title || `Scratch Game ${gameId}`;
 
   return (
     <Container maxWidth="lg">
       <Box sx={{ mt: 4 }}>
-        <Typography variant="h5" gutterBottom>
-          Game Player
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Playing Scratch Project: {gameId}
-        </Typography>
+        {/* Game Info Card */}
+        <Card sx={{ mb: 3 }}>
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' } }}>
+            {/* Thumbnail */}
+            <CardMedia
+              component="img"
+              sx={{ 
+                width: { xs: '100%', md: 250 }, 
+                height: { xs: 200, md: 'auto' },
+                objectFit: 'cover' 
+              }}
+              image={thumbnailUrl}
+              alt={gameTitle}
+            />
+            
+            {/* Game Details */}
+            <CardContent sx={{ flex: 1 }}>
+              <Typography variant="h4" gutterBottom>
+                {gameTitle}
+              </Typography>
+              
+              {loading && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <CircularProgress size={20} />
+                  <Typography variant="body2" color="text.secondary">
+                    Loading game details...
+                  </Typography>
+                </Box>
+              )}
+              
+              {error && (
+                <Alert severity="warning" sx={{ mt: 1 }}>
+                  {error}
+                </Alert>
+              )}
+              
+              {projectData && (
+                <>
+                  <Typography variant="body1" color="text.secondary" paragraph>
+                    Scratch Project ID: {gameId}
+                  </Typography>
+                  
+                  {projectData.description && (
+                    <Typography variant="body2" paragraph>
+                      {projectData.description}
+                    </Typography>
+                  )}
+                  
+                  {projectData.instructions && (
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="subtitle2" gutterBottom>
+                        Instructions:
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {projectData.instructions}
+                      </Typography>
+                    </Box>
+                  )}
+                  
+                  {projectData.author && (
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
+                      Created by: {projectData.author.username}
+                    </Typography>
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Box>
+        </Card>
         
         {/* Responsive iframe container for Scratch game */}
         <Box

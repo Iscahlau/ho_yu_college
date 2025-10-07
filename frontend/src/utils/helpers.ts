@@ -76,3 +76,27 @@ export function getScratchEmbedUrl(scratchId: string): string {
 export function getTimerWarningDuration(): number {
   return parseInt(import.meta.env.VITE_TIMER_WARNING || '3600000');
 }
+
+/**
+ * Extract Scratch project ID from URL or return the ID if already clean
+ * @param input - Can be a full URL (https://scratch.mit.edu/projects/123456) or just the ID (123456)
+ * @returns The Scratch project ID
+ * 
+ * @example
+ * extractScratchId('https://scratch.mit.edu/projects/60917032') // '60917032'
+ * extractScratchId('60917032') // '60917032'
+ */
+export function extractScratchId(input: string): string {
+  const match = input.match(/\/projects\/(\d+)/);
+  return match ? match[1] : input;
+}
+
+/**
+ * Get default Scratch thumbnail URL for a project
+ * This can be used as a fallback if the API fails
+ * @param scratchId - The Scratch project ID
+ * @returns The default thumbnail URL
+ */
+export function getDefaultScratchThumbnail(scratchId: string): string {
+  return `https://cdn2.scratch.mit.edu/get_image/project/${scratchId}_480x360.png`;
+}
