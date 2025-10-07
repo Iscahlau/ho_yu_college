@@ -21,13 +21,12 @@ function Footer() {
         <Box
           sx={{
             display: 'flex',
-            flexDirection: { xs: 'column', md: 'row' },
-            justifyContent: 'space-between',
+            flexDirection: 'column',
             alignItems: 'center',
-            gap: 2,
+            gap: 1,
           }}
         >
-          <Typography variant="body2" sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+          <Typography variant="body2" sx={{ textAlign: 'center' }}>
             Copyright© 2025 {t('footer.schoolName')}
           </Typography>
           <Box
@@ -38,10 +37,10 @@ function Footer() {
               justifyContent: 'center',
             }}
           >
-            <Typography variant="body2" sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+            <Typography variant="body2" sx={{ textAlign: 'center' }}>
               {t('footer.createdBy')}
             </Typography>
-            <Typography variant="body2" sx={{ textAlign: { xs: 'center', md: 'left' }, color: '#E6F094' }}>
+            <Typography variant="body2" sx={{ textAlign: 'center', color: '#E6F094' }}>
               {t('footer.hundredKitStudio')}
             </Typography>
           </Box>
