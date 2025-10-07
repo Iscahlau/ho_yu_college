@@ -36,7 +36,7 @@ function FilterBar() {
               sx={{ 
                 cursor: 'pointer',
                 backgroundColor: subject === 'all' ? '#000000' : 'transparent',
-                color: '#FFEC8D',
+                color: subject === 'all' ? '#FFEC8D' : '#000000',
                 borderColor: '#000000',
                 '&:hover': {
                   backgroundColor: subject === 'all' ? '#333333' : 'rgba(0,0,0,0.1)'
@@ -52,7 +52,7 @@ function FilterBar() {
                 sx={{ 
                   cursor: 'pointer',
                   backgroundColor: subject === subjectOption ? '#000000' : 'transparent',
-                  color: '#FFEC8D',
+                  color: subject === subjectOption ? '#FFEC8D' : '#000000',
                   borderColor: '#000000',
                   '&:hover': {
                     backgroundColor: subject === subjectOption ? '#333333' : 'rgba(0,0,0,0.1)'
@@ -76,7 +76,7 @@ function FilterBar() {
               sx={{ 
                 cursor: 'pointer',
                 backgroundColor: difficulty === 'all' ? '#FFFFFF' : 'transparent',
-                color: '#A080FF',
+                color: difficulty === 'all' ? '#A080FF' : '#FFFFFF',
                 borderColor: '#FFFFFF',
                 '&:hover': {
                   backgroundColor: difficulty === 'all' ? '#F0F0F0' : 'rgba(255,255,255,0.1)'
@@ -92,7 +92,7 @@ function FilterBar() {
                 sx={{ 
                   cursor: 'pointer',
                   backgroundColor: difficulty === difficultyOption ? '#FFFFFF' : 'transparent',
-                  color: '#A080FF',
+                  color: difficulty === difficultyOption ? '#A080FF' : '#FFFFFF',
                   borderColor: '#FFFFFF',
                   '&:hover': {
                     backgroundColor: difficulty === difficultyOption ? '#F0F0F0' : 'rgba(255,255,255,0.1)'
