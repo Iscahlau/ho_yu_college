@@ -6,13 +6,12 @@ The Navbar component is a responsive navigation bar that adapts to different scr
 ## Features
 
 ### Desktop View (≥ 900px / md breakpoint)
-When viewed on desktop or wide screens, the Navbar displays all elements horizontally:
+When viewed on desktop or wide screens, the Navbar displays elements in a three-section layout:
 - **Left**: School logo
-- **Center**: Platform title (學趣天地)
-- **Right**: 
-  - Student information (when authenticated): Name, ID, and Marks
-  - Language toggle button (English/中文)
-  - Login/Logout button
+- **Center**: Platform title (學趣天地) - absolutely positioned and horizontally centered
+- **Right** (vertical layout with two rows):
+  - **Row 1**: Language toggle button (English/中文) and Login/Logout button
+  - **Row 2**: Student information (when authenticated): Name, ID, and Marks - displayed below the buttons
 
 ### Mobile View (< 900px / md breakpoint)
 When viewed on mobile or narrow screens, the Navbar transforms into a compact App Bar:
@@ -65,7 +64,7 @@ const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 - Mobile: Shows "Login" button (no hamburger menu)
 
 #### Authenticated
-- Desktop: Shows user info inline + "Logout" button
+- Desktop: Shows Language toggle and "Logout" button in top row, with user info displayed below in a second row
 - Mobile: Shows hamburger menu + "Logout" button
   - User info is hidden from navbar
   - User info is accessible via hamburger menu
@@ -109,13 +108,44 @@ The component uses Material UI's standard breakpoints:
 ## Code Example
 
 ```typescript
-// Conditional rendering based on screen size
-{!isMobile && isAuthenticated && user && (
-  <Typography variant="body1">
-    <PermIdentityOutlinedIcon /> 
-    {user.name2} {user.id} {t('nav.marks')}:{user.marks}
-  </Typography>
+// Desktop layout with vertical flex direction for right section
+{!isMobile && (
+  <Box sx={{
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    gap: 0.5
+  }}>
+    {/* Row 1: Language toggle and Login/Logout buttons */}
+    <Box sx={{ display: 'flex', gap: 1.5 }}>
+      <Button onClick={toggleLanguage}>
+        {i18n.language === 'en' ? '中文' : 'English'}
+      </Button>
+      <Button onClick={isAuthenticated ? handleLogout : handleLogin}>
+        {isAuthenticated ? t('nav.logout') : t('nav.login')}
+      </Button>
+    </Box>
+    
+    {/* Row 2: User info (when authenticated) */}
+    {isAuthenticated && user && (
+      <Typography variant="body1">
+        <PermIdentityOutlinedIcon /> 
+        {user.name2} {user.id} {t('nav.marks')}:{user.marks}
+      </Typography>
+    )}
+  </Box>
 )}
+
+// Title with absolute positioning for true centering
+<Typography
+  sx={{
+    position: 'absolute',
+    left: '50%',
+    transform: 'translateX(-50%)'
+  }}
+>
+  {t('app.title')}
+</Typography>
 
 // Hamburger menu only on mobile when authenticated
 {isMobile && isAuthenticated && (
