@@ -14,7 +14,7 @@ function Footer() {
         backgroundColor: '#318B43',
         color: 'white',
         py: 3,
-        mt: 'auto',
+        mt: 5,
       }}
     >
       <Container maxWidth="lg">
