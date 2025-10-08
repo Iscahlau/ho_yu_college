@@ -89,6 +89,7 @@ npx cdk deploy     # Deploy to AWS (requires credentials)
 
 For detailed development instructions, build commands, troubleshooting, and best practices, see:
 - **[Copilot Instructions](.github/copilot-instructions.md)** - Comprehensive development guide with validated commands and timings
+- **[Local Mock Database Setup](backend/database/README.md)** - Set up local SQL database with DataGrip for development
 
 ### Game Page Usage
 

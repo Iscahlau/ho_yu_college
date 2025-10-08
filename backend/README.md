@@ -10,6 +10,11 @@ backend/
 ├── aws/              # AWS infrastructure code (CDK stacks, excluding Lambda)
 │   ├── lib/          # CDK stack definitions
 │   └── README.md     # AWS infrastructure documentation
+├── database/         # Local mock database for development
+│   ├── schema/       # SQL table definitions
+│   ├── seeds/        # Mock data population scripts
+│   ├── scripts/      # Database initialization and reset scripts
+│   └── README.md     # Database setup and DataGrip instructions
 ├── lambda/           # Lambda function handlers (application logic)
 │   ├── auth/         # Authentication handlers
 │   └── games/        # Game management handlers
@@ -26,6 +31,21 @@ backend/
 **Note**: AWS CDK infrastructure code is now organized in the `aws/` directory, while Lambda functions remain in `lambda/` to maintain clear separation between infrastructure definitions and application business logic.
 
 ## Development
+
+### Local Mock Database
+
+For visual database management and SQL-based development, set up a local database:
+
+```bash
+cd database
+./scripts/init-sqlite.sh  # Creates SQLite database with mock data
+```
+
+**See [database/README.md](database/README.md) for comprehensive setup instructions including:**
+- SQLite setup (zero-configuration)
+- PostgreSQL with Docker (production-like environment)
+- DataGrip connection instructions
+- Database schema and mock data details
 
 ### Local Development with Mock Server
 

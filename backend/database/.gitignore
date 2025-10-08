@@ -1,0 +1,20 @@
+# SQLite database files
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# PostgreSQL data (if running without Docker)
+/data/
+/pgdata/
+
+# Backup files
+*.sql.backup
+*.sql.bak
+backup_*.sql
+
+# Temporary files
+*.tmp
+*.temp
+.DS_Store
