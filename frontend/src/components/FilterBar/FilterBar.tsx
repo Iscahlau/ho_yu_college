@@ -25,7 +25,7 @@ function FilterBar() {
       <Stack spacing={0}>
         {/* Subject Filters */}
         <Box sx={{ p: 1, bgcolor: '#FFEC8D' }}>
-          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap justifyContent="center" alignItems="center">
             <Chip
               label={t('homepage.filters.all')}
               onClick={() => handleSubjectClick('all')}
@@ -62,7 +62,7 @@ function FilterBar() {
 
         {/* Difficulty Filters */}
         <Box sx={{ p: 1, bgcolor: '#A080FF' }}>
-          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap justifyContent="center" alignItems="center">
             <Chip
               label={t('homepage.filters.all')}
               onClick={() => handleDifficultyClick('all')}
