@@ -21,8 +21,8 @@ function FilterBar() {
   };
 
   return (
-    <Box sx={{ mb: 3, bgcolor: 'background.paper', boxShadow: 1 }}>
-      <Stack spacing={2}>
+    <Box sx={{ width: '100%' }}>
+      <Stack spacing={0}>
         {/* Subject Filters */}
         <Box sx={{ p: 1, bgcolor: '#FFEC8D' }}>
           <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>

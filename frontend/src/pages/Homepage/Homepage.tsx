@@ -104,11 +104,11 @@ function Homepage() {
   };
 
     return (
-        <Container>
-
+        <>
             <FilterBar/>
 
-            <Box sx={{mt: 4, mb: 4}}>
+            <Container>
+                <Box sx={{mt: 4, mb: 4}}>
 
                 {loading && (
                     <Box sx={{display: 'flex', justifyContent: 'center', mt: 4}}>
@@ -243,8 +243,9 @@ function Homepage() {
             </Box>
           </Box>
         )}
-      </Box>
-    </Container>
+                </Box>
+            </Container>
+        </>
   );
 }
 
