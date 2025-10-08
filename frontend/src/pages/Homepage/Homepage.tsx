@@ -142,7 +142,7 @@ function Homepage() {
             <Box
               sx={{
                 bgcolor: '#E95354',
-                height: '100px',
+                height: '90px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
@@ -210,9 +210,11 @@ function Homepage() {
                               color="primary"
                               variant="outlined"
                             />
-                            <Chip 
-                              label={t(`homepage.difficulties.${game.difficulty}`)} 
-                              size="small" 
+                          </Stack>
+                          <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+                            <Chip
+                              label={t(`homepage.difficulties.${game.difficulty}`)}
+                              size="small"
                               color="secondary"
                               variant="outlined"
                             />
