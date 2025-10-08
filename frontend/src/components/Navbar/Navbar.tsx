@@ -76,7 +76,7 @@ function Navbar() {
 
                     {/* Center section - Title */}
                     <Typography
-                        variant={isMobile ? "h6" : "h4"}
+                        variant={isMobile ? "h6" : "h3"}
                         component="div"
                         sx={{
                             flexGrow: 1,
