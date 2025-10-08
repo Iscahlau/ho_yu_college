@@ -213,8 +213,6 @@ function Homepage() {
                                                                 color="primary"
                                                                 variant="outlined"
                                                             />
-                                                        </Stack>
-                                                        <Stack direction="row" spacing={1} sx={{mb: 1}}>
                                                             <Chip
                                                                 label={t(`homepage.difficulties.${game.difficulty}`)}
                                                                 size="small"
