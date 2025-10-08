@@ -98,7 +98,9 @@ function Navbar() {
                             flexDirection: 'column',
                             alignItems: 'flex-end',
                             gap: 0.5,
-                            flex: 1
+                            flex: 1,
+                            pt: 1,
+                            pb: 1
                         }}>
                             {/* Row 1: Language toggle and Login/Logout buttons */}
                             <Box sx={{
@@ -159,7 +161,7 @@ function Navbar() {
 
                             {/* Row 2: User info (displayed below buttons when authenticated) */}
                             {isAuthenticated && user && (
-                                <Typography variant="body1" sx={{fontWeight: 500, whiteSpace: 'nowrap'}} id='user-info'>
+                                <Typography variant="body1" sx={{fontWeight: 500, whiteSpace: 'nowrap', mt:1}} id='user-info'>
                                     <PermIdentityOutlinedIcon sx={{verticalAlign: 'middle', mr: 0.5}} /> 
                                     {user.name2} {user.id} {t('nav.marks')}:{user.marks}
                                 </Typography>
