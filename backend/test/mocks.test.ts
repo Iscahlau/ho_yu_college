@@ -93,6 +93,7 @@ describe('Mock Teachers Data', () => {
   test('all teachers should have required fields', () => {
     mockTeachers.forEach((teacher: any) => {
       expect(teacher).toHaveProperty('teacher_id');
+      expect(teacher).toHaveProperty('name');
       expect(teacher).toHaveProperty('password');
       expect(teacher).toHaveProperty('responsible_class');
       expect(teacher).toHaveProperty('last_login');
@@ -128,6 +129,13 @@ describe('Mock Teachers Data', () => {
   test('at least one teacher should be an admin', () => {
     const adminTeachers = mockTeachers.filter((t: any) => t.is_admin);
     expect(adminTeachers.length).toBeGreaterThan(0);
+  });
+
+  test('teacher names should be non-empty strings', () => {
+    mockTeachers.forEach((teacher: any) => {
+      expect(typeof teacher.name).toBe('string');
+      expect(teacher.name.length).toBeGreaterThan(0);
+    });
   });
 
   test('last_login should be valid ISO date string', () => {

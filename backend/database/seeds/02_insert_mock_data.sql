@@ -9,10 +9,10 @@
 -- - teacher123 -> 6f2f1c614c6c8654c190fde6028645afc86ace623488c5e96e0b2d60be38a5dd
 -- - admin123 -> 240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9
 
-INSERT INTO teachers (teacher_id, password, responsible_class, last_login, is_admin) VALUES
-('TCH001', '6f2f1c614c6c8654c190fde6028645afc86ace623488c5e96e0b2d60be38a5dd', '["1A", "2A"]', '2024-01-15T08:00:00.000Z', FALSE),
-('TCH002', '6f2f1c614c6c8654c190fde6028645afc86ace623488c5e96e0b2d60be38a5dd', '["1B"]', '2024-01-16T08:30:00.000Z', FALSE),
-('TCH003', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', '["2B"]', '2024-01-17T07:45:00.000Z', TRUE);
+INSERT INTO teachers (teacher_id, name, password, responsible_class, last_login, is_admin) VALUES
+('TCH001', 'Mr. Wong', '6f2f1c614c6c8654c190fde6028645afc86ace623488c5e96e0b2d60be38a5dd', '["1A", "2A"]', '2024-01-15T08:00:00.000Z', FALSE),
+('TCH002', 'Ms. Chan', '6f2f1c614c6c8654c190fde6028645afc86ace623488c5e96e0b2d60be38a5dd', '["1B"]', '2024-01-16T08:30:00.000Z', FALSE),
+('TCH003', 'Dr. Lee', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', '["2B"]', '2024-01-17T07:45:00.000Z', TRUE);
 
 -- ============================================================================
 -- STUDENTS (10 records)

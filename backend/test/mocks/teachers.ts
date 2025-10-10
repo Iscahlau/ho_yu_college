@@ -12,6 +12,7 @@ function hashPassword(password: string): string {
 export const mockTeachers = [
   {
     teacher_id: 'TCH001',
+    name: 'Mr. Wong',
     password: hashPassword('teacher123'),
     responsible_class: ['1A', '2A'],
     last_login: '2024-01-15T08:00:00.000Z',
@@ -19,6 +20,7 @@ export const mockTeachers = [
   },
   {
     teacher_id: 'TCH002',
+    name: 'Ms. Chan',
     password: hashPassword('teacher123'),
     responsible_class: ['1B'],
     last_login: '2024-01-16T08:30:00.000Z',
@@ -26,6 +28,7 @@ export const mockTeachers = [
   },
   {
     teacher_id: 'TCH003',
+    name: 'Dr. Lee',
     password: hashPassword('admin123'),
     responsible_class: ['2B'],
     last_login: '2024-01-17T07:45:00.000Z',

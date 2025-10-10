@@ -37,11 +37,11 @@ admin123   → 240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9
 
 ## Teachers (3 records)
 
-| ID | Responsible Classes | Is Admin |
-|----|---------------------|----------|
-| TCH001 | 1A, 2A | No |
-| TCH002 | 1B | No |
-| TCH003 | 2B | Yes |
+| ID | Name | Responsible Classes | Is Admin |
+|----|------|---------------------|----------|
+| TCH001 | Mr. Wong | 1A, 2A | No |
+| TCH002 | Ms. Chan | 1B | No |
+| TCH003 | Dr. Lee | 2B | Yes |
 
 ## Games (20 records)
 

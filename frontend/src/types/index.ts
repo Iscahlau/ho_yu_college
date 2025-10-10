@@ -15,6 +15,7 @@ export interface Student {
 
 export interface Teacher {
   teacher_id: string;
+  name: string;
   password: string;
   responsible_class: string[];
   last_login: string;
