@@ -50,7 +50,7 @@ function Admin() {
   return (
     <Box sx={{ 
       minHeight: 'calc(100vh - 64px)',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      backgroundColor: '#16D3F9',
       py: 4
     }}>
       <Container maxWidth="lg">
