@@ -15,10 +15,11 @@ Mock data is provided for all three main database tables:
 
 ### Teachers (3 records)
 - **IDs**: TCH001, TCH002, TCH003
+- **Names**: Mr. Wong, Ms. Chan, Dr. Lee
 - **Responsible Classes**: Each teacher manages 1-2 classes
-- **TCH001**: Regular teacher (classes 1A, 2A)
-- **TCH002**: Regular teacher (class 1B)
-- **TCH003**: Admin teacher (class 2B) - has `is_admin: true`
+- **TCH001**: Regular teacher (classes 1A, 2A) - Mr. Wong
+- **TCH002**: Regular teacher (class 1B) - Ms. Chan
+- **TCH003**: Admin teacher (class 2B) - Dr. Lee, has `is_admin: true`
 - **Passwords**: 
   - Regular teachers (TCH001, TCH002): `teacher123`
   - Admin teacher (TCH003): `admin123`

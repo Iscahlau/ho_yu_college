@@ -7,6 +7,7 @@
 -- Stores teacher information including admin status and class assignments
 CREATE TABLE IF NOT EXISTS teachers (
     teacher_id VARCHAR(20) PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,  -- Teacher name
     password VARCHAR(64) NOT NULL,  -- SHA-256 hash
     responsible_class TEXT NOT NULL,  -- JSON array stored as text: ["1A", "2A"]
     last_login TIMESTAMP NOT NULL,

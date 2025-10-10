@@ -79,6 +79,7 @@ This starts:
 
 #### **teachers**
 - `teacher_id` (PK) - Unique teacher identifier
+- `name` - Teacher name
 - `password` - SHA-256 hashed password
 - `responsible_class` - JSON array of assigned classes
 - `last_login` - Last login timestamp
@@ -214,11 +215,11 @@ GROUP BY subject;
 
 ### Teachers (3 records)
 
-| teacher_id | password | responsible_class | is_admin |
-|------------|----------|-------------------|----------|
-| TCH001 | teacher123 | ["1A", "2A"] | false |
-| TCH002 | teacher123 | ["1B"] | false |
-| TCH003 | admin123 | ["2B"] | true |
+| teacher_id | name | password | responsible_class | is_admin |
+|------------|------|----------|-------------------|----------|
+| TCH001 | Mr. Wong | teacher123 | ["1A", "2A"] | false |
+| TCH002 | Ms. Chan | teacher123 | ["1B"] | false |
+| TCH003 | Dr. Lee | admin123 | ["2B"] | true |
 
 ### Students (10 records)
 

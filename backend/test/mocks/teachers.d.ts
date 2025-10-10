@@ -4,6 +4,7 @@
  */
 export declare const mockTeachers: {
     teacher_id: string;
+    name: string;
     password: string;
     responsible_class: string[];
     last_login: string;
