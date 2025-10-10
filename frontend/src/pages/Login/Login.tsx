@@ -46,8 +46,9 @@ function Login() {
                     // Store user in Redux
                     dispatch(loginAction({
                         id: role === 'student' ? (user as any).student_id : (user as any).teacher_id,
-                        name1: (user as any).name_1 || '',
-                        name2: (user as any).name_2 || '',
+                        name1: role === 'student' ? (user as any).name_1 : undefined,
+                        name2: role === 'student' ? (user as any).name_2 : undefined,
+                        name: role !== 'student' ? (user as any).name : undefined,
                         marks: (user as any).marks || 0,
                         role,
                         class: (user as any).class,

@@ -73,7 +73,7 @@ function Admin() {
                   Admin Dashboard
                 </Typography>
                 <Typography variant="body1" sx={{ color: '#718096', mt: 0.5 }}>
-                  Welcome, {user?.name1} {user?.name2}
+                  Welcome, {user?.role === 'student' ? `${user?.name1} ${user?.name2}` : user?.name}
                 </Typography>
               </Box>
             </Box>

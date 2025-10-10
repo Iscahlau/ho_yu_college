@@ -2,8 +2,9 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface User {
   id: string;
-  name1: string;
-  name2: string;
+  name1?: string; // For students (name_1)
+  name2?: string; // For students (name_2)
+  name?: string;  // For teachers (single name field)
   marks: number;
   role: 'student' | 'teacher' | 'admin';
   class?: string;
