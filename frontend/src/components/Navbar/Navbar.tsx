@@ -42,6 +42,10 @@ function Navbar() {
         setMobileMenuOpen(!mobileMenuOpen);
     };
 
+    const handleHomeNavigation = () => {
+        navigate('/');
+    };
+
     return (
         <>
             <AppBar
@@ -65,7 +69,23 @@ function Navbar() {
                                 <MenuIcon />
                             </IconButton>
                         )}
-                        <Box sx={{display: 'flex', alignItems: 'center'}}>
+                        <Box 
+                            sx={{
+                                display: 'flex', 
+                                alignItems: 'center',
+                                cursor: 'pointer'
+                            }}
+                            onClick={handleHomeNavigation}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    handleHomeNavigation();
+                                }
+                            }}
+                            aria-label="Navigate to homepage"
+                        >
                             <img
                                 src="/assets/images/hoyu_logo_light-400x85.png"
                                 alt="Ho Yu College Logo"
@@ -78,6 +98,16 @@ function Navbar() {
                     <Typography
                         variant={isMobile ? "h6" : "h3"}
                         component="div"
+                        onClick={handleHomeNavigation}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                handleHomeNavigation();
+                            }
+                        }}
+                        role="button"
+                        tabIndex={0}
+                        aria-label="Navigate to homepage"
                         sx={{
                             position: 'absolute',
                             left: '50%',
@@ -85,7 +115,10 @@ function Navbar() {
                             fontWeight: 600,
                             letterSpacing: '0.05em',
                             color: 'white',
-                            pointerEvents: 'none'
+                            cursor: 'pointer',
+                            '&:hover': {
+                                opacity: 0.9
+                            }
                         }}
                     >
                         {t('app.title')}
