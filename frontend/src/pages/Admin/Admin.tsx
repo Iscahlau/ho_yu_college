@@ -72,9 +72,6 @@ function Admin() {
                 <Typography variant="h4" sx={{ fontWeight: 700, color: '#2d3748' }}>
                   Admin Dashboard
                 </Typography>
-                <Typography variant="body1" sx={{ color: '#718096', mt: 0.5 }}>
-                  Welcome, {user?.name1} {user?.name2}
-                </Typography>
               </Box>
             </Box>
             <Divider sx={{ my: 2 }} />
