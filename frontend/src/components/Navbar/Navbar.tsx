@@ -73,7 +73,8 @@ function Navbar() {
                             sx={{
                                 display: 'flex', 
                                 alignItems: 'center',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                pl: 5
                             }}
                             onClick={handleHomeNavigation}
                             role="button"
@@ -133,7 +134,8 @@ function Navbar() {
                             gap: 0.5,
                             flex: 1,
                             pt: 1,
-                            pb: 1
+                            pb: 1,
+                            pr: 5
                         }}>
                             {/* Row 1: Language toggle and Login/Logout buttons */}
                             <Box sx={{
