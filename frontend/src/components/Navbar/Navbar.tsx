@@ -73,8 +73,7 @@ function Navbar() {
                             sx={{
                                 display: 'flex', 
                                 alignItems: 'center',
-                                cursor: 'pointer',
-                                pl: 5
+                                cursor: 'pointer'
                             }}
                             onClick={handleHomeNavigation}
                             role="button"
@@ -110,9 +109,17 @@ function Navbar() {
                         tabIndex={0}
                         aria-label="Navigate to homepage"
                         sx={{
-                            position: 'absolute',
-                            left: '50%',
-                            transform: 'translateX(-50%)',
+                            ...(isMobile ? {
+                                // Mobile: relative positioning to avoid overlap
+                                flex: 1,
+                                textAlign: 'center',
+                                mr: 2
+                            } : {
+                                // Desktop: absolute positioning for true centering
+                                position: 'absolute',
+                                left: '50%',
+                                transform: 'translateX(-50%)'
+                            }),
                             fontWeight: 600,
                             letterSpacing: '0.05em',
                             color: 'white',
@@ -134,8 +141,7 @@ function Navbar() {
                             gap: 0.5,
                             flex: 1,
                             pt: 1,
-                            pb: 1,
-                            pr: 5
+                            pb: 1
                         }}>
                             {/* Row 1: Language toggle and Login/Logout buttons */}
                             <Box sx={{
