@@ -50,6 +50,67 @@ export function validateFileFormat(file: File): boolean {
 }
 
 /**
+ * Count rows in Excel/CSV file
+ * @param file - File to count rows in
+ * @returns Promise that resolves to number of data rows (excluding header)
+ */
+export async function countFileRows(file: File): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    
+    reader.onload = async (e) => {
+      try {
+        const data = e.target?.result;
+        if (!data) {
+          reject(new Error('Failed to read file'));
+          return;
+        }
+
+        // Dynamically import xlsx to avoid bundling it if not used
+        const XLSX = await import('xlsx');
+        
+        let workbook: any;
+        if (file.name.toLowerCase().endsWith('.csv')) {
+          // For CSV files, read as text
+          const csvText = data as string;
+          workbook = XLSX.read(csvText, { type: 'string' });
+        } else {
+          // For Excel files, read as binary
+          workbook = XLSX.read(data, { type: 'binary' });
+        }
+
+        // Get first sheet
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        
+        // Convert to JSON to count rows (excluding header)
+        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+        
+        // Count non-empty rows, excluding header row
+        const dataRows = jsonData.slice(1).filter((row: any) => 
+          Array.isArray(row) && row.some(cell => cell !== null && cell !== undefined && cell !== '')
+        );
+        
+        resolve(dataRows.length);
+      } catch (error) {
+        reject(error);
+      }
+    };
+
+    reader.onerror = () => {
+      reject(new Error('Failed to read file'));
+    };
+
+    // Read file based on type
+    if (file.name.toLowerCase().endsWith('.csv')) {
+      reader.readAsText(file);
+    } else {
+      reader.readAsBinaryString(file);
+    }
+  });
+}
+
+/**
  * Format timestamp to readable date
  */
 export function formatDate(timestamp: string): string {

@@ -17,7 +17,7 @@ export const DIFFICULTIES = ['Beginner', 'Intermediate', 'Advanced'] as const;
 // File upload limits
 export const FILE_UPLOAD_LIMITS = {
   MAX_SIZE: 10 * 1024 * 1024, // 10 MB in bytes
-  MAX_ROWS: 10000,
+  MAX_ROWS: 4000, // Maximum 4000 records (students + teachers) per file
   SUPPORTED_FORMATS: ['.xlsx', '.xls', '.csv'],
 };
 
