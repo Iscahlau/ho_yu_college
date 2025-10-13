@@ -111,9 +111,7 @@ function Navbar() {
                         sx={{
                             ...(isMobile ? {
                                 // Mobile: relative positioning to avoid overlap
-                                flex: 1,
-                                textAlign: 'center',
-                                mr: 2
+                                textAlign: 'right',
                             } : {
                                 // Desktop: absolute positioning for true centering
                                 position: 'absolute',
