@@ -48,8 +48,13 @@ The Admin page now supports uploading CSV and Excel files for managing student, 
    - Format check
    - Size check
    - Row count check (parses file to count data rows)
-4. Feedback is displayed via a Snackbar notification:
-   - **Success**: Green notification with success message
+4. File is uploaded to the backend
+5. Backend processes the file:
+   - **Header row is skipped** (first row)
+   - **ID-based upsert**: If the ID exists, the record is updated; if not, a new record is created
+   - **No delete**: Records not in the file are left unchanged in the database
+6. Feedback is displayed via a Snackbar notification:
+   - **Success**: Green notification with count of inserted/updated records
    - **Error**: Red notification with specific error details
    - **Info**: Blue notification for progress updates
 
@@ -67,6 +72,34 @@ The Admin page now supports uploading CSV and Excel files for managing student, 
 - **xlsx library**: For parsing Excel and CSV files
 - **Material-UI**: For UI components (Snackbar, Alert, file inputs)
 - **React Hooks**: useState for state management, useRef for file input refs
+- **AWS Lambda**: For backend file processing
+- **DynamoDB**: For data storage with upsert operations
+
+### File Processing Logic
+
+#### Header Row Handling
+- The first row of the uploaded file is treated as headers
+- Column names are extracted from the first row
+- Data processing starts from the second row onwards
+
+#### Upsert (Update/Insert) Logic
+- **Check existence**: For each data row, check if the ID already exists in DynamoDB
+  - Students: checked by `student_id`
+  - Teachers: checked by `teacher_id`
+  - Games: checked by `game_id`
+- **Update**: If the ID exists, update the record with new values
+  - Preserves `created_at` timestamp
+  - Updates `updated_at` to current timestamp
+  - For games: preserves `accumulated_click` count from existing record
+- **Insert**: If the ID doesn't exist, create a new record
+  - Sets both `created_at` and `updated_at` to current timestamp
+  - For games: uses `accumulated_click` from file or defaults to 0
+- **No Delete**: Records not mentioned in the file remain unchanged in the database
+
+#### Special Field Handling
+- **teacher.responsible_class**: Parses JSON array string (e.g., `["1A", "2A"]`) into array
+- **game.accumulated_click**: Preserved from existing record on update, preventing overwrite
+- **Timestamps**: Automatically managed (`created_at`, `updated_at`, `last_login`, `last_update`)
 
 ### File Parsing
 The `countFileRows()` helper function:
@@ -90,9 +123,18 @@ Count Rows → ❌ Reject if 0 or > 4000
     ↓
 ✅ All validations passed
     ↓
-Upload to Server (API call)
+Upload to Server (base64 encoded)
+    ↓
+Backend Processing:
+  - Skip header row (row 1)
+  - For each data row (row 2+):
+    * Check if ID exists
+    * Update if exists, Insert if new
+  - Generate results summary
     ↓
 Show Success/Error Message
+  - Display count: X inserted, Y updated
+  - Show any row-level errors
 ```
 
 ## API Integration

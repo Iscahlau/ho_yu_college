@@ -14,13 +14,22 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
  */
 export async function uploadStudentData(file: File): Promise<FileUploadResponse> {
   try {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('type', 'students');
+    // Read file as ArrayBuffer and convert to base64
+    const arrayBuffer = await file.arrayBuffer();
+    const base64 = btoa(
+      new Uint8Array(arrayBuffer)
+        .reduce((data, byte) => data + String.fromCharCode(byte), '')
+    );
 
     const response = await fetch(`${API_BASE_URL}/upload/students`, {
       method: 'POST',
-      body: formData,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        file: base64,
+        filename: file.name,
+      }),
     });
 
     const data = await response.json();
@@ -52,13 +61,22 @@ export async function uploadStudentData(file: File): Promise<FileUploadResponse>
  */
 export async function uploadTeacherData(file: File): Promise<FileUploadResponse> {
   try {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('type', 'teachers');
+    // Read file as ArrayBuffer and convert to base64
+    const arrayBuffer = await file.arrayBuffer();
+    const base64 = btoa(
+      new Uint8Array(arrayBuffer)
+        .reduce((data, byte) => data + String.fromCharCode(byte), '')
+    );
 
     const response = await fetch(`${API_BASE_URL}/upload/teachers`, {
       method: 'POST',
-      body: formData,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        file: base64,
+        filename: file.name,
+      }),
     });
 
     const data = await response.json();
@@ -90,13 +108,22 @@ export async function uploadTeacherData(file: File): Promise<FileUploadResponse>
  */
 export async function uploadGameData(file: File): Promise<FileUploadResponse> {
   try {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('type', 'games');
+    // Read file as ArrayBuffer and convert to base64
+    const arrayBuffer = await file.arrayBuffer();
+    const base64 = btoa(
+      new Uint8Array(arrayBuffer)
+        .reduce((data, byte) => data + String.fromCharCode(byte), '')
+    );
 
     const response = await fetch(`${API_BASE_URL}/upload/games`, {
       method: 'POST',
-      body: formData,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        file: base64,
+        filename: file.name,
+      }),
     });
 
     const data = await response.json();
