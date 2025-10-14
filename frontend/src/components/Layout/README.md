@@ -12,7 +12,7 @@ As of the latest update, the Layout component now includes a decorative rainbow 
 - **Visibility**: Only shown on desktop/wide-screen views (≥900px)
 - **Position**: Top-right corner, fixed position (doesn't move on scroll)
 - **Size**: Approximately 25% of screen area (25vw × 33.33vh)
-- **Image**: `/assets/images/rainbow-left.svg` - left half of a rainbow with clouds
+- **Image**: `/assets/images/rainbow-left.png` - left half of a rainbow with clouds
 - **Opacity**: 0.85 for subtle appearance
 - **Z-index**: 0 (behind all content)
 - **Pointer Events**: None (doesn't interfere with clicks)

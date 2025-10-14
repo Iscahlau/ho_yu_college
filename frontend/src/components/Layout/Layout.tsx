@@ -33,7 +33,7 @@ function Layout({ children }: LayoutProps) {
             right: 0,
             width: '25vw',
             height: '33.33vh',
-            backgroundImage: 'url(/assets/images/rainbow-left.svg)',
+            backgroundImage: 'url(/assets/images/rainbow-left.png)',
             backgroundSize: 'contain',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'top right',
