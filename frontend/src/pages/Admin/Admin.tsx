@@ -1,7 +1,11 @@
-import { Box, Typography, Container, Paper, Button, Grid, Card, CardContent, CardActions, Divider, Chip } from '@mui/material';
+import { Box, Typography, Container, Paper, Button, Grid, Card, CardContent, CardActions, Divider, Chip, Alert, Snackbar } from '@mui/material';
 import { Upload, Download, CloudUpload, GetApp, People, School, SportsEsports, AdminPanelSettings } from '@mui/icons-material';
 import { useAppSelector } from '../../store/hooks';
 import { downloadStudentData, downloadTeacherData, downloadGamesData } from '../../services/downloadService';
+import { uploadStudentData, uploadTeacherData, uploadGameData } from '../../services/uploadService';
+import { validateFileFormat, validateFileSize, countFileRows } from '../../utils/helpers';
+import { FILE_UPLOAD_LIMITS } from '../../utils/constants';
+import { useState, useRef } from 'react';
 
 /**
  * Admin Page - Management dashboard for teachers and admins
@@ -10,6 +14,171 @@ import { downloadStudentData, downloadTeacherData, downloadGamesData } from '../
 function Admin() {
   const user = useAppSelector((state) => state.auth.user);
   const isAdmin = user?.role === 'admin';
+
+  // State for file upload feedback
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: 'success' | 'error' | 'warning' | 'info';
+  }>({
+    open: false,
+    message: '',
+    severity: 'info',
+  });
+
+  // Refs for file inputs
+  const studentFileInputRef = useRef<HTMLInputElement>(null);
+  const teacherFileInputRef = useRef<HTMLInputElement>(null);
+  const gameFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Close snackbar
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  // Show snackbar message
+  const showMessage = (message: string, severity: 'success' | 'error' | 'warning' | 'info') => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  // Validate uploaded file
+  const validateFile = async (file: File): Promise<{ valid: boolean; error?: string }> => {
+    // Check file format
+    if (!validateFileFormat(file)) {
+      return {
+        valid: false,
+        error: `Invalid file format. Only ${FILE_UPLOAD_LIMITS.SUPPORTED_FORMATS.join(', ')} files are supported.`,
+      };
+    }
+
+    // Check file size
+    if (!validateFileSize(file)) {
+      return {
+        valid: false,
+        error: `File size exceeds ${FILE_UPLOAD_LIMITS.MAX_SIZE / (1024 * 1024)} MB limit.`,
+      };
+    }
+
+    // Check row count
+    try {
+      const rowCount = await countFileRows(file);
+      if (rowCount > FILE_UPLOAD_LIMITS.MAX_ROWS) {
+        return {
+          valid: false,
+          error: `File contains ${rowCount} records. Maximum allowed is ${FILE_UPLOAD_LIMITS.MAX_ROWS} records.`,
+        };
+      }
+      if (rowCount === 0) {
+        return {
+          valid: false,
+          error: 'File is empty or contains no valid data rows.',
+        };
+      }
+    } catch (error) {
+      return {
+        valid: false,
+        error: 'Failed to read file. Please ensure the file is not corrupted.',
+      };
+    }
+
+    return { valid: true };
+  };
+
+  // Handle student file upload
+  const handleUploadStudents = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file
+    const validation = await validateFile(file);
+    if (!validation.valid) {
+      showMessage(validation.error || 'Invalid file', 'error');
+      // Reset file input
+      if (studentFileInputRef.current) {
+        studentFileInputRef.current.value = '';
+      }
+      return;
+    }
+
+    // Upload file
+    showMessage('Uploading student data...', 'info');
+    const result = await uploadStudentData(file);
+    
+    if (result.success) {
+      showMessage(result.message, 'success');
+    } else {
+      showMessage(result.message, 'error');
+    }
+
+    // Reset file input
+    if (studentFileInputRef.current) {
+      studentFileInputRef.current.value = '';
+    }
+  };
+
+  // Handle teacher file upload (admin only)
+  const handleUploadTeachers = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file
+    const validation = await validateFile(file);
+    if (!validation.valid) {
+      showMessage(validation.error || 'Invalid file', 'error');
+      // Reset file input
+      if (teacherFileInputRef.current) {
+        teacherFileInputRef.current.value = '';
+      }
+      return;
+    }
+
+    // Upload file
+    showMessage('Uploading teacher data...', 'info');
+    const result = await uploadTeacherData(file);
+    
+    if (result.success) {
+      showMessage(result.message, 'success');
+    } else {
+      showMessage(result.message, 'error');
+    }
+
+    // Reset file input
+    if (teacherFileInputRef.current) {
+      teacherFileInputRef.current.value = '';
+    }
+  };
+
+  // Handle game file upload
+  const handleUploadGames = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file
+    const validation = await validateFile(file);
+    if (!validation.valid) {
+      showMessage(validation.error || 'Invalid file', 'error');
+      // Reset file input
+      if (gameFileInputRef.current) {
+        gameFileInputRef.current.value = '';
+      }
+      return;
+    }
+
+    // Upload file
+    showMessage('Uploading game data...', 'info');
+    const result = await uploadGameData(file);
+    
+    if (result.success) {
+      showMessage(result.message, 'success');
+    } else {
+      showMessage(result.message, 'error');
+    }
+
+    // Reset file input
+    if (gameFileInputRef.current) {
+      gameFileInputRef.current.value = '';
+    }
+  };
 
   // Handle download student data
   const handleDownloadStudents = async () => {
@@ -136,16 +305,27 @@ function Admin() {
                   <Typography variant="body2" sx={{ color: '#718096', mb: 2, lineHeight: 1.6 }}>
                     Upload Excel/CSV file to add, update, or delete student records
                   </Typography>
-                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
                     <Chip label=".xlsx" size="small" variant="outlined" />
                     <Chip label=".csv" size="small" variant="outlined" />
                   </Box>
+                  <Typography variant="caption" sx={{ color: '#a0aec0', display: 'block' }}>
+                    Max: {FILE_UPLOAD_LIMITS.MAX_ROWS.toLocaleString()} records, {FILE_UPLOAD_LIMITS.MAX_SIZE / (1024 * 1024)} MB
+                  </Typography>
                 </CardContent>
                 <CardActions sx={{ p: 3, pt: 0 }}>
+                  <input
+                    type="file"
+                    ref={studentFileInputRef}
+                    accept={FILE_UPLOAD_LIMITS.SUPPORTED_FORMATS.join(',')}
+                    onChange={handleUploadStudents}
+                    style={{ display: 'none' }}
+                  />
                   <Button 
                     variant="contained" 
                     startIcon={<Upload />}
                     fullWidth
+                    onClick={() => studentFileInputRef.current?.click()}
                     sx={{
                       py: 1.2,
                       fontWeight: 600,
@@ -193,16 +373,27 @@ function Admin() {
                     <Typography variant="body2" sx={{ color: '#718096', mb: 2, lineHeight: 1.6 }}>
                       Upload Excel/CSV file to manage teacher accounts
                     </Typography>
-                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
                       <Chip label="Admin Only" size="small" color="error" />
                       <Chip label=".xlsx" size="small" variant="outlined" />
                     </Box>
+                    <Typography variant="caption" sx={{ color: '#a0aec0', display: 'block' }}>
+                      Max: {FILE_UPLOAD_LIMITS.MAX_ROWS.toLocaleString()} records, {FILE_UPLOAD_LIMITS.MAX_SIZE / (1024 * 1024)} MB
+                    </Typography>
                   </CardContent>
                   <CardActions sx={{ p: 3, pt: 0 }}>
+                    <input
+                      type="file"
+                      ref={teacherFileInputRef}
+                      accept={FILE_UPLOAD_LIMITS.SUPPORTED_FORMATS.join(',')}
+                      onChange={handleUploadTeachers}
+                      style={{ display: 'none' }}
+                    />
                     <Button 
                       variant="contained" 
                       startIcon={<Upload />}
                       fullWidth
+                      onClick={() => teacherFileInputRef.current?.click()}
                       sx={{
                         py: 1.2,
                         fontWeight: 600,
@@ -250,16 +441,27 @@ function Admin() {
                   <Typography variant="body2" sx={{ color: '#718096', mb: 2, lineHeight: 1.6 }}>
                     Upload Excel/CSV file to add, update, or delete game records
                   </Typography>
-                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
                     <Chip label=".xlsx" size="small" variant="outlined" />
                     <Chip label=".csv" size="small" variant="outlined" />
                   </Box>
+                  <Typography variant="caption" sx={{ color: '#a0aec0', display: 'block' }}>
+                    Max: {FILE_UPLOAD_LIMITS.MAX_ROWS.toLocaleString()} records, {FILE_UPLOAD_LIMITS.MAX_SIZE / (1024 * 1024)} MB
+                  </Typography>
                 </CardContent>
                 <CardActions sx={{ p: 3, pt: 0 }}>
+                  <input
+                    type="file"
+                    ref={gameFileInputRef}
+                    accept={FILE_UPLOAD_LIMITS.SUPPORTED_FORMATS.join(',')}
+                    onChange={handleUploadGames}
+                    style={{ display: 'none' }}
+                  />
                   <Button 
                     variant="contained" 
                     startIcon={<Upload />}
                     fullWidth
+                    onClick={() => gameFileInputRef.current?.click()}
                     sx={{
                       py: 1.2,
                       fontWeight: 600,
@@ -477,6 +679,18 @@ function Admin() {
           </Grid>
         </Box>
       </Container>
+
+      {/* Snackbar for user feedback */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
