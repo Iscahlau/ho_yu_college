@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 600" width="500" height="600">
+  <!-- Left half of rainbow with clouds -->
+  <defs>
+    <clipPath id="leftHalf">
+      <rect x="0" y="0" width="500" height="600"/>
+    </clipPath>
+  </defs>
+  
+  <g clip-path="url(#leftHalf)">
+    <!-- Rainbow arcs (centered at x=500, which will be cut in half) -->
+    <!-- Red arc -->
+    <path d="M 500 100 A 400 400 0 0 0 100 500" 
+          fill="none" stroke="#FF1744" stroke-width="60" opacity="0.9"/>
+    
+    <!-- Orange arc -->
+    <path d="M 500 130 A 370 370 0 0 0 130 500" 
+          fill="none" stroke="#FF9100" stroke-width="60" opacity="0.9"/>
+    
+    <!-- Yellow arc -->
+    <path d="M 500 160 A 340 340 0 0 0 160 500" 
+          fill="none" stroke="#FFEA00" stroke-width="60" opacity="0.9"/>
+    
+    <!-- Green arc -->
+    <path d="M 500 190 A 310 310 0 0 0 190 500" 
+          fill="none" stroke="#4CAF50" stroke-width="60" opacity="0.9"/>
+    
+    <!-- Blue arc -->
+    <path d="M 500 220 A 280 280 0 0 0 220 500" 
+          fill="none" stroke="#2196F3" stroke-width="60" opacity="0.9"/>
+    
+    <!-- Cloud at bottom left -->
+    <g transform="translate(50, 400)">
+      <!-- Cloud outline -->
+      <ellipse cx="60" cy="50" rx="60" ry="40" fill="#4A5F7F" opacity="0.8"/>
+      <ellipse cx="30" cy="60" rx="45" ry="35" fill="#4A5F7F" opacity="0.8"/>
+      <ellipse cx="90" cy="60" rx="50" ry="38" fill="#4A5F7F" opacity="0.8"/>
+      <!-- Cloud fill -->
+      <ellipse cx="60" cy="45" rx="55" ry="35" fill="white" opacity="0.95"/>
+      <ellipse cx="30" cy="55" rx="40" ry="30" fill="white" opacity="0.95"/>
+      <ellipse cx="90" cy="55" rx="45" ry="33" fill="white" opacity="0.95"/>
+      <!-- Cloud shadow -->
+      <ellipse cx="60" cy="65" rx="50" ry="20" fill="#D0D0D0" opacity="0.6"/>
+    </g>
+    
+    <!-- Cloud at middle -->
+    <g transform="translate(200, 320)">
+      <!-- Cloud outline -->
+      <ellipse cx="50" cy="45" rx="50" ry="35" fill="#4A5F7F" opacity="0.8"/>
+      <ellipse cx="25" cy="55" rx="38" ry="30" fill="#4A5F7F" opacity="0.8"/>
+      <ellipse cx="75" cy="55" rx="42" ry="32" fill="#4A5F7F" opacity="0.8"/>
+      <!-- Cloud fill -->
+      <ellipse cx="50" cy="40" rx="45" ry="30" fill="white" opacity="0.95"/>
+      <ellipse cx="25" cy="50" rx="33" ry="25" fill="white" opacity="0.95"/>
+      <ellipse cx="75" cy="50" rx="37" ry="27" fill="white" opacity="0.95"/>
+      <!-- Cloud shadow -->
+      <ellipse cx="50" cy="60" rx="40" ry="18" fill="#D0D0D0" opacity="0.6"/>
+    </g>
+  </g>
+</svg>
