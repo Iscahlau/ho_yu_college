@@ -20,10 +20,10 @@ function Layout({ children }: LayoutProps) {
         <Box
           sx={{
             position: 'fixed',
-            top: 20,
-            right: '-25%',
-            width: '900px',
-            height: '900px',
+            top: 0,
+            right: '-50%',
+            width: '800px',
+            height: '800px',
             backgroundImage: 'url(/assets/images/rainbow.png)',
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'contain',
@@ -33,8 +33,10 @@ function Layout({ children }: LayoutProps) {
           }}
         />
       )}
-      <Navbar />
-      <Box component="main" sx={{ flexGrow: 1, position: 'relative' }}>
+      <Box sx={{ position: 'relative', zIndex: 1 }}>
+        <Navbar />
+      </Box>
+      <Box component="main" sx={{ flexGrow: 1, position: 'relative', zIndex: 1 }}>
         {children}
       </Box>
       <Footer />
