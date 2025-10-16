@@ -14,7 +14,7 @@ function Layout({ children }: LayoutProps) {
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#16D3F9', position: 'relative' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#16D3F9', position: 'relative', overflow: 'hidden' }}>
       {/* Rainbow background image - desktop only */}
       {isDesktop && (
         <Box
@@ -28,13 +28,13 @@ function Layout({ children }: LayoutProps) {
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'contain',
             backgroundPosition: 'top right',
-            zIndex: -1,
+            zIndex: 0,
             pointerEvents: 'none',
           }}
         />
       )}
       <Navbar />
-      <Box component="main" sx={{ flexGrow: 1, position: 'relative', zIndex: 1 }}>
+      <Box component="main" sx={{ flexGrow: 1, position: 'relative' }}>
         {children}
       </Box>
       <Footer />
