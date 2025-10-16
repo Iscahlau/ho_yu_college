@@ -77,3 +77,9 @@ temp/
 
 # Log files
 *.log
+
+# Database files (local development only)
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
