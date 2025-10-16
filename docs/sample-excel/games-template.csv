@@ -1,0 +1,4 @@
+game_id,game_name,student_id,subject,difficulty,teacher_id,scratch_id,scratch_api,accumulated_click,last_update
+GAME021,Math Quiz Adventure,STU011,Mathematics,Beginner,TCH001,1234567890,https://scratch.mit.edu/projects/1234567890,0,2024-01-20T09:00:00.000Z
+GAME022,English Word Hunt,STU012,English Language,Intermediate,TCH002,1234567891,https://scratch.mit.edu/projects/1234567891,0,2024-01-20T10:00:00.000Z
+GAME023,Science Explorer,STU013,Humanities and Science,Advanced,TCH001,1234567892,https://scratch.mit.edu/projects/1234567892,0,2024-01-20T11:00:00.000Z

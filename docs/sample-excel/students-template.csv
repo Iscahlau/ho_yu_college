@@ -1,0 +1,4 @@
+student_id,name_1,name_2,marks,class,class_no,teacher_id,password,last_login,last_update
+STU011,Alice Smith,史愛麗,350,1A,11,TCH001,123,2024-01-20T09:00:00.000Z,2024-01-20T09:00:00.000Z
+STU012,Bob Johnson,莊寶,520,1B,12,TCH002,123,2024-01-20T10:00:00.000Z,2024-01-20T10:00:00.000Z
+STU013,Carol Wang,王嘉莉,680,2A,13,TCH001,123,2024-01-20T11:00:00.000Z,2024-01-20T11:00:00.000Z

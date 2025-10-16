@@ -1,0 +1,3 @@
+teacher_id,name,password,responsible_class,is_admin,last_login
+TCH004,Ms. Davis,teacher123,"[""1C"", ""2C""]",false,2024-01-20T08:00:00.000Z
+TCH005,Mr. Brown,teacher123,"[""1D""]",false,2024-01-20T08:30:00.000Z

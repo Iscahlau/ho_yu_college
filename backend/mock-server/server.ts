@@ -34,7 +34,7 @@ mockGames.forEach(game => {
  * POST /auth/login
  * Login endpoint for students and teachers
  */
-app.post('/auth/login', (req: express.Request, res: express.Response) => {
+app.post('/auth/login', (req: express.Request, res: express.Response): any => {
   const { id, password } = req.body;
 
   if (!id || !password) {
@@ -44,7 +44,7 @@ app.post('/auth/login', (req: express.Request, res: express.Response) => {
   const hashedPassword = hashPassword(password);
 
   // Try to find student first
-  let user = mockStudents.find(s => s.student_id === id);
+  let user: any = mockStudents.find(s => s.student_id === id);
   let role: 'student' | 'teacher' | 'admin' = 'student';
 
   // If not found, try teacher
@@ -64,7 +64,7 @@ app.post('/auth/login', (req: express.Request, res: express.Response) => {
   // Remove password from response
   const { password: _, ...userWithoutPassword } = user;
 
-  res.json({
+  return res.json({
     success: true,
     user: userWithoutPassword,
     role,
@@ -91,7 +91,7 @@ app.get('/games', (req: express.Request, res: express.Response) => {
  * GET /games/:gameId
  * Fetch a single game by ID
  */
-app.get('/games/:gameId', (req: express.Request, res: express.Response) => {
+app.get('/games/:gameId', (req: express.Request, res: express.Response): any => {
   const { gameId } = req.params;
   const game = mockGames.find(g => g.game_id === gameId);
 
@@ -100,7 +100,7 @@ app.get('/games/:gameId', (req: express.Request, res: express.Response) => {
   }
 
   // Return game with updated click count
-  res.json({
+  return res.json({
     ...game,
     accumulated_click: gameClicks.get(game.game_id) || game.accumulated_click,
   });
@@ -110,7 +110,7 @@ app.get('/games/:gameId', (req: express.Request, res: express.Response) => {
  * POST /games/:gameId/click
  * Increment game click count
  */
-app.post('/games/:gameId/click', (req: express.Request, res: express.Response) => {
+app.post('/games/:gameId/click', (req: express.Request, res: express.Response): any => {
   const { gameId } = req.params;
   const game = mockGames.find(g => g.game_id === gameId);
 
@@ -122,7 +122,7 @@ app.post('/games/:gameId/click', (req: express.Request, res: express.Response) =
   const currentClicks = gameClicks.get(gameId) || game.accumulated_click;
   gameClicks.set(gameId, currentClicks + 1);
 
-  res.json({
+  return res.json({
     success: true,
     accumulated_click: gameClicks.get(gameId),
   });
