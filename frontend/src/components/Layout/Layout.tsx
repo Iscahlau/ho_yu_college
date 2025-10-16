@@ -24,7 +24,7 @@ function Layout({ children }: LayoutProps) {
             right: 0,
             width: '400px',
             height: '400px',
-            backgroundImage: 'url(/assets/images/rainbow.svg)',
+            backgroundImage: 'url(/assets/images/rainbow.png)',
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'contain',
             backgroundPosition: 'top right',
