@@ -20,10 +20,10 @@ function Layout({ children }: LayoutProps) {
         <Box
           sx={{
             position: 'fixed',
-            top: 0,
-            right: '-50%',
-            width: '800px',
-            height: '800px',
+            top: 10,
+            right: '-20%',
+            width: '900px',
+            height: '900px',
             backgroundImage: 'url(/assets/images/rainbow.png)',
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'contain',
