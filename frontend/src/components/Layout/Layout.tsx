@@ -21,7 +21,7 @@ function Layout({ children }: LayoutProps) {
           sx={{
             position: 'fixed',
             top: 0,
-            right: '-50%',
+            right: '-20%',
             width: '800px',
             height: '800px',
             backgroundImage: 'url(/assets/images/rainbow.png)',
