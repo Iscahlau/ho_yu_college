@@ -322,13 +322,32 @@ Mock credentials:
   Admin:    TCH003, password: "admin123"
 ```
 
+### Environment Configuration (Optional)
+
+The mock server works out-of-the-box without any configuration. However, you can optionally create a `.env` file if you want to customize settings:
+
+```bash
+# Create .env file (optional)
+cd backend
+cp .env.example .env
+
+# Edit .env to change port if needed
+# PORT=3000
+```
+
+**Note:** The mock server only requires the `PORT` configuration. It uses in-memory mock data and doesn't need database connection strings.
+
 ### Change Port (Optional)
 
 If port 3000 is already in use:
 
 ```bash
-# Use a different port
+# Option 1: Set PORT environment variable
 PORT=3001 npm run mock-server
+
+# Option 2: Create/edit .env file
+echo "PORT=3001" > .env
+npm run mock-server
 
 # Update frontend configuration
 cd ../frontend
