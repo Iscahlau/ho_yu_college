@@ -21,14 +21,14 @@ function Layout({ children }: LayoutProps) {
           sx={{
             position: 'fixed',
             top: 0,
-            right: 0,
-            width: '400px',
-            height: '400px',
+            right: '-50%',
+            width: '800px',
+            height: '800px',
             backgroundImage: 'url(/assets/images/rainbow.png)',
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'contain',
             backgroundPosition: 'top right',
-            zIndex: 0,
+            zIndex: -1,
             pointerEvents: 'none',
           }}
         />
