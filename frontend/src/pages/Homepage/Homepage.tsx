@@ -202,11 +202,18 @@ function Homepage() {
                                                         </Box>
                                                     )}
                                                     <CardContent sx={{flexGrow: 1}}>
-                                                        <Typography variant="h6" gutterBottom noWrap
-                                                                    title={game.gameName}>
+                                                        <Typography variant="h6" gutterBottom
+                                                                    title={game.gameName}
+                                                                    sx={{
+                                                                        overflow: 'hidden',
+                                                                        display: '-webkit-box',
+                                                                        WebkitLineClamp: 2,
+                                                                        WebkitBoxOrient: 'vertical',
+                                                                        wordBreak: 'break-word'
+                                                                    }}>
                                                             {game.gameName}
                                                         </Typography>
-                                                        <Stack direction="row" spacing={1} sx={{mb: 1}}>
+                                                        <Stack direction="column" spacing={1} sx={{mb: 1}}>
                                                             <Chip
                                                                 label={t(`homepage.subjects.${game.subject}`)}
                                                                 size="small"
