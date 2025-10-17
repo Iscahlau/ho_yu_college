@@ -70,11 +70,13 @@ cdk.out/
 test/**/*.js
 test/**/*.d.ts
 !test/**/*.test.js
+backend/test/**/*.js
+backend/test/**/*.d.ts
 
 # Lambda build artifacts (TypeScript compilation)
-lambda/**/*.js
-lambda/**/*.d.ts
-lambda/**/*.js.map
+backend/lambda/**/*.js
+backend/lambda/**/*.d.ts
+backend/lambda/**/*.js.map
 
 # Temporary folders
 tmp/
