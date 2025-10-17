@@ -182,37 +182,45 @@ function Admin() {
 
   // Handle download student data
   const handleDownloadStudents = async () => {
-    try {
-      // Teachers can only download their own class data
-      const classFilter = isAdmin ? undefined : user?.responsibleClasses;
-      await downloadStudentData(classFilter);
-      // Note: Actual file download implementation would be added here
-      alert('Student data download initiated');
-    } catch (error) {
-      alert('Failed to download student data');
-      console.error(error);
+    showMessage('Preparing student data for download...', 'info');
+    
+    // Teachers can only download their own class data
+    const classFilter = isAdmin ? undefined : user?.responsibleClasses;
+    const result = await downloadStudentData(classFilter);
+    
+    if (result.success) {
+      showMessage(result.message, 'success');
+    } else {
+      showMessage(result.message, 'error');
     }
   };
 
   // Handle download teacher data (admin only)
   const handleDownloadTeachers = async () => {
-    try {
-      await downloadTeacherData();
-      alert('Teacher data download initiated');
-    } catch (error) {
-      alert('Failed to download teacher data');
-      console.error(error);
+    if (!isAdmin) {
+      showMessage('Only admins can download teacher data', 'error');
+      return;
+    }
+
+    showMessage('Preparing teacher data for download...', 'info');
+    const result = await downloadTeacherData();
+    
+    if (result.success) {
+      showMessage(result.message, 'success');
+    } else {
+      showMessage(result.message, 'error');
     }
   };
 
   // Handle download games data
   const handleDownloadGames = async () => {
-    try {
-      await downloadGamesData();
-      alert('Games data download initiated');
-    } catch (error) {
-      alert('Failed to download games data');
-      console.error(error);
+    showMessage('Preparing games data for download...', 'info');
+    const result = await downloadGamesData();
+    
+    if (result.success) {
+      showMessage(result.message, 'success');
+    } else {
+      showMessage(result.message, 'error');
     }
   };
 

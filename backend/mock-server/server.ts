@@ -5,7 +5,7 @@
 
 import express = require('express');
 import cors = require('cors');
-import crypto = require('crypto');
+import * as XLSX from 'xlsx';
 import { mockStudents, mockTeachers, mockGames } from '../test/mocks';
 
 const app = express();
@@ -14,11 +14,6 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-
-// Helper function to hash passwords
-function hashPassword(password: string): string {
-  return crypto.createHash('sha256').update(password).digest('hex');
-}
 
 // In-memory storage for game clicks (simulating database updates)
 const gameClicks = new Map<string, number>();
@@ -41,8 +36,6 @@ app.post('/auth/login', (req: express.Request, res: express.Response) => {
     return res.status(400).json({ message: 'Missing id or password' });
   }
 
-  const hashedPassword = hashPassword(password);
-
   // Try to find student first
   let user = mockStudents.find(s => s.student_id === id);
   let role: 'student' | 'teacher' | 'admin' = 'student';
@@ -56,8 +49,8 @@ app.post('/auth/login', (req: express.Request, res: express.Response) => {
     }
   }
 
-  // Verify user exists and password matches
-  if (!user || user.password !== hashedPassword) {
+  // Verify user exists and password matches (plain text comparison)
+  if (!user || user.password !== password) {
     return res.status(401).json({ message: 'Invalid credentials' });
   }
 
@@ -85,6 +78,47 @@ app.get('/games', (req: express.Request, res: express.Response) => {
   }));
 
   res.json(gamesWithUpdatedClicks);
+});
+
+/**
+ * GET /games/download
+ * Download games data as Excel
+ * NOTE: This must be defined before /games/:gameId to avoid route conflicts
+ */
+app.get('/games/download', (req: express.Request, res: express.Response) => {
+  try {
+    // Get games with updated click counts
+    const gamesWithUpdatedClicks = mockGames.map(game => ({
+      ...game,
+      accumulated_click: gameClicks.get(game.game_id) || game.accumulated_click,
+    }));
+
+    // Sort games by game_id
+    gamesWithUpdatedClicks.sort((a, b) => a.game_id.localeCompare(b.game_id));
+
+    // Create Excel workbook
+    const worksheet = XLSX.utils.json_to_sheet(gamesWithUpdatedClicks);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Games');
+
+    // Set column widths
+    worksheet['!cols'] = [
+      { wch: 12 }, { wch: 30 }, { wch: 12 }, { wch: 25 }, { wch: 15 },
+      { wch: 12 }, { wch: 20 }, { wch: 15 }, { wch: 40 }, { wch: 15 }
+    ];
+
+    // Generate Excel file
+    const excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="games_${new Date().toISOString().split('T')[0]}.xlsx"`);
+    res.send(excelBuffer);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to download games data',
+    });
+  }
 });
 
 /**
@@ -128,6 +162,110 @@ app.post('/games/:gameId/click', (req: express.Request, res: express.Response) =
   });
 });
 
+// ===== Download Endpoints =====
+
+/**
+ * GET /students/download
+ * Download student data as Excel
+ */
+app.get('/students/download', (req: express.Request, res: express.Response) => {
+  try {
+    const classFilter = req.query.classes ? (req.query.classes as string).split(',') : [];
+    
+    let students = mockStudents;
+    if (classFilter.length > 0) {
+      students = mockStudents.filter(s => classFilter.includes(s.class));
+    }
+
+    // Sort students by class and class_no
+    students.sort((a, b) => {
+      if (a.class !== b.class) {
+        return a.class.localeCompare(b.class);
+      }
+      return a.class_no.localeCompare(b.class_no);
+    });
+
+    // Include all fields including password
+    const excelData = students.map(student => ({
+      student_id: student.student_id,
+      name_1: student.name_1,
+      name_2: student.name_2,
+      marks: student.marks,
+      class: student.class,
+      class_no: student.class_no,
+      last_login: student.last_login,
+      last_update: student.last_update,
+      teacher_id: student.teacher_id,
+      password: student.password,
+    }));
+
+    // Create Excel workbook
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Students');
+
+    // Set column widths
+    worksheet['!cols'] = [
+      { wch: 12 }, { wch: 20 }, { wch: 20 }, { wch: 8 },
+      { wch: 8 }, { wch: 10 }, { wch: 20 }, { wch: 20 }, { wch: 12 }, { wch: 15 }
+    ];
+
+    // Generate Excel file
+    const excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="students_${new Date().toISOString().split('T')[0]}.xlsx"`);
+    res.send(excelBuffer);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to download student data',
+    });
+  }
+});
+
+/**
+ * GET /teachers/download
+ * Download teacher data as Excel (Admin only)
+ */
+app.get('/teachers/download', (req: express.Request, res: express.Response) => {
+  try {
+    const teachers = mockTeachers.sort((a, b) => a.teacher_id.localeCompare(b.teacher_id));
+
+    // Include all fields including password
+    const excelData = teachers.map(teacher => ({
+      teacher_id: teacher.teacher_id,
+      name: teacher.name,
+      responsible_class: teacher.responsible_class.join(', '),
+      last_login: teacher.last_login,
+      is_admin: teacher.is_admin ? 'Yes' : 'No',
+      password: teacher.password,
+    }));
+
+    // Create Excel workbook
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Teachers');
+
+    // Set column widths
+    worksheet['!cols'] = [
+      { wch: 12 }, { wch: 20 }, { wch: 30 }, { wch: 20 }, { wch: 10 }, { wch: 15 }
+    ];
+
+    // Generate Excel file
+    const excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="teachers_${new Date().toISOString().split('T')[0]}.xlsx"`);
+    res.send(excelBuffer);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to download teacher data',
+    });
+  }
+});
+
 // ===== Server Start =====
 
 app.listen(PORT, () => {
@@ -138,6 +276,9 @@ app.listen(PORT, () => {
   console.log(`  GET    /games`);
   console.log(`  GET    /games/:gameId`);
   console.log(`  POST   /games/:gameId/click`);
+  console.log(`  GET    /students/download`);
+  console.log(`  GET    /teachers/download`);
+  console.log(`  GET    /games/download`);
   console.log(`\nMock credentials:`);
   console.log(`  Students: STU001-STU010, password: "123"`);
   console.log(`  Teachers: TCH001-TCH002, password: "teacher123"`);
