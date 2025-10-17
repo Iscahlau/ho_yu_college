@@ -6,7 +6,6 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import * as crypto from 'crypto';
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
@@ -34,9 +33,6 @@ export const handler = async (
       };
     }
 
-    // Hash password for comparison
-    const hashedPassword = hashPassword(password);
-
     // Try to find student first
     let user = await getStudent(id);
     let role: 'student' | 'teacher' | 'admin' = 'student';
@@ -49,8 +45,8 @@ export const handler = async (
       }
     }
 
-    // Verify user exists and password matches
-    if (!user || user.password !== hashedPassword) {
+    // Verify user exists and password matches (plain text comparison)
+    if (!user || user.password !== password) {
       return {
         statusCode: 401,
         headers: {
@@ -116,8 +112,4 @@ async function updateLastLogin(id: string, role: 'student' | 'teacher' | 'admin'
   // Implementation would update the last_login timestamp
   // This is a placeholder for the actual implementation
   console.log(`Updating last login for ${role} ${id}`);
-}
-
-function hashPassword(password: string): string {
-  return crypto.createHash('sha256').update(password).digest('hex');
 }

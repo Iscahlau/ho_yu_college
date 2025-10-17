@@ -11,6 +11,4 @@ export declare const mockTeachers: {
     is_admin: boolean;
 }[];
 export declare const MOCK_TEACHER_PASSWORD = "teacher123";
-export declare const MOCK_TEACHER_PASSWORD_HASH: string;
 export declare const MOCK_ADMIN_PASSWORD = "admin123";
-export declare const MOCK_ADMIN_PASSWORD_HASH: string;

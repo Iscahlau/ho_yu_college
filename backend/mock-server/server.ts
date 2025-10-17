@@ -5,7 +5,6 @@
 
 import express = require('express');
 import cors = require('cors');
-import crypto = require('crypto');
 import * as XLSX from 'xlsx';
 import { mockStudents, mockTeachers, mockGames } from '../test/mocks';
 
@@ -15,11 +14,6 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-
-// Helper function to hash passwords
-function hashPassword(password: string): string {
-  return crypto.createHash('sha256').update(password).digest('hex');
-}
 
 // In-memory storage for game clicks (simulating database updates)
 const gameClicks = new Map<string, number>();
@@ -42,8 +36,6 @@ app.post('/auth/login', (req: express.Request, res: express.Response) => {
     return res.status(400).json({ message: 'Missing id or password' });
   }
 
-  const hashedPassword = hashPassword(password);
-
   // Try to find student first
   let user = mockStudents.find(s => s.student_id === id);
   let role: 'student' | 'teacher' | 'admin' = 'student';
@@ -57,8 +49,8 @@ app.post('/auth/login', (req: express.Request, res: express.Response) => {
     }
   }
 
-  // Verify user exists and password matches
-  if (!user || user.password !== hashedPassword) {
+  // Verify user exists and password matches (plain text comparison)
+  if (!user || user.password !== password) {
     return res.status(401).json({ message: 'Invalid credentials' });
   }
 
@@ -215,7 +207,7 @@ app.get('/students/download', (req: express.Request, res: express.Response) => {
     // Set column widths
     worksheet['!cols'] = [
       { wch: 12 }, { wch: 20 }, { wch: 20 }, { wch: 8 },
-      { wch: 8 }, { wch: 10 }, { wch: 20 }, { wch: 20 }, { wch: 12 }, { wch: 64 }
+      { wch: 8 }, { wch: 10 }, { wch: 20 }, { wch: 20 }, { wch: 12 }, { wch: 15 }
     ];
 
     // Generate Excel file
@@ -257,7 +249,7 @@ app.get('/teachers/download', (req: express.Request, res: express.Response) => {
 
     // Set column widths
     worksheet['!cols'] = [
-      { wch: 12 }, { wch: 20 }, { wch: 30 }, { wch: 20 }, { wch: 10 }, { wch: 64 }
+      { wch: 12 }, { wch: 20 }, { wch: 30 }, { wch: 20 }, { wch: 10 }, { wch: 15 }
     ];
 
     // Generate Excel file

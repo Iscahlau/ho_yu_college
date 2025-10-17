@@ -92,7 +92,7 @@ export const handler = async (
       { wch: 20 }, // last_login
       { wch: 20 }, // last_update
       { wch: 12 }, // teacher_id
-      { wch: 64 }, // password (hash)
+      { wch: 15 }, // password
     ];
 
     // Generate Excel file buffer
