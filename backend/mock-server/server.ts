@@ -89,6 +89,47 @@ app.get('/games', (req: express.Request, res: express.Response) => {
 });
 
 /**
+ * GET /games/download
+ * Download games data as Excel
+ * NOTE: This must be defined before /games/:gameId to avoid route conflicts
+ */
+app.get('/games/download', (req: express.Request, res: express.Response) => {
+  try {
+    // Get games with updated click counts
+    const gamesWithUpdatedClicks = mockGames.map(game => ({
+      ...game,
+      accumulated_click: gameClicks.get(game.game_id) || game.accumulated_click,
+    }));
+
+    // Sort games by game_id
+    gamesWithUpdatedClicks.sort((a, b) => a.game_id.localeCompare(b.game_id));
+
+    // Create Excel workbook
+    const worksheet = XLSX.utils.json_to_sheet(gamesWithUpdatedClicks);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Games');
+
+    // Set column widths
+    worksheet['!cols'] = [
+      { wch: 12 }, { wch: 30 }, { wch: 12 }, { wch: 25 }, { wch: 15 },
+      { wch: 12 }, { wch: 20 }, { wch: 15 }, { wch: 40 }, { wch: 15 }
+    ];
+
+    // Generate Excel file
+    const excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="games_${new Date().toISOString().split('T')[0]}.xlsx"`);
+    res.send(excelBuffer);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to download games data',
+    });
+  }
+});
+
+/**
  * GET /games/:gameId
  * Fetch a single game by ID
  */
@@ -220,46 +261,6 @@ app.get('/teachers/download', (req: express.Request, res: express.Response) => {
     res.status(500).json({
       success: false,
       message: 'Failed to download teacher data',
-    });
-  }
-});
-
-/**
- * GET /games/download
- * Download games data as Excel
- */
-app.get('/games/download', (req: express.Request, res: express.Response) => {
-  try {
-    // Get games with updated click counts
-    const gamesWithUpdatedClicks = mockGames.map(game => ({
-      ...game,
-      accumulated_click: gameClicks.get(game.game_id) || game.accumulated_click,
-    }));
-
-    // Sort games by game_id
-    gamesWithUpdatedClicks.sort((a, b) => a.game_id.localeCompare(b.game_id));
-
-    // Create Excel workbook
-    const worksheet = XLSX.utils.json_to_sheet(gamesWithUpdatedClicks);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Games');
-
-    // Set column widths
-    worksheet['!cols'] = [
-      { wch: 12 }, { wch: 30 }, { wch: 12 }, { wch: 25 }, { wch: 15 },
-      { wch: 12 }, { wch: 20 }, { wch: 15 }, { wch: 40 }, { wch: 15 }
-    ];
-
-    // Generate Excel file
-    const excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
-
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="games_${new Date().toISOString().split('T')[0]}.xlsx"`);
-    res.send(excelBuffer);
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Failed to download games data',
     });
   }
 });
