@@ -36,13 +36,14 @@ export const handler = async (
     // Sort teachers by teacher_id
     teachers.sort((a, b) => a.teacher_id.localeCompare(b.teacher_id));
 
-    // Prepare data for Excel (remove password field for security)
+    // Prepare data for Excel (including password field)
     const excelData = teachers.map(teacher => ({
       teacher_id: teacher.teacher_id,
       name: teacher.name,
       responsible_class: teacher.responsible_class.join(', '), // Convert array to comma-separated string
       last_login: teacher.last_login,
       is_admin: teacher.is_admin ? 'Yes' : 'No',
+      password: teacher.password,
     }));
 
     // Create Excel workbook
@@ -57,6 +58,7 @@ export const handler = async (
       { wch: 30 }, // responsible_class
       { wch: 20 }, // last_login
       { wch: 10 }, // is_admin
+      { wch: 64 }, // password (hash)
     ];
 
     // Generate Excel file buffer

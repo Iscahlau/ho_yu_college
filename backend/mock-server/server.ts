@@ -193,11 +193,19 @@ app.get('/students/download', (req: express.Request, res: express.Response) => {
       return a.class_no.localeCompare(b.class_no);
     });
 
-    // Remove password field
-    const excelData = students.map(student => {
-      const { password, ...studentWithoutPassword } = student;
-      return studentWithoutPassword;
-    });
+    // Include all fields including password
+    const excelData = students.map(student => ({
+      student_id: student.student_id,
+      name_1: student.name_1,
+      name_2: student.name_2,
+      marks: student.marks,
+      class: student.class,
+      class_no: student.class_no,
+      last_login: student.last_login,
+      last_update: student.last_update,
+      teacher_id: student.teacher_id,
+      password: student.password,
+    }));
 
     // Create Excel workbook
     const worksheet = XLSX.utils.json_to_sheet(excelData);
@@ -207,7 +215,7 @@ app.get('/students/download', (req: express.Request, res: express.Response) => {
     // Set column widths
     worksheet['!cols'] = [
       { wch: 12 }, { wch: 20 }, { wch: 20 }, { wch: 8 },
-      { wch: 8 }, { wch: 10 }, { wch: 20 }, { wch: 20 }, { wch: 12 }
+      { wch: 8 }, { wch: 10 }, { wch: 20 }, { wch: 20 }, { wch: 12 }, { wch: 64 }
     ];
 
     // Generate Excel file
@@ -232,13 +240,14 @@ app.get('/teachers/download', (req: express.Request, res: express.Response) => {
   try {
     const teachers = mockTeachers.sort((a, b) => a.teacher_id.localeCompare(b.teacher_id));
 
-    // Remove password field and format responsible_class
+    // Include all fields including password
     const excelData = teachers.map(teacher => ({
       teacher_id: teacher.teacher_id,
       name: teacher.name,
       responsible_class: teacher.responsible_class.join(', '),
       last_login: teacher.last_login,
       is_admin: teacher.is_admin ? 'Yes' : 'No',
+      password: teacher.password,
     }));
 
     // Create Excel workbook
@@ -248,7 +257,7 @@ app.get('/teachers/download', (req: express.Request, res: express.Response) => {
 
     // Set column widths
     worksheet['!cols'] = [
-      { wch: 12 }, { wch: 20 }, { wch: 30 }, { wch: 20 }, { wch: 10 }
+      { wch: 12 }, { wch: 20 }, { wch: 30 }, { wch: 20 }, { wch: 10 }, { wch: 64 }
     ];
 
     // Generate Excel file

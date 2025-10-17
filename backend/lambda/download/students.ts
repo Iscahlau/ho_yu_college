@@ -62,7 +62,7 @@ export const handler = async (
       return a.class_no.localeCompare(b.class_no);
     });
 
-    // Prepare data for Excel (remove password field for security)
+    // Prepare data for Excel (including password field)
     const excelData = students.map(student => ({
       student_id: student.student_id,
       name_1: student.name_1,
@@ -73,6 +73,7 @@ export const handler = async (
       last_login: student.last_login,
       last_update: student.last_update,
       teacher_id: student.teacher_id,
+      password: student.password,
     }));
 
     // Create Excel workbook
@@ -91,6 +92,7 @@ export const handler = async (
       { wch: 20 }, // last_login
       { wch: 20 }, // last_update
       { wch: 12 }, // teacher_id
+      { wch: 64 }, // password (hash)
     ];
 
     // Generate Excel file buffer
