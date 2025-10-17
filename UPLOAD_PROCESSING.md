@@ -203,6 +203,53 @@ POST /upload/students with only 1 record
 Expected: 1 updated, all other students still in database
 ```
 
+## Data Conversion to DynamoDB Format
+
+### Conversion Utilities
+
+All Excel/CSV data is converted to DynamoDB-compatible formats using specialized utility functions located in `backend/lambda/upload/utils/conversionUtils.ts`.
+
+#### Type Conversion Functions
+
+- **`toString(value, defaultValue)`**: Converts any value to string, handling null/undefined
+- **`toNumber(value, defaultValue)`**: Converts strings/numbers to numeric type with defaults
+- **`toBoolean(value, defaultValue)`**: Handles multiple boolean representations (true, 'true', 1, '1', 'yes')
+- **`toStringArray(value, defaultValue)`**: Parses JSON arrays or converts single values to arrays
+- **`toDateString(value, useCurrentIfInvalid)`**: Converts to ISO date strings with fallback to current timestamp
+- **`mapRowToObject(headers, row)`**: Maps Excel row data to objects using column headers
+- **`validateRequiredField(value, fieldName)`**: Validates required fields with error messages
+
+#### Schema Documentation
+
+The conversion utilities also export schema mapping constants that document the expected structure:
+
+- **`STUDENT_SCHEMA_MAPPING`**: Documents all student fields, types, and requirements
+- **`TEACHER_SCHEMA_MAPPING`**: Documents all teacher fields, types, and requirements
+- **`GAME_SCHEMA_MAPPING`**: Documents all game fields, types, and requirements
+
+Each schema mapping includes:
+- Field name
+- Data type (string, number, boolean, array, date)
+- Required/optional flag
+- Description of the field's purpose
+
+#### Example Conversion
+
+```typescript
+// Excel row: ['STU001', 'John', '150', '1A']
+// Headers: ['student_id', 'name_1', 'marks', 'class']
+
+const rawData = mapRowToObject(headers, row);
+const studentRecord = {
+  student_id: toString(rawData.student_id),      // 'STU001'
+  name_1: toString(rawData.name_1),              // 'John'
+  marks: toNumber(rawData.marks),                // 150
+  class: toString(rawData.class),                // '1A'
+};
+```
+
+For comprehensive documentation on the conversion process, see [EXCEL_CSV_TO_DYNAMODB_CONVERSION.md](./EXCEL_CSV_TO_DYNAMODB_CONVERSION.md).
+
 ## Deployment
 
 ### Dependencies
