@@ -4,6 +4,8 @@ interface ImportMetaEnv {
   readonly VITE_API_URL: string;
   readonly VITE_LOGIN_ENDPOINT: string;
   readonly VITE_GAMES_ENDPOINT: string;
+  readonly VITE_STUDENTS_ENDPOINT: string;
+  readonly VITE_TEACHERS_ENDPOINT: string;
   readonly VITE_UPLOAD_ENDPOINT: string;
   readonly VITE_DOWNLOAD_ENDPOINT: string;
   readonly VITE_SCRATCH_API_BASE: string;
