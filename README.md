@@ -48,7 +48,34 @@ This constraint is validated in the test suite to ensure data integrity.
 ### Prerequisites
 - Node.js v18+ (v20.19.5 recommended)
 - npm v10+
+- Docker and Docker Compose (for DynamoDB Local)
 - AWS CLI (for backend deployment)
+
+### Local Development with DynamoDB Local
+
+For local development with a real DynamoDB instance (recommended):
+
+```bash
+# Terminal 1: Start DynamoDB Local
+cd backend
+npm install
+cp .env.example .env  # Configure environment
+npm run dynamodb:setup  # Start DynamoDB, create tables, seed data
+
+# Terminal 2: Start backend/mock server
+cd backend
+npm run mock-server  # Runs on http://localhost:3000
+
+# Terminal 3: Start frontend
+cd frontend
+npm install
+echo "VITE_API_URL=http://localhost:3000" > .env.local
+npm run dev  # Runs on http://localhost:5173
+```
+
+**DynamoDB Admin UI**: Access at http://localhost:8001 to view and manage data.
+
+See [DynamoDB Local Guide](backend/DYNAMODB_LOCAL_GUIDE.md) for comprehensive setup instructions.
 
 ### Local Development with Mock Server
 
@@ -89,6 +116,7 @@ npx cdk deploy     # Deploy to AWS (requires credentials)
 
 For detailed development instructions, build commands, troubleshooting, and best practices, see:
 - **[Copilot Instructions](.github/copilot-instructions.md)** - Comprehensive development guide with validated commands and timings
+- **[DynamoDB Local Setup Guide](backend/DYNAMODB_LOCAL_GUIDE.md)** - Complete guide for local DynamoDB development
 - **[Local Mock Database Setup](backend/database/README.md)** - Set up local SQL database with DataGrip for development
   - **[Quick Start Guide](backend/database/QUICK_START.md)** - Fast setup reference
   - **[DataGrip Setup Guide](backend/database/DATAGRIP_GUIDE.md)** - Visual walkthrough
