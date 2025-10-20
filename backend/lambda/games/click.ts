@@ -4,12 +4,9 @@
  * Uses atomic DynamoDB operations to handle concurrent clicks safely
  */
 
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, UpdateCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
+import { UpdateCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
+import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
 
 export const handler = async (
   event: APIGatewayProxyEvent
@@ -30,11 +27,11 @@ export const handler = async (
 
     // First verify the game exists
     const getCommand = new GetCommand({
-      TableName: process.env.GAMES_TABLE_NAME,
+      TableName: tableNames.games,
       Key: { game_id: gameId },
     });
 
-    const getResult = await docClient.send(getCommand);
+    const getResult = await dynamoDBClient.send(getCommand);
     
     if (!getResult.Item) {
       return {
@@ -50,7 +47,7 @@ export const handler = async (
     // Use atomic ADD operation to increment the click count
     // This ensures thread-safety even with concurrent requests
     const updateCommand = new UpdateCommand({
-      TableName: process.env.GAMES_TABLE_NAME,
+      TableName: tableNames.games,
       Key: { game_id: gameId },
       UpdateExpression: 'ADD accumulated_click :increment',
       ExpressionAttributeValues: {
@@ -59,7 +56,7 @@ export const handler = async (
       ReturnValues: 'ALL_NEW',
     });
 
-    const updateResult = await docClient.send(updateCommand);
+    const updateResult = await dynamoDBClient.send(updateCommand);
 
     return {
       statusCode: 200,

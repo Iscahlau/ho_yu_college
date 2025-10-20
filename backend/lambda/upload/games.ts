@@ -6,13 +6,10 @@
  * - No delete functionality
  */
 
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
+import { PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import * as XLSX from 'xlsx';
-
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
+import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
 
 interface GameRecord {
   game_id: string;
@@ -193,10 +190,10 @@ export const handler = async (
 async function getGame(gameId: string) {
   try {
     const command = new GetCommand({
-      TableName: process.env.GAMES_TABLE_NAME || 'ho-yu-games',
+      TableName: tableNames.games,
       Key: { game_id: gameId },
     });
-    const result = await docClient.send(command);
+    const result = await dynamoDBClient.send(command);
     return result.Item as GameRecord | undefined;
   } catch (error) {
     console.error(`Error getting game ${gameId}:`, error);
@@ -206,8 +203,8 @@ async function getGame(gameId: string) {
 
 async function putGame(game: GameRecord) {
   const command = new PutCommand({
-    TableName: process.env.GAMES_TABLE_NAME || 'ho-yu-games',
+    TableName: tableNames.games,
     Item: game,
   });
-  await docClient.send(command);
+  await dynamoDBClient.send(command);
 }

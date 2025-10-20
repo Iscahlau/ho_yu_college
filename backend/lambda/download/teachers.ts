@@ -5,13 +5,10 @@
  * - Returns Excel file (.xlsx) with proper structure
  */
 
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, ScanCommand } from '@aws-sdk/lib-dynamodb';
+import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import * as XLSX from 'xlsx';
-
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
+import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
 
 interface TeacherRecord {
   teacher_id: string;
@@ -28,9 +25,9 @@ export const handler = async (
   try {
     // Get all teachers from DynamoDB
     const scanCommand = new ScanCommand({
-      TableName: process.env.TEACHERS_TABLE_NAME || 'ho-yu-teachers',
+      TableName: tableNames.teachers,
     });
-    const result = await docClient.send(scanCommand);
+    const result = await dynamoDBClient.send(scanCommand);
     const teachers = result.Items as TeacherRecord[];
 
     // Sort teachers by teacher_id

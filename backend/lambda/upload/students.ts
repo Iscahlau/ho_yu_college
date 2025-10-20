@@ -6,13 +6,10 @@
  * - No delete functionality
  */
 
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
+import { PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import * as XLSX from 'xlsx';
-
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
+import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
 
 interface StudentRecord {
   student_id: string;
@@ -191,10 +188,10 @@ export const handler = async (
 async function getStudent(studentId: string) {
   try {
     const command = new GetCommand({
-      TableName: process.env.STUDENTS_TABLE_NAME || 'ho-yu-students',
+      TableName: tableNames.students,
       Key: { student_id: studentId },
     });
-    const result = await docClient.send(command);
+    const result = await dynamoDBClient.send(command);
     return result.Item as StudentRecord | undefined;
   } catch (error) {
     console.error(`Error getting student ${studentId}:`, error);
@@ -204,8 +201,8 @@ async function getStudent(studentId: string) {
 
 async function putStudent(student: StudentRecord) {
   const command = new PutCommand({
-    TableName: process.env.STUDENTS_TABLE_NAME || 'ho-yu-students',
+    TableName: tableNames.students,
     Item: student,
   });
-  await docClient.send(command);
+  await dynamoDBClient.send(command);
 }

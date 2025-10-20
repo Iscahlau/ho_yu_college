@@ -32,7 +32,7 @@ const TABLE_NAMES = {
 /**
  * Seed data in batches (DynamoDB batch write limit is 25 items)
  */
-async function seedInBatches<T>(
+async function seedInBatches<T extends Record<string, any>>(
   tableName: string,
   items: T[],
   label: string
@@ -50,7 +50,7 @@ async function seedInBatches<T>(
     const batch = batches[i];
     const putRequests = batch.map(item => ({
       PutRequest: {
-        Item: item,
+        Item: item as Record<string, any>,
       },
     }));
 
