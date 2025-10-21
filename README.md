@@ -48,18 +48,45 @@ This constraint is validated in the test suite to ensure data integrity.
 ### Prerequisites
 - Node.js v18+ (v20.19.5 recommended)
 - npm v10+
-- Docker and Docker Compose (for DynamoDB Local)
-- AWS CLI (for backend deployment)
+- Docker and Docker Compose (for DynamoDB Local - optional)
+- AWS CLI (for backend deployment - optional)
 
-### Local Development with DynamoDB Local
+### Local Development
 
-For local development with a real DynamoDB instance (recommended):
+**Choose your development mode:**
+
+1. **In-Memory Mode (Fastest)** - No database required
+2. **DynamoDB Local Mode (Production-like)** - Full database integration
+
+For detailed setup instructions for both modes, see **[Local Development Guide](LOCAL_DEVELOPMENT_GUIDE.md)**.
+
+### Quick Start - In-Memory Mode
+
+```bash
+# Terminal 1: Start mock server
+cd backend
+npm install
+npm run mock-server  # Runs on http://localhost:3000
+
+# Terminal 2: Start frontend
+cd frontend
+npm install
+echo "VITE_API_URL=http://localhost:3000" > .env.local
+npm run dev  # Runs on http://localhost:5173
+```
+
+### Quick Start - DynamoDB Local Mode
+
+### Quick Start - DynamoDB Local Mode
+
+For production-like database testing with DynamoDB Local:
 
 ```bash
 # Terminal 1: Start DynamoDB Local
 cd backend
 npm install
 cp .env.example .env  # Configure environment
+echo "USE_DYNAMODB=true" >> .env  # Enable DynamoDB mode
 npm run dynamodb:setup  # Start DynamoDB, create tables, seed data
 
 # Terminal 2: Start backend/mock server
@@ -75,11 +102,13 @@ npm run dev  # Runs on http://localhost:5173
 
 **DynamoDB Admin UI**: Access at http://localhost:8001 to view and manage data.
 
-See [DynamoDB Local Guide](backend/DYNAMODB_LOCAL_GUIDE.md) for comprehensive setup instructions.
+See **[Local Development Guide](LOCAL_DEVELOPMENT_GUIDE.md)** for complete setup instructions and **[DynamoDB Local Guide](backend/DYNAMODB_LOCAL_GUIDE.md)** for comprehensive DynamoDB documentation.
 
-### Local Development with Mock Server
+### Local Development with Mock Server Only (Legacy)
 
-For local development without AWS deployment:
+### Local Development with Mock Server Only (Legacy)
+
+For local development without DynamoDB (uses in-memory data):
 
 ```bash
 # Terminal 1: Start mock server
@@ -114,13 +143,20 @@ npx cdk deploy     # Deploy to AWS (requires credentials)
 
 ## 📖 Documentation
 
-For detailed development instructions, build commands, troubleshooting, and best practices, see:
-- **[Copilot Instructions](.github/copilot-instructions.md)** - Comprehensive development guide with validated commands and timings
+### Getting Started
+- **[Local Development Guide](LOCAL_DEVELOPMENT_GUIDE.md)** - Complete guide for local development in both modes
+- **[Copilot Instructions](.github/copilot-instructions.md)** - Comprehensive development guide with validated commands
+- **[Main README](README.md)** - This file, project overview
+
+### Backend Development
 - **[DynamoDB Local Setup Guide](backend/DYNAMODB_LOCAL_GUIDE.md)** - Complete guide for local DynamoDB development
-- **[Local Mock Database Setup](backend/database/README.md)** - Set up local SQL database with DataGrip for development
+- **[Mock Server Documentation](backend/mock-server/README.md)** - API documentation and usage guide
+- **[Local Mock Database Setup](backend/database/README.md)** - Alternative SQL database setup (legacy)
   - **[Quick Start Guide](backend/database/QUICK_START.md)** - Fast setup reference
   - **[DataGrip Setup Guide](backend/database/DATAGRIP_GUIDE.md)** - Visual walkthrough
   - **[Documentation Index](backend/database/INDEX.md)** - Complete guide to all database docs
+
+For detailed development instructions, build commands, troubleshooting, and best practices, see the documentation above.
 
 ### Game Page Usage
 

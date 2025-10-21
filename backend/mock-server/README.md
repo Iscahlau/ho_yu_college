@@ -285,6 +285,23 @@ echo "VITE_API_URL=http://localhost:3000" > .env.local
 npm run dev  # Runs on http://localhost:5173
 ```
 
+### Testing Mock Server
+
+To verify all endpoints are working correctly:
+
+```bash
+# In a separate terminal, with mock server running
+cd backend
+npm run mock-server:test
+```
+
+This runs automated tests against the mock server endpoints, testing:
+- GET /games (fetch all games)
+- GET /games/:gameId (fetch single game)
+- POST /auth/login (authentication)
+- POST /games/:gameId/click (increment clicks)
+- Error handling (404, 401, 400 responses)
+
 ### Accessing Services
 - **Frontend**: http://localhost:5173
 - **Mock Server**: http://localhost:3000

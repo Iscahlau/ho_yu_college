@@ -10,6 +10,7 @@
     "test": "jest",
     "cdk": "cdk",
     "mock-server": "ts-node-dev --respawn --transpile-only mock-server/server.ts",
+    "mock-server:test": "bash scripts/test-mock-server.sh",
     "dynamodb:start": "docker-compose -f docker-compose.dynamodb.yml up -d",
     "dynamodb:stop": "docker-compose -f docker-compose.dynamodb.yml stop",
     "dynamodb:down": "docker-compose -f docker-compose.dynamodb.yml down -v",
