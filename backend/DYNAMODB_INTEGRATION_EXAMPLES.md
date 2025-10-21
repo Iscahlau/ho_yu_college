@@ -13,7 +13,7 @@ cd backend
 cat > .env << 'EOF'
 # DynamoDB Configuration
 DYNAMODB_MODE=local
-DYNAMODB_ENDPOINT=http://localhost:8000
+DYNAMODB_ENDPOINT=http://localhost:8002
 AWS_REGION=us-east-1
 AWS_ACCESS_KEY_ID=local
 AWS_SECRET_ACCESS_KEY=local
@@ -36,7 +36,7 @@ docker ps
 
 # Expected output:
 # CONTAINER ID   IMAGE                           PORTS
-# ...            amazon/dynamodb-local:latest    0.0.0.0:8000->8000/tcp
+# ...            amazon/dynamodb-local:latest    0.0.0.0:8002->8000/tcp
 # ...            aaronshaf/dynamodb-admin        0.0.0.0:8001->8001/tcp
 ```
 
@@ -233,7 +233,7 @@ Your code automatically switches based on environment variables:
 **Local Development** (`.env`):
 ```bash
 DYNAMODB_MODE=local
-DYNAMODB_ENDPOINT=http://localhost:8000
+DYNAMODB_ENDPOINT=http://localhost:8002
 AWS_ACCESS_KEY_ID=local
 AWS_SECRET_ACCESS_KEY=local
 ```
@@ -411,7 +411,7 @@ process.env.DEBUG = 'aws-sdk:*';
 # Use AWS CLI
 aws dynamodb scan \
   --table-name ho-yu-students \
-  --endpoint-url http://localhost:8000 \
+  --endpoint-url http://localhost:8002 \
   --region us-east-1 \
   --max-items 5
 

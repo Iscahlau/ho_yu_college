@@ -83,7 +83,7 @@ Summary: 5 passed, 0 failed
 2. **Environment variables configured**:
    - Copy `.env.example` to `.env`
    - Ensure `DYNAMODB_MODE=local`
-   - Set `DYNAMODB_ENDPOINT=http://localhost:8000`
+   - Set `DYNAMODB_ENDPOINT=http://localhost:8002`
 
 ## Complete Workflow
 
@@ -138,7 +138,7 @@ npm run dynamodb:down
 
 **Configuration:**
 - Reads from environment variables:
-  - `DYNAMODB_ENDPOINT` (default: http://localhost:8000)
+  - `DYNAMODB_ENDPOINT` (default: http://localhost:8002)
   - `AWS_REGION` (default: us-east-1)
   - `*_TABLE_NAME` variables
 

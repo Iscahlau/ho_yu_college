@@ -6,7 +6,7 @@ This document summarizes the complete implementation of DynamoDB Local for the H
 
 ### 1. Infrastructure (Docker)
 - **docker-compose.dynamodb.yml**: Complete Docker Compose configuration
-  - DynamoDB Local container on port 8000
+  - DynamoDB Local container on port 8002
   - DynamoDB Admin UI on port 8001
   - Persistent data volume
   - Custom network for container communication
@@ -182,7 +182,7 @@ lambda/utils/dynamodb-client.ts
     ↓
 Environment Check (DYNAMODB_MODE)
     ↓
-    ├─→ local → http://localhost:8000 → DynamoDB Local
+    ├─→ local → http://localhost:8002 → DynamoDB Local
     └─→ aws   → AWS SDK           → AWS DynamoDB
 ```
 

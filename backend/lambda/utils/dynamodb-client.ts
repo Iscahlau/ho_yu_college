@@ -20,7 +20,7 @@ export function createDynamoDBClient(): DynamoDBDocumentClient {
 
   // Configure for local DynamoDB
   if (mode === 'local') {
-    const endpoint = process.env.DYNAMODB_ENDPOINT || 'http://localhost:8000';
+    const endpoint = process.env.DYNAMODB_ENDPOINT || 'http://localhost:8002';
     
     clientConfig.endpoint = endpoint;
     clientConfig.credentials = {

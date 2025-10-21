@@ -36,9 +36,9 @@ Done! Your local DynamoDB is ready.
 
 ## 🔍 Access Points
 
-- **DynamoDB Local**: http://localhost:8000
+- **DynamoDB Local**: http://localhost:8002
 - **Admin UI**: http://localhost:8001
-- **AWS CLI**: `--endpoint-url http://localhost:8000`
+- **AWS CLI**: `--endpoint-url http://localhost:8002`
 
 ## 🗄️ Test Data
 
@@ -58,7 +58,7 @@ Edit `.env` file:
 
 ```bash
 DYNAMODB_MODE=local
-DYNAMODB_ENDPOINT=http://localhost:8000
+DYNAMODB_ENDPOINT=http://localhost:8002
 AWS_REGION=us-east-1
 AWS_ACCESS_KEY_ID=local
 AWS_SECRET_ACCESS_KEY=local
@@ -70,7 +70,7 @@ AWS_SECRET_ACCESS_KEY=local
 ```bash
 # Change port in docker-compose.dynamodb.yml
 ports:
-  - "8001:8000"  # Changed from 8000:8000
+  - "8002:8000  # Changed from 8000:8000
 ```
 
 **Container won't start?**

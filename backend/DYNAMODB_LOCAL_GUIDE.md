@@ -85,7 +85,7 @@ Edit the `.env` file with your preferred settings:
 ```bash
 # DynamoDB Configuration
 DYNAMODB_MODE=local
-DYNAMODB_ENDPOINT=http://localhost:8000
+DYNAMODB_ENDPOINT=http://localhost:8002
 AWS_REGION=us-east-1
 
 # Dummy credentials for local development
@@ -107,7 +107,7 @@ npm run dynamodb:start
 ```
 
 This command:
-- Starts DynamoDB Local on **port 8000**
+- Starts DynamoDB Local on **port 8002**
 - Starts DynamoDB Admin UI on **port 8001**
 - Creates a persistent volume for data storage
 - Runs containers in detached mode (background)
@@ -240,7 +240,7 @@ Features:
 List tables:
 ```bash
 aws dynamodb list-tables \
-  --endpoint-url http://localhost:8000 \
+  --endpoint-url http://localhost:8002 \
   --region us-east-1
 ```
 
@@ -248,7 +248,7 @@ Scan a table:
 ```bash
 aws dynamodb scan \
   --table-name ho-yu-students \
-  --endpoint-url http://localhost:8000 \
+  --endpoint-url http://localhost:8002 \
   --region us-east-1
 ```
 
@@ -257,7 +257,7 @@ Get an item:
 aws dynamodb get-item \
   --table-name ho-yu-students \
   --key '{"student_id": {"S": "STU001"}}' \
-  --endpoint-url http://localhost:8000 \
+  --endpoint-url http://localhost:8002 \
   --region us-east-1
 ```
 
@@ -280,7 +280,7 @@ npm run dynamodb:seed
 # Export data to JSON
 aws dynamodb scan \
   --table-name ho-yu-students \
-  --endpoint-url http://localhost:8000 \
+  --endpoint-url http://localhost:8002 \
   --region us-east-1 > backup-students.json
 ```
 
@@ -311,7 +311,7 @@ Test Lambda functions with local DynamoDB:
 ```bash
 # Set environment variables
 export DYNAMODB_MODE=local
-export DYNAMODB_ENDPOINT=http://localhost:8000
+export DYNAMODB_ENDPOINT=http://localhost:8002
 
 # Run your integration tests
 npm test -- --testPathPattern=integration
@@ -326,13 +326,13 @@ Test CRUD operations:
 aws dynamodb put-item \
   --table-name ho-yu-students \
   --item '{"student_id": {"S": "TEST001"}, "name_1": {"S": "Test User"}}' \
-  --endpoint-url http://localhost:8000
+  --endpoint-url http://localhost:8002
 
 # Read the student
 aws dynamodb get-item \
   --table-name ho-yu-students \
   --key '{"student_id": {"S": "TEST001"}}' \
-  --endpoint-url http://localhost:8000
+  --endpoint-url http://localhost:8002
 
 # Update the student
 aws dynamodb update-item \
@@ -340,13 +340,13 @@ aws dynamodb update-item \
   --key '{"student_id": {"S": "TEST001"}}' \
   --update-expression "SET marks = :marks" \
   --expression-attribute-values '{":marks": {"N": "500"}}' \
-  --endpoint-url http://localhost:8000
+  --endpoint-url http://localhost:8002
 
 # Delete the student
 aws dynamodb delete-item \
   --table-name ho-yu-students \
   --key '{"student_id": {"S": "TEST001"}}' \
-  --endpoint-url http://localhost:8000
+  --endpoint-url http://localhost:8002
 ```
 
 ## DynamoDB Admin UI
@@ -374,12 +374,12 @@ Access the web-based admin interface at **http://localhost:8001**
 
 #### Port Already in Use
 
-**Error**: "Port 8000 is already in use"
+**Error**: "Port 8002 is already in use"
 
 **Solution**:
 ```bash
-# Find process using port 8000
-lsof -i :8000
+# Find process using port 8002
+lsof -i :8002
 
 # Kill the process or change port in docker-compose.dynamodb.yml
 ```
@@ -404,7 +404,7 @@ npm run dynamodb:start
 
 #### Cannot Connect to DynamoDB Local
 
-**Error**: "NetworkingError: connect ECONNREFUSED 127.0.0.1:8000"
+**Error**: "NetworkingError: connect ECONNREFUSED 127.0.0.1:8002"
 
 **Solution**:
 ```bash
@@ -412,7 +412,7 @@ npm run dynamodb:start
 docker ps | grep dynamodb
 
 # Check if port is accessible
-curl http://localhost:8000
+curl http://localhost:8002
 
 # Verify environment variables
 echo $DYNAMODB_ENDPOINT

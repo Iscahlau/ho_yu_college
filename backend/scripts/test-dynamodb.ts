@@ -19,7 +19,7 @@ import {
 // Configuration for local DynamoDB
 const client = new DynamoDBClient({
   region: process.env.AWS_REGION || 'us-east-1',
-  endpoint: process.env.DYNAMODB_ENDPOINT || 'http://localhost:8000',
+  endpoint: process.env.DYNAMODB_ENDPOINT || 'http://localhost:8002',
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'local',
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'local',
@@ -234,7 +234,7 @@ async function runTests(): Promise<void> {
   console.log('╚════════════════════════════════════════════════════════════╝\n');
 
   console.log('Configuration:');
-  console.log(`  Endpoint: ${process.env.DYNAMODB_ENDPOINT || 'http://localhost:8000'}`);
+  console.log(`  Endpoint: ${process.env.DYNAMODB_ENDPOINT || 'http://localhost:8002'}`);
   console.log(`  Region: ${process.env.AWS_REGION || 'us-east-1'}`);
   console.log(`  Mode: ${process.env.DYNAMODB_MODE || 'aws'}`);
   console.log(`  Table: ${STUDENTS_TABLE}\n`);
