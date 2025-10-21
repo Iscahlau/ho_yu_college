@@ -5,13 +5,10 @@
  * - Returns Excel file (.xlsx) with proper structure
  */
 
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, ScanCommand } from '@aws-sdk/lib-dynamodb';
+import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import * as XLSX from 'xlsx';
-
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
+import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
 
 interface GameRecord {
   game_id: string;
@@ -32,9 +29,9 @@ export const handler = async (
   try {
     // Get all games from DynamoDB
     const scanCommand = new ScanCommand({
-      TableName: process.env.GAMES_TABLE_NAME || 'ho-yu-games',
+      TableName: tableNames.games,
     });
-    const result = await docClient.send(scanCommand);
+    const result = await dynamoDBClient.send(scanCommand);
     const games = result.Items as GameRecord[];
 
     // Sort games by game_id

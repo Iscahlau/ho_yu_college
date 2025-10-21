@@ -3,12 +3,9 @@
  * Handles student and teacher authentication
  */
 
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, GetCommand } from '@aws-sdk/lib-dynamodb';
+import { GetCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
+import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
 
 interface LoginRequest {
   id: string;
@@ -90,21 +87,21 @@ export const handler = async (
 
 async function getStudent(studentId: string) {
   const command = new GetCommand({
-    TableName: process.env.STUDENTS_TABLE_NAME,
+    TableName: tableNames.students,
     Key: { student_id: studentId },
   });
 
-  const result = await docClient.send(command);
+  const result = await dynamoDBClient.send(command);
   return result.Item;
 }
 
 async function getTeacher(teacherId: string) {
   const command = new GetCommand({
-    TableName: process.env.TEACHERS_TABLE_NAME,
+    TableName: tableNames.teachers,
     Key: { teacher_id: teacherId },
   });
 
-  const result = await docClient.send(command);
+  const result = await dynamoDBClient.send(command);
   return result.Item;
 }
 

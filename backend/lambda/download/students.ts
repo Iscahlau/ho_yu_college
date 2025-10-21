@@ -6,13 +6,10 @@
  * - Returns Excel file (.xlsx) with proper structure
  */
 
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, ScanCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
+import { ScanCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import * as XLSX from 'xlsx';
-
-const client = new DynamoDBClient({});
-const docClient = DynamoDBDocumentClient.from(client);
+import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
 
 interface StudentRecord {
   student_id: string;
@@ -40,17 +37,17 @@ export const handler = async (
     if (classFilter.length > 0) {
       // If class filter is provided, scan and filter by classes
       const scanCommand = new ScanCommand({
-        TableName: process.env.STUDENTS_TABLE_NAME || 'ho-yu-students',
+        TableName: tableNames.students,
       });
-      const result = await docClient.send(scanCommand);
+      const result = await dynamoDBClient.send(scanCommand);
       students = (result.Items as StudentRecord[])
         .filter(student => classFilter.includes(student.class));
     } else {
       // No filter - get all students (admin access)
       const scanCommand = new ScanCommand({
-        TableName: process.env.STUDENTS_TABLE_NAME || 'ho-yu-students',
+        TableName: tableNames.students,
       });
-      const result = await docClient.send(scanCommand);
+      const result = await dynamoDBClient.send(scanCommand);
       students = result.Items as StudentRecord[];
     }
 
