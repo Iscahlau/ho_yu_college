@@ -10,9 +10,9 @@
     "synth": "cdk synth",
     "deploy": "cdk deploy",
     "diff": "cdk diff",
-    "sam:build": "sam build",
-    "sam:start": "sam local start-api --host 0.0.0.0 --port 3000 --docker-network ho-yu-network",
-    "local:start": "./start-local.sh"
+    "sam:start": "bash start-sam-local.sh",
+    "local:start": "cd ../backend && node simple-server.js",
+    "local:dynamodb": "cd ../backend && npm run dynamodb:setup"
   },
   "keywords": ["cdk", "infrastructure", "aws"],
   "author": "",

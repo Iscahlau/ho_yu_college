@@ -16,6 +16,8 @@
     "dynamodb:seed": "ts-node scripts/seed-dynamodb.ts",
     "dynamodb:test": "ts-node scripts/test-dynamodb.ts",
     "dynamodb:setup": "npm run dynamodb:start && sleep 5 && npm run dynamodb:init && npm run dynamodb:seed",
+    "local:start": "node simple-server.js",
+    "local:dynamodb": "npm run dynamodb:setup",
     "dev:start": "bash scripts/start-local-dev.sh",
     "dev:stop": "bash scripts/stop-local-dev.sh"
   },
