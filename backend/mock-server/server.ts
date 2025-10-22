@@ -29,39 +29,56 @@ mockGames.forEach(game => {
  * POST /auth/login
  * Login endpoint for students and teachers
  */
-app.post('/auth/login', (req: express.Request, res: express.Response) => {
+app.post('/auth/login', (req: express.Request, res: express.Response): void => {
   const { id, password } = req.body;
 
   if (!id || !password) {
-    return res.status(400).json({ message: 'Missing id or password' });
+    res.status(400).json({ message: 'Missing id or password' });
+    return;
   }
 
   // Try to find student first
-  let user = mockStudents.find(s => s.student_id === id);
-  let role: 'student' | 'teacher' | 'admin' = 'student';
+  const student = mockStudents.find(s => s.student_id === id);
+  
+  if (student) {
+    // Verify student password matches
+    if (student.password !== password) {
+      res.status(401).json({ message: 'Invalid credentials' });
+      return;
+    }
+    
+    // Remove password from response
+    const { password: _, ...userWithoutPassword } = student;
+    res.json({
+      success: true,
+      user: userWithoutPassword,
+      role: 'student',
+    });
+    return;
+  }
 
   // If not found, try teacher
-  if (!user) {
-    const teacher = mockTeachers.find(t => t.teacher_id === id);
-    if (teacher) {
-      user = teacher;
-      role = teacher.is_admin ? 'admin' : 'teacher';
+  const teacher = mockTeachers.find(t => t.teacher_id === id);
+  if (teacher) {
+    // Verify teacher password matches
+    if (teacher.password !== password) {
+      res.status(401).json({ message: 'Invalid credentials' });
+      return;
     }
+    
+    const role = teacher.is_admin ? 'admin' : 'teacher';
+    // Remove password from response
+    const { password: _, ...userWithoutPassword } = teacher;
+    res.json({
+      success: true,
+      user: userWithoutPassword,
+      role,
+    });
+    return;
   }
 
-  // Verify user exists and password matches (plain text comparison)
-  if (!user || user.password !== password) {
-    return res.status(401).json({ message: 'Invalid credentials' });
-  }
-
-  // Remove password from response
-  const { password: _, ...userWithoutPassword } = user;
-
-  res.json({
-    success: true,
-    user: userWithoutPassword,
-    role,
-  });
+  // User not found
+  res.status(401).json({ message: 'Invalid credentials' });
 });
 
 // ===== Games Endpoints =====
@@ -125,12 +142,13 @@ app.get('/games/download', (req: express.Request, res: express.Response) => {
  * GET /games/:gameId
  * Fetch a single game by ID
  */
-app.get('/games/:gameId', (req: express.Request, res: express.Response) => {
+app.get('/games/:gameId', (req: express.Request, res: express.Response): void => {
   const { gameId } = req.params;
   const game = mockGames.find(g => g.game_id === gameId);
 
   if (!game) {
-    return res.status(404).json({ message: 'Game not found' });
+    res.status(404).json({ message: 'Game not found' });
+    return;
   }
 
   // Return game with updated click count
@@ -144,12 +162,13 @@ app.get('/games/:gameId', (req: express.Request, res: express.Response) => {
  * POST /games/:gameId/click
  * Increment game click count
  */
-app.post('/games/:gameId/click', (req: express.Request, res: express.Response) => {
+app.post('/games/:gameId/click', (req: express.Request, res: express.Response): void => {
   const { gameId } = req.params;
   const game = mockGames.find(g => g.game_id === gameId);
 
   if (!game) {
-    return res.status(404).json({ message: 'Game not found' });
+    res.status(404).json({ message: 'Game not found' });
+    return;
   }
 
   // Increment click count
