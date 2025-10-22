@@ -49,22 +49,55 @@ This constraint is validated in the test suite to ensure data integrity.
 - Node.js v18+ (v20.19.5 recommended)
 - npm v10+
 - Docker and Docker Compose (for DynamoDB Local)
-- AWS CLI (for backend deployment)
+- AWS SAM CLI (installed automatically by start-local.sh if missing)
+- AWS CLI (for production deployment only)
 
-### Local Development with DynamoDB Local
+### Local Development (Recommended)
 
-For local development with a real DynamoDB instance (recommended):
+The project includes a complete local development environment using AWS SAM Local that mirrors production:
+
+```bash
+# One-command startup (from project root)
+./start-local.sh
+```
+
+This script will:
+1. Start DynamoDB Local via Docker Compose
+2. Initialize and seed DynamoDB tables with mock data
+3. Build and start SAM Local API Gateway on http://localhost:3000
+4. Provide all backend Lambda functions locally
+
+**Services Available:**
+- 📊 DynamoDB Local: http://localhost:8002
+- 🔧 DynamoDB Admin UI: http://localhost:8001
+- 🌐 API Gateway: http://localhost:3000
+
+**Start the Frontend:**
+```bash
+# In a new terminal
+cd frontend
+npm install
+echo "VITE_API_URL=http://localhost:3000" > .env.local
+npm run dev  # Runs on http://localhost:5173
+```
+
+See [Infrastructure Documentation](infra/README.md) for detailed setup and troubleshooting.
+
+### Manual Local Development
+
+If you prefer to start services individually:
 
 ```bash
 # Terminal 1: Start DynamoDB Local
 cd backend
 npm install
-cp .env.example .env  # Configure environment
 npm run dynamodb:setup  # Start DynamoDB, create tables, seed data
 
-# Terminal 2: Start backend/mock server
-cd backend
-npm run mock-server  # Runs on http://localhost:3000
+# Terminal 2: Start SAM Local API Gateway
+cd infra
+npm install
+npm run build
+npm run sam:start  # Runs on http://localhost:3000
 
 # Terminal 3: Start frontend
 cd frontend
@@ -77,25 +110,6 @@ npm run dev  # Runs on http://localhost:5173
 
 See [DynamoDB Local Guide](backend/DYNAMODB_LOCAL_GUIDE.md) for comprehensive setup instructions.
 
-### Local Development with Mock Server
-
-For local development without AWS deployment:
-
-```bash
-# Terminal 1: Start mock server
-cd backend
-npm install
-npm run mock-server  # Runs on http://localhost:3000
-
-# Terminal 2: Start frontend
-cd frontend
-npm install
-echo "VITE_API_URL=http://localhost:3000" > .env.local
-npm run dev  # Runs on http://localhost:5173
-```
-
-See [Mock Server Documentation](backend/mock-server/README.md) for more details.
-
 ### Frontend Setup
 ```bash
 cd frontend
@@ -103,24 +117,26 @@ npm install
 npm run dev  # Start development server at http://localhost:5173
 ```
 
-### Backend Setup
+### Production Deployment
+
+The infrastructure is managed using AWS CDK in the `infra/` directory:
+
 ```bash
-cd backend
+cd infra
 npm install
 npm run build       # Compile TypeScript
-npx cdk synth      # Generate CloudFormation template
-npx cdk deploy     # Deploy to AWS (requires credentials)
+npm run synth       # Generate CloudFormation template
+npm run deploy      # Deploy to AWS (requires credentials)
 ```
+
+See [Infrastructure Documentation](infra/README.md) for detailed deployment instructions.
 
 ## 📖 Documentation
 
 For detailed development instructions, build commands, troubleshooting, and best practices, see:
 - **[Copilot Instructions](.github/copilot-instructions.md)** - Comprehensive development guide with validated commands and timings
+- **[Infrastructure Documentation](infra/README.md)** - AWS CDK and SAM Local setup, local development, and deployment guide
 - **[DynamoDB Local Setup Guide](backend/DYNAMODB_LOCAL_GUIDE.md)** - Complete guide for local DynamoDB development
-- **[Local Mock Database Setup](backend/database/README.md)** - Set up local SQL database with DataGrip for development
-  - **[Quick Start Guide](backend/database/QUICK_START.md)** - Fast setup reference
-  - **[DataGrip Setup Guide](backend/database/DATAGRIP_GUIDE.md)** - Visual walkthrough
-  - **[Documentation Index](backend/database/INDEX.md)** - Complete guide to all database docs
 
 ### Game Page Usage
 
@@ -181,18 +197,27 @@ For detailed API usage and code examples, see [Frontend Source Documentation](fr
 
 ### Building
 - Frontend: `cd frontend && npm run build`
-- Backend: `cd backend && npm run build`
+- Backend Lambda: `cd backend && npm run build`
+- Infrastructure: `cd infra && npm run build`
 
 ### Testing
-Run the development server to test changes:
+Backend tests:
 ```bash
-cd frontend && npm run dev
+cd backend && npm test
 ```
 
-### Deployment
-Deploy the backend infrastructure to AWS:
+### Local Development
+Run the complete local development stack:
 ```bash
-cd backend && npx cdk deploy
+./start-local.sh
+```
+
+See [Infrastructure Documentation](infra/README.md) for detailed local development setup.
+
+### Deployment
+Deploy the infrastructure to AWS:
+```bash
+cd infra && npm run deploy
 ```
 
 ## 📁 Project Structure
@@ -203,11 +228,17 @@ cd backend && npx cdk deploy
 │   │   ├── App.tsx    # Main component
 │   │   └── main.tsx   # Entry point
 │   └── package.json
-├── backend/            # Backend services
-│   ├── bin/           # CDK app entry
-│   ├── aws/           # AWS infrastructure code (CDK stacks)
+├── backend/            # Lambda functions and DynamoDB setup
 │   ├── lambda/        # Lambda function handlers
+│   ├── scripts/       # DynamoDB initialization scripts
+│   ├── test/          # Unit tests
 │   └── package.json
+├── infra/              # Infrastructure as Code (AWS CDK & SAM)
+│   ├── lib/           # CDK stack definitions
+│   ├── backend.ts     # CDK app entry point
+│   ├── template.yaml  # SAM template for local development
+│   └── package.json
+├── start-local.sh      # One-command local development startup
 └── .github/
     └── copilot-instructions.md
 ```

@@ -1,15 +1,10 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "bin": {
-    "backend": "bin/backend.js"
-  },
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "cdk": "cdk",
-    "mock-server": "ts-node-dev --respawn --transpile-only mock-server/server.ts",
     "dynamodb:start": "docker-compose -f docker-compose.dynamodb.yml up -d",
     "dynamodb:stop": "docker-compose -f docker-compose.dynamodb.yml stop",
     "dynamodb:down": "docker-compose -f docker-compose.dynamodb.yml down -v",
