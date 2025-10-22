@@ -23,9 +23,11 @@ DynamoDB Local is an official AWS tool that allows you to develop and test Dynam
 - ✅ **Zero AWS costs** during development
 - ✅ **Faster development** with instant data access
 - ✅ **Offline development** - no internet required
-- ✅ **Data persistence** across container restarts
+- ✅ **In-memory mode** for reliable operation on macOS
 - ✅ **Web UI** for easy data management (DynamoDB Admin)
 - ✅ **Consistent behavior** with AWS DynamoDB
+
+> **Note**: This setup uses in-memory mode (`-inMemory`) to avoid SQLite file permission issues on macOS. Data will be cleared when containers stop, but can be easily reseeded with `npm run dynamodb:seed`.
 
 ## Prerequisites
 

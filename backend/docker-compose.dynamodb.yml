@@ -6,9 +6,7 @@ services:
     container_name: ho-yu-dynamodb-local
     ports:
       - "8002:8000"
-    command: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-dbPath", "/data"]
-    volumes:
-      - dynamodb-data:/data
+    command: ["-jar", "DynamoDBLocal.jar", "-sharedDb", "-inMemory"]
     networks:
       - ho-yu-network
 
@@ -28,8 +26,6 @@ services:
     networks:
       - ho-yu-network
 
-volumes:
-  dynamodb-data:
 
 networks:
   ho-yu-network:

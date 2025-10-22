@@ -5,6 +5,8 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
+    "mock-server": "ts-node-dev --respawn --transpile-only mock-server/server.ts",
+    "mock-server:test": "bash scripts/test-mock-server.sh",
     "dynamodb:start": "docker-compose -f docker-compose.dynamodb.yml up -d",
     "dynamodb:stop": "docker-compose -f docker-compose.dynamodb.yml stop",
     "dynamodb:down": "docker-compose -f docker-compose.dynamodb.yml down -v",
@@ -13,7 +15,9 @@
     "dynamodb:reset": "ts-node scripts/init-dynamodb.ts --reset",
     "dynamodb:seed": "ts-node scripts/seed-dynamodb.ts",
     "dynamodb:test": "ts-node scripts/test-dynamodb.ts",
-    "dynamodb:setup": "npm run dynamodb:start && sleep 5 && npm run dynamodb:init && npm run dynamodb:seed"
+    "dynamodb:setup": "npm run dynamodb:start && sleep 5 && npm run dynamodb:init && npm run dynamodb:seed",
+    "dev:start": "bash scripts/start-local-dev.sh",
+    "dev:stop": "bash scripts/stop-local-dev.sh"
   },
   "keywords": [],
   "author": "",
