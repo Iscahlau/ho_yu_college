@@ -189,6 +189,26 @@ export const handler = async (
             updated_at: now,
           };
 
+          // Check if data has actually changed
+          let hasChanges = !existingRecord;
+          if (existingRecord) {
+            hasChanges = (
+              gameRecord.game_name !== existingRecord.game_name ||
+              gameRecord.student_id !== existingRecord.student_id ||
+              gameRecord.subject !== existingRecord.subject ||
+              gameRecord.difficulty !== existingRecord.difficulty ||
+              gameRecord.teacher_id !== existingRecord.teacher_id ||
+              gameRecord.scratch_id !== existingRecord.scratch_id ||
+              gameRecord.scratch_api !== existingRecord.scratch_api
+            );
+          }
+
+          // Only update timestamps if there are actual changes
+          if (!hasChanges && existingRecord) {
+            gameRecord.last_update = existingRecord.last_update;
+            gameRecord.updated_at = existingRecord.updated_at;
+          }
+
           putRequests.push({
             PutRequest: {
               Item: gameRecord,
@@ -219,11 +239,22 @@ export const handler = async (
         } catch (error) {
           console.error('Error batch writing games:', error);
           // If batch write fails, fall back to individual writes for this batch
-          for (const request of putRequests) {
+          for (let j = 0; j < putRequests.length; j++) {
+            const request = putRequests[j];
             try {
               await putGame(request.PutRequest.Item);
             } catch (err) {
-              console.error('Error writing game:', err);
+              const gameId = request.PutRequest.Item.game_id;
+              const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+              console.error(`Error writing game ${gameId}:`, err);
+              results.errors.push(`Game ${gameId}: ${errorMsg}`);
+              // Adjust counts since this item failed
+              if (existingRecordsMap.has(gameId)) {
+                results.updated--;
+              } else {
+                results.inserted--;
+              }
+              results.processed--;
             }
           }
         }

@@ -195,6 +195,22 @@ export const handler = async (
             updated_at: now,
           };
 
+          // Check if data has actually changed
+          let hasChanges = !existingRecord;
+          if (existingRecord) {
+            hasChanges = (
+              teacherRecord.name !== existingRecord.name ||
+              teacherRecord.password !== existingRecord.password ||
+              JSON.stringify(teacherRecord.responsible_class) !== JSON.stringify(existingRecord.responsible_class) ||
+              teacherRecord.is_admin !== existingRecord.is_admin
+            );
+          }
+
+          // Only update timestamps if there are actual changes
+          if (!hasChanges && existingRecord) {
+            teacherRecord.updated_at = existingRecord.updated_at;
+          }
+
           putRequests.push({
             PutRequest: {
               Item: teacherRecord,
@@ -225,11 +241,22 @@ export const handler = async (
         } catch (error) {
           console.error('Error batch writing teachers:', error);
           // If batch write fails, fall back to individual writes for this batch
-          for (const request of putRequests) {
+          for (let j = 0; j < putRequests.length; j++) {
+            const request = putRequests[j];
             try {
               await putTeacher(request.PutRequest.Item);
             } catch (err) {
-              console.error('Error writing teacher:', err);
+              const teacherId = request.PutRequest.Item.teacher_id;
+              const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+              console.error(`Error writing teacher ${teacherId}:`, err);
+              results.errors.push(`Teacher ${teacherId}: ${errorMsg}`);
+              // Adjust counts since this item failed
+              if (existingRecordsMap.has(teacherId)) {
+                results.updated--;
+              } else {
+                results.inserted--;
+              }
+              results.processed--;
             }
           }
         }

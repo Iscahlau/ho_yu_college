@@ -10,6 +10,7 @@ import { PutCommand, GetCommand, BatchGetCommand, BatchWriteCommand } from '@aws
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import * as XLSX from 'xlsx';
 import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
+import { toString } from './utils/conversionUtils';
 
 interface StudentRecord {
   student_id: string;
@@ -178,7 +179,7 @@ export const handler = async (
             name_2: record.name_2 || '',
             marks: typeof record.marks === 'number' ? record.marks : 0,
             class: record.class || '',
-            class_no: record.class_no || '',
+            class_no: toString(record.class_no),
             last_login: record.last_login || now,
             last_update: now,
             teacher_id: record.teacher_id || '',
@@ -186,6 +187,26 @@ export const handler = async (
             created_at: existingRecord ? existingRecord.created_at : now,
             updated_at: now,
           };
+
+          // Check if data has actually changed
+          let hasChanges = !existingRecord;
+          if (existingRecord) {
+            hasChanges = (
+              studentRecord.name_1 !== existingRecord.name_1 ||
+              studentRecord.name_2 !== existingRecord.name_2 ||
+              studentRecord.marks !== existingRecord.marks ||
+              studentRecord.class !== existingRecord.class ||
+              studentRecord.class_no !== existingRecord.class_no ||
+              studentRecord.teacher_id !== existingRecord.teacher_id ||
+              studentRecord.password !== existingRecord.password
+            );
+          }
+
+          // Only update timestamps if there are actual changes
+          if (!hasChanges && existingRecord) {
+            studentRecord.last_update = existingRecord.last_update;
+            studentRecord.updated_at = existingRecord.updated_at;
+          }
 
           putRequests.push({
             PutRequest: {
@@ -217,11 +238,22 @@ export const handler = async (
         } catch (error) {
           console.error('Error batch writing students:', error);
           // If batch write fails, fall back to individual writes for this batch
-          for (const request of putRequests) {
+          for (let j = 0; j < putRequests.length; j++) {
+            const request = putRequests[j];
             try {
               await putStudent(request.PutRequest.Item);
             } catch (err) {
-              console.error('Error writing student:', err);
+              const studentId = request.PutRequest.Item.student_id;
+              const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+              console.error(`Error writing student ${studentId}:`, err);
+              results.errors.push(`Student ${studentId}: ${errorMsg}`);
+              // Adjust counts since this item failed
+              if (existingRecordsMap.has(studentId)) {
+                results.updated--;
+              } else {
+                results.inserted--;
+              }
+              results.processed--;
             }
           }
         }
