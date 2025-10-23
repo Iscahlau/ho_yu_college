@@ -95,6 +95,51 @@ export class BackendStack extends cdk.Stack {
     // Grant Lambda permissions to read and update games table
     gamesTable.grantReadWriteData(gameClickLambda);
 
+    // Lambda function for downloading students data
+    const studentsDownloadLambda = new lambda.Function(this, 'StudentsDownloadFunction', {
+      functionName: 'ho-yu-students-download',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'students.handler',
+      code: lambda.Code.fromAsset('../backend/lambda/download'),
+      environment: {
+        STUDENTS_TABLE_NAME: studentsTable.tableName,
+      },
+      timeout: cdk.Duration.seconds(30),
+    });
+
+    // Grant Lambda permissions to read students table
+    studentsTable.grantReadData(studentsDownloadLambda);
+
+    // Lambda function for downloading teachers data
+    const teachersDownloadLambda = new lambda.Function(this, 'TeachersDownloadFunction', {
+      functionName: 'ho-yu-teachers-download',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'teachers.handler',
+      code: lambda.Code.fromAsset('../backend/lambda/download'),
+      environment: {
+        TEACHERS_TABLE_NAME: teachersTable.tableName,
+      },
+      timeout: cdk.Duration.seconds(30),
+    });
+
+    // Grant Lambda permissions to read teachers table
+    teachersTable.grantReadData(teachersDownloadLambda);
+
+    // Lambda function for downloading games data
+    const gamesDownloadLambda = new lambda.Function(this, 'GamesDownloadFunction', {
+      functionName: 'ho-yu-games-download',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'games.handler',
+      code: lambda.Code.fromAsset('../backend/lambda/download'),
+      environment: {
+        GAMES_TABLE_NAME: gamesTable.tableName,
+      },
+      timeout: cdk.Duration.seconds(30),
+    });
+
+    // Grant Lambda permissions to read games table
+    gamesTable.grantReadData(gamesDownloadLambda);
+
     // API Gateway resources and methods
     const gamesResource = api.root.addResource('games');
     const gameResource = gamesResource.addResource('{gameId}');
@@ -104,6 +149,33 @@ export class BackendStack extends cdk.Stack {
     clickResource.addMethod(
       'POST',
       new apigateway.LambdaIntegration(gameClickLambda)
+    );
+
+    // GET /games/download - Download all games data
+    const gamesDownloadResource = gamesResource.addResource('download');
+    gamesDownloadResource.addMethod(
+      'GET',
+      new apigateway.LambdaIntegration(gamesDownloadLambda)
+    );
+
+    // Students API endpoints
+    const studentsResource = api.root.addResource('students');
+    
+    // GET /students/download - Download students data
+    const studentsDownloadResource = studentsResource.addResource('download');
+    studentsDownloadResource.addMethod(
+      'GET',
+      new apigateway.LambdaIntegration(studentsDownloadLambda)
+    );
+
+    // Teachers API endpoints
+    const teachersResource = api.root.addResource('teachers');
+    
+    // GET /teachers/download - Download teachers data
+    const teachersDownloadResource = teachersResource.addResource('download');
+    teachersDownloadResource.addMethod(
+      'GET',
+      new apigateway.LambdaIntegration(teachersDownloadLambda)
     );
 
     // Output the API URL
