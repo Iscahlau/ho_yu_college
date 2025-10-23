@@ -1,0 +1,53 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "mock-server": "ts-node-dev --respawn --transpile-only mock-server/server.ts",
+    "mock-server:test": "bash scripts/test-mock-server.sh",
+    "dynamodb:start": "docker-compose -f docker-compose.dynamodb.yml up -d",
+    "dynamodb:stop": "docker-compose -f docker-compose.dynamodb.yml stop",
+    "dynamodb:down": "docker-compose -f docker-compose.dynamodb.yml down -v",
+    "dynamodb:logs": "docker-compose -f docker-compose.dynamodb.yml logs -f dynamodb-local",
+    "dynamodb:init": "ts-node scripts/init-dynamodb.ts",
+    "dynamodb:reset": "ts-node scripts/init-dynamodb.ts --reset",
+    "dynamodb:seed": "ts-node scripts/seed-dynamodb.ts",
+    "dynamodb:test": "ts-node scripts/test-dynamodb.ts",
+    "dynamodb:setup": "npm run dynamodb:start && sleep 5 && npm run dynamodb:init && npm run dynamodb:seed",
+    "local:start": "node simple-server.js",
+    "local:dynamodb": "npm run dynamodb:setup",
+    "dev:start": "bash scripts/start-local-dev.sh",
+    "dev:stop": "bash scripts/stop-local-dev.sh"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.902.0",
+    "@aws-sdk/lib-dynamodb": "^3.902.0",
+    "aws-cdk-lib": "^2.216.0",
+    "constructs": "^10.4.2",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@aws-sdk/types": "^3.901.0",
+    "@types/aws-lambda": "^8.10.153",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.5.2",
+    "aws-cdk": "^2.1029.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "jest": "^30.2.0",
+    "source-map-support": "^0.5.21",
+    "ts-jest": "^29.4.4",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.2"
+  }
+}
