@@ -11,7 +11,6 @@
     "deploy": "cdk deploy",
     "diff": "cdk diff",
     "sam:start": "bash start-sam-local.sh",
-    "local:start": "cd ../backend && node simple-server.js",
     "local:dynamodb": "cd ../backend && npm run dynamodb:setup"
   },
   "keywords": ["cdk", "infrastructure", "aws"],
