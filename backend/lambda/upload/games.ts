@@ -235,7 +235,31 @@ export const handler = async (
             },
           });
           
-          await dynamoDBClient.send(batchWriteCommand);
+          const batchResult = await dynamoDBClient.send(batchWriteCommand);
+          
+          // Check for unprocessed items
+          const unprocessedItems = batchResult.UnprocessedItems?.[tableNames.games];
+          if (unprocessedItems && unprocessedItems.length > 0) {
+            console.warn(`Batch write had ${unprocessedItems.length} unprocessed items for games`);
+            // Try individual writes for unprocessed items
+            for (const unprocessedItem of unprocessedItems) {
+              try {
+                await putGame(unprocessedItem.PutRequest!.Item as GameRecord);
+              } catch (err) {
+                const gameId = (unprocessedItem.PutRequest!.Item as any).game_id;
+                const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+                console.error(`Error writing unprocessed game ${gameId}:`, err);
+                results.errors.push(`Game ${gameId}: ${errorMsg}`);
+                // Adjust counts since this item failed
+                if (existingRecordsMap.has(gameId)) {
+                  results.updated--;
+                } else {
+                  results.inserted--;
+                }
+                results.processed--;
+              }
+            }
+          }
         } catch (error) {
           console.error('Error batch writing games:', error);
           // If batch write fails, fall back to individual writes for this batch

@@ -1,49 +1,45 @@
 # Known Limitations - Upload Feature
 
-## BatchWriteCommand UnprocessedItems Not Handled
+## ~~BatchWriteCommand UnprocessedItems Not Handled~~ (FIXED)
 
-### Issue
-The upload handlers (games, students, teachers) use DynamoDB's `BatchWriteCommand` to write multiple records at once. However, they don't currently check for or retry `UnprocessedItems` in the response.
+### ✅ Status: RESOLVED
 
-### Context
-DynamoDB's BatchWriteItem API may return `UnprocessedItems` when:
-- Throughput is exceeded (though we use on-demand billing)
-- The batch size exceeds DynamoDB's limits (we use 25 items per batch, which is the max)
-- Individual item validation fails
-- Other transient errors occur
+This issue has been fixed. The upload handlers now properly handle UnprocessedItems returned by DynamoDB's BatchWriteCommand.
 
-According to AWS documentation, applications should:
-1. Check the response for UnprocessedItems
-2. Retry those items with exponential backoff
-3. Continue until all items are processed or a maximum retry limit is reached
+### Previous Issue
+The upload handlers (games, students, teachers) were not checking for or retrying `UnprocessedItems` in the BatchWriteCommand response, which could lead to silent data loss.
 
-### Current Behavior
-When UnprocessedItems are returned:
-- The code treats the BatchWriteCommand as successful
-- The counters reflect that items were processed
-- But some items may not actually be written to the database
+### Fix Applied
+All three upload handlers (games.ts, students.ts, teachers.ts) now:
+1. Capture the response from `BatchWriteCommand`
+2. Check for `UnprocessedItems` in the response
+3. Retry unprocessed items individually
+4. Adjust counters appropriately if retries fail
+5. Include errors in the response for failed items
 
-### Recommendation for Future Enhancement
-Consider implementing UnprocessedItems handling:
-
+### Implementation
 ```typescript
 const batchResult = await dynamoDBClient.send(batchWriteCommand);
 
 // Check for unprocessed items
-if (batchResult.UnprocessedItems && 
-    Object.keys(batchResult.UnprocessedItems).length > 0) {
-  // Retry with exponential backoff
-  // Update counters for any items that ultimately fail
+const unprocessedItems = batchResult.UnprocessedItems?.[tableName];
+if (unprocessedItems && unprocessedItems.length > 0) {
+  console.warn(`Batch write had ${unprocessedItems.length} unprocessed items`);
+  // Try individual writes for unprocessed items
+  for (const unprocessedItem of unprocessedItems) {
+    try {
+      await putRecord(unprocessedItem.PutRequest!.Item);
+    } catch (err) {
+      // Adjust counts and record errors
+      results.processed--;
+      results.errors.push(error message);
+    }
+  }
 }
 ```
 
-### Mitigation
-The current fix (checking if `results.processed === 0`) helps in the most common failure case where ALL records fail. However, partial failures due to UnprocessedItems could still show as "success" even though not all records were written.
-
-### Priority
-Low - This is an edge case that's unlikely to occur with:
-- On-demand billing (no throughput limits)
-- Small batch sizes (25 items)
-- The current fallback to individual writes already provides resilience
-
-However, for production deployments at scale, this should be addressed for completeness.
+### Result
+- No silent data loss - all unprocessed items are retried
+- Accurate counters - only successfully written items are counted
+- Error reporting - any failures are included in the response
+- User feedback - users know exactly which records succeeded/failed

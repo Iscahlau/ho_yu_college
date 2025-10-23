@@ -234,7 +234,31 @@ export const handler = async (
             },
           });
           
-          await dynamoDBClient.send(batchWriteCommand);
+          const batchResult = await dynamoDBClient.send(batchWriteCommand);
+          
+          // Check for unprocessed items
+          const unprocessedItems = batchResult.UnprocessedItems?.[tableNames.students];
+          if (unprocessedItems && unprocessedItems.length > 0) {
+            console.warn(`Batch write had ${unprocessedItems.length} unprocessed items for students`);
+            // Try individual writes for unprocessed items
+            for (const unprocessedItem of unprocessedItems) {
+              try {
+                await putStudent(unprocessedItem.PutRequest!.Item as StudentRecord);
+              } catch (err) {
+                const studentId = (unprocessedItem.PutRequest!.Item as any).student_id;
+                const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+                console.error(`Error writing unprocessed student ${studentId}:`, err);
+                results.errors.push(`Student ${studentId}: ${errorMsg}`);
+                // Adjust counts since this item failed
+                if (existingRecordsMap.has(studentId)) {
+                  results.updated--;
+                } else {
+                  results.inserted--;
+                }
+                results.processed--;
+              }
+            }
+          }
         } catch (error) {
           console.error('Error batch writing students:', error);
           // If batch write fails, fall back to individual writes for this batch
