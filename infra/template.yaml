@@ -20,6 +20,9 @@ Globals:
       AllowHeaders: "'Content-Type,Authorization,X-Requested-With'"
       AllowOrigin: "'*'"
       AllowCredentials: false
+    BinaryMediaTypes:
+      - 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      - 'application/octet-stream'
 
 Resources:
   # Lambda function for authentication/login

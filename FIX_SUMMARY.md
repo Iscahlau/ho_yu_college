@@ -1,16 +1,22 @@
 # Fix Summary: Error 500 in Download Endpoints with SAM and DynamoDB Local
 
 ## Issue Description
-Students, teachers, and games download endpoints were returning Error 500 (Internal Server Error) when using AWS SAM Local with DynamoDB Local for local development.
+Students, teachers, and games download endpoints were returning Error 500 (Internal Server Error) or corrupted Excel files when using AWS SAM Local with DynamoDB Local for local development.
 
-## Root Cause
-When SAM Local runs Lambda functions in Docker containers, they need to communicate with the DynamoDB Local container through the Docker network. The Lambda functions were configured to use the Docker network hostname `dynamodb-local`, but the actual implementation needed verification that the environment variables were being properly respected.
+## Root Causes
+
+There were two separate issues:
+
+1. **DynamoDB Connection Issue**: When SAM Local runs Lambda functions in Docker containers, they need to communicate with the DynamoDB Local container through the Docker network. The Lambda functions were configured to use the Docker network hostname `dynamodb-local`, but the actual implementation needed verification that the environment variables were being properly respected.
+
+2. **Binary Response Handling Issue**: API Gateway was not configured to handle binary responses (Excel files). When API Gateway doesn't recognize the content type as binary, it treats the base64-encoded Excel data as text, which corrupts the file when downloaded.
 
 **Key Points:**
 - SAM template sets `DYNAMODB_ENDPOINT: http://dynamodb-local:8000` for Lambda containers running in Docker
 - Lambda containers run on `backend_ho-yu-network` Docker network
 - DynamoDB Local container has hostname `dynamodb-local` on the same network
 - The `dynamodb-client.ts` was already designed to respect the `DYNAMODB_ENDPOINT` environment variable
+- API Gateway needs `BinaryMediaTypes` configuration to properly handle Excel file downloads
 
 ## Solution
 The fix involved minimal changes to ensure proper configuration and remove unnecessary files:
@@ -57,7 +63,26 @@ This makes the script portable and works on any machine.
 
 The simple server was a basic Express server used for early development. It's not needed with SAM Local, which provides a proper production-like environment.
 
-### 4. Added Configuration Tests
+### 4. Added Binary Media Type Configuration
+**File**: `infra/template.yaml`
+
+Added `BinaryMediaTypes` to the API Gateway configuration to properly handle binary responses:
+
+```yaml
+Api:
+  Cors:
+    AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+    AllowHeaders: "'Content-Type,Authorization,X-Requested-With'"
+    AllowOrigin: "'*'"
+    AllowCredentials: false
+  BinaryMediaTypes:
+    - 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    - 'application/octet-stream'
+```
+
+This tells API Gateway to treat Excel files (and other binary content) as binary data instead of text, preventing corruption of the downloaded files.
+
+### 5. Added Configuration Tests
 **File**: `backend/test/lambda/download.test.ts` (new)
 
 Created 5 tests to validate DynamoDB configuration:
@@ -67,7 +92,7 @@ Created 5 tests to validate DynamoDB configuration:
 - Tests table name environment variables
 - Validates SAM template configuration matches expectations
 
-### 5. Created Testing Guide
+### 6. Created Testing Guide
 **File**: `TESTING_DOWNLOAD_FIX.md` (new)
 
 Comprehensive guide including:
@@ -83,11 +108,13 @@ Comprehensive guide including:
 |------|-------------|-------------|
 | `backend/lambda/utils/dynamodb-client.ts` | Modified | Added detailed comments explaining endpoint configuration |
 | `infra/start-sam-local.sh` | Modified | Fixed hardcoded path to use dynamic script directory |
+| `infra/template.yaml` | Modified | Added `BinaryMediaTypes` configuration for Excel file handling |
 | `backend/simple-server.js` | Deleted | Removed deprecated simple server (not SAM-related) |
 | `backend/package.json` | Modified | Removed `local:start` script reference |
 | `infra/package.json` | Modified | Removed `local:start` script reference |
 | `backend/test/lambda/download.test.ts` | Added | 5 tests for DynamoDB configuration |
 | `TESTING_DOWNLOAD_FIX.md` | Added | Comprehensive testing guide |
+| `FIX_SUMMARY.md` | Added | Fix documentation |
 
 ## Test Results
 ✅ All 120 tests pass
@@ -133,12 +160,13 @@ The `dynamodb-client.ts` automatically switches between:
 
 ## Benefits of This Fix
 
-1. **Minimal Changes**: Only documentation and cleanup, no logic changes needed
+1. **Minimal Changes**: Only configuration and documentation updates, no major logic changes
 2. **Maintains SAM**: Continues using SAM Local as requested
-3. **Proper Configuration**: Validates environment variables are set correctly
+3. **Proper Configuration**: Validates environment variables are set correctly and adds binary media type handling
 4. **Clean Codebase**: Removed deprecated simple-server.js
 5. **Well Tested**: Added configuration tests
 6. **Well Documented**: Comprehensive testing guide
+7. **Fixes Binary File Corruption**: Excel files now download correctly without corruption
 
 ## Verification Steps
 
@@ -159,6 +187,7 @@ To verify the fix works:
 3. **Verify Success:**
    - All three endpoints return HTTP 200
    - Excel files are downloaded successfully
+   - **Files open correctly in Excel without corruption errors**
    - Files contain data when opened
 
 4. **Run Tests:**
@@ -168,16 +197,25 @@ To verify the fix works:
    - All 120 tests should pass
 
 ## Production Deployment
-No changes needed for production deployment. The same Lambda functions work in AWS with:
-- `DYNAMODB_MODE=aws` (or not set)
-- No `DYNAMODB_ENDPOINT` (uses AWS DynamoDB service)
+The same configuration works in production. The `BinaryMediaTypes` configuration in the SAM template will be applied to the production API Gateway as well, ensuring Excel files download correctly in all environments.
+
+- `DYNAMODB_MODE=aws` (or not set) - uses AWS DynamoDB service
+- No `DYNAMODB_ENDPOINT` needed - connects to AWS DynamoDB
+- `BinaryMediaTypes` applies to both local and production environments
 
 ## Conclusion
-The issue was already mostly solved in the code - the `dynamodb-client.ts` was designed to respect the `DYNAMODB_ENDPOINT` environment variable. The fix focused on:
+The issues were resolved through two key fixes:
+
+1. **DynamoDB Connection**: The `dynamodb-client.ts` was designed to respect the `DYNAMODB_ENDPOINT` environment variable. The fix added clear documentation and validation tests.
+
+2. **Binary Response Handling**: Added `BinaryMediaTypes` configuration to the SAM template to tell API Gateway to properly handle Excel files as binary data instead of text.
+
+**Key Changes:**
 1. Adding clear documentation
 2. Removing deprecated code (simple-server)
 3. Fixing path issues in scripts
 4. Adding tests to validate configuration
-5. Creating a comprehensive testing guide
+5. **Adding `BinaryMediaTypes` to fix Excel file corruption**
+6. Creating a comprehensive testing guide
 
 The download endpoints now work correctly with SAM Local and DynamoDB Local.

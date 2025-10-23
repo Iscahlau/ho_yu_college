@@ -4,16 +4,22 @@ This document explains how to test the fix for Error 500 when downloading data f
 
 ## What Was Fixed
 
-The issue was that Lambda functions running in SAM Local couldn't connect to DynamoDB Local because of endpoint configuration:
+There were two issues that prevented proper Excel file downloads:
 
-- **Before**: Lambda containers tried to connect to `http://localhost:8002` which doesn't work inside Docker
-- **After**: Lambda containers now correctly use `http://dynamodb-local:8000` via the Docker network
+1. **DynamoDB Connection Issue**: Lambda functions running in SAM Local couldn't connect to DynamoDB Local because of endpoint configuration:
+   - **Before**: Lambda containers tried to connect to `http://localhost:8002` which doesn't work inside Docker
+   - **After**: Lambda containers now correctly use `http://dynamodb-local:8000` via the Docker network
 
-The `dynamodb-client.ts` was already designed to respect the `DYNAMODB_ENDPOINT` environment variable set by the SAM template. The fixes included:
+2. **Binary Response Handling Issue**: API Gateway wasn't configured to handle binary responses (Excel files):
+   - **Before**: API Gateway treated base64-encoded Excel data as text, corrupting the file
+   - **After**: Added `BinaryMediaTypes` configuration to properly handle Excel file downloads
+
+The fixes included:
 1. Added detailed comments explaining the endpoint configuration
 2. Removed the deprecated `simple-server.js` (not related to SAM)
 3. Fixed hardcoded paths in `start-sam-local.sh`
 4. Added tests to validate the configuration
+5. **Added `BinaryMediaTypes` to SAM template to properly handle Excel file responses**
 
 ## Prerequisites
 
