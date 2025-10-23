@@ -6,7 +6,7 @@
  * - No delete functionality
  */
 
-import { PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
+import { PutCommand, GetCommand, BatchGetCommand, BatchWriteCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import * as XLSX from 'xlsx';
 import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
@@ -95,7 +95,7 @@ export const handler = async (
       };
     }
 
-    // Process each row - upsert (update if exists, insert if new)
+    // Process records in batches for better performance
     const results = {
       processed: 0,
       inserted: 0,
@@ -103,53 +103,128 @@ export const handler = async (
       errors: [] as string[],
     };
 
+    const now = new Date().toISOString();
+    
+    // Map all rows to records first, validating required fields
+    const parsedRecords: Array<{ index: number; record: any }> = [];
     for (let i = 0; i < dataRows.length; i++) {
       const row = dataRows[i];
+      const record: any = {};
+      headers.forEach((header, index) => {
+        record[header] = row[index];
+      });
+
+      // Validate required field
+      if (!record.student_id) {
+        results.errors.push(`Row ${i + 2}: Missing student_id`);
+        continue;
+      }
+
+      parsedRecords.push({ index: i, record });
+    }
+
+    // Batch check which records already exist (25 items per batch)
+    const BATCH_SIZE = 25;
+    const existingRecordsMap = new Map<string, StudentRecord>();
+    
+    for (let i = 0; i < parsedRecords.length; i += BATCH_SIZE) {
+      const batch = parsedRecords.slice(i, i + BATCH_SIZE);
+      const keys = batch.map(({ record }) => ({ student_id: record.student_id }));
       
       try {
-        // Map row data to object using headers
-        const record: any = {};
-        headers.forEach((header, index) => {
-          record[header] = row[index];
+        const batchGetCommand = new BatchGetCommand({
+          RequestItems: {
+            [tableNames.students]: {
+              Keys: keys,
+            },
+          },
         });
-
-        // Validate required field
-        if (!record.student_id) {
-          results.errors.push(`Row ${i + 2}: Missing student_id`);
-          continue;
-        }
-
-        // Check if record exists
-        const existingRecord = await getStudent(record.student_id);
-        const now = new Date().toISOString();
-
-        // Prepare student record
-        const studentRecord: StudentRecord = {
-          student_id: record.student_id,
-          name_1: record.name_1 || '',
-          name_2: record.name_2 || '',
-          marks: typeof record.marks === 'number' ? record.marks : 0,
-          class: record.class || '',
-          class_no: record.class_no || '',
-          last_login: record.last_login || now,
-          last_update: now,
-          teacher_id: record.teacher_id || '',
-          password: record.password || '',
-          created_at: existingRecord ? existingRecord.created_at : now,
-          updated_at: now,
-        };
-
-        // Upsert record
-        await putStudent(studentRecord);
         
-        if (existingRecord) {
-          results.updated++;
-        } else {
-          results.inserted++;
-        }
-        results.processed++;
+        const batchResult = await dynamoDBClient.send(batchGetCommand);
+        const items = batchResult.Responses?.[tableNames.students] || [];
+        
+        items.forEach((item) => {
+          existingRecordsMap.set(item.student_id, item as StudentRecord);
+        });
       } catch (error) {
-        results.errors.push(`Row ${i + 2}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        console.error('Error batch getting students:', error);
+        // If batch get fails, fall back to individual checks for this batch
+        for (const { record } of batch) {
+          try {
+            const existing = await getStudent(record.student_id);
+            if (existing) {
+              existingRecordsMap.set(record.student_id, existing);
+            }
+          } catch (err) {
+            console.error(`Error getting student ${record.student_id}:`, err);
+          }
+        }
+      }
+    }
+
+    // Batch write records (25 items per batch)
+    for (let i = 0; i < parsedRecords.length; i += BATCH_SIZE) {
+      const batch = parsedRecords.slice(i, i + BATCH_SIZE);
+      const putRequests: any[] = [];
+      
+      for (const { index, record } of batch) {
+        try {
+          const existingRecord = existingRecordsMap.get(record.student_id);
+          
+          // Prepare student record
+          const studentRecord: StudentRecord = {
+            student_id: record.student_id,
+            name_1: record.name_1 || '',
+            name_2: record.name_2 || '',
+            marks: typeof record.marks === 'number' ? record.marks : 0,
+            class: record.class || '',
+            class_no: record.class_no || '',
+            last_login: record.last_login || now,
+            last_update: now,
+            teacher_id: record.teacher_id || '',
+            password: record.password || '',
+            created_at: existingRecord ? existingRecord.created_at : now,
+            updated_at: now,
+          };
+
+          putRequests.push({
+            PutRequest: {
+              Item: studentRecord,
+            },
+          });
+          
+          if (existingRecord) {
+            results.updated++;
+          } else {
+            results.inserted++;
+          }
+          results.processed++;
+        } catch (error) {
+          results.errors.push(`Row ${index + 2}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+      }
+      
+      // Execute batch write
+      if (putRequests.length > 0) {
+        try {
+          const batchWriteCommand = new BatchWriteCommand({
+            RequestItems: {
+              [tableNames.students]: putRequests,
+            },
+          });
+          
+          await dynamoDBClient.send(batchWriteCommand);
+        } catch (error) {
+          console.error('Error batch writing students:', error);
+          // If batch write fails, fall back to individual writes for this batch
+          for (const request of putRequests) {
+            try {
+              await putStudent(request.PutRequest.Item);
+            } catch (err) {
+              console.error('Error writing student:', err);
+            }
+          }
+        }
       }
     }
 

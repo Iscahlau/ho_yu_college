@@ -6,7 +6,7 @@
  * - No delete functionality
  */
 
-import { PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
+import { PutCommand, GetCommand, BatchGetCommand, BatchWriteCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import * as XLSX from 'xlsx';
 import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
@@ -95,7 +95,7 @@ export const handler = async (
       };
     }
 
-    // Process each row - upsert (update if exists, insert if new)
+    // Process records in batches for better performance
     const results = {
       processed: 0,
       inserted: 0,
@@ -103,55 +103,130 @@ export const handler = async (
       errors: [] as string[],
     };
 
+    const now = new Date().toISOString();
+    
+    // Map all rows to records first, validating required fields
+    const parsedRecords: Array<{ index: number; record: any }> = [];
     for (let i = 0; i < dataRows.length; i++) {
       const row = dataRows[i];
+      const record: any = {};
+      headers.forEach((header, index) => {
+        record[header] = row[index];
+      });
+
+      // Validate required field
+      if (!record.game_id) {
+        results.errors.push(`Row ${i + 2}: Missing game_id`);
+        continue;
+      }
+
+      parsedRecords.push({ index: i, record });
+    }
+
+    // Batch check which records already exist (25 items per batch)
+    const BATCH_SIZE = 25;
+    const existingRecordsMap = new Map<string, GameRecord>();
+    
+    for (let i = 0; i < parsedRecords.length; i += BATCH_SIZE) {
+      const batch = parsedRecords.slice(i, i + BATCH_SIZE);
+      const keys = batch.map(({ record }) => ({ game_id: record.game_id }));
       
       try {
-        // Map row data to object using headers
-        const record: any = {};
-        headers.forEach((header, index) => {
-          record[header] = row[index];
+        const batchGetCommand = new BatchGetCommand({
+          RequestItems: {
+            [tableNames.games]: {
+              Keys: keys,
+            },
+          },
         });
-
-        // Validate required field
-        if (!record.game_id) {
-          results.errors.push(`Row ${i + 2}: Missing game_id`);
-          continue;
-        }
-
-        // Check if record exists
-        const existingRecord = await getGame(record.game_id);
-        const now = new Date().toISOString();
-
-        // Prepare game record
-        const gameRecord: GameRecord = {
-          game_id: record.game_id,
-          game_name: record.game_name || '',
-          student_id: record.student_id || '',
-          subject: record.subject || '',
-          difficulty: record.difficulty || '',
-          teacher_id: record.teacher_id || '',
-          last_update: now,
-          scratch_id: record.scratch_id || '',
-          scratch_api: record.scratch_api || '',
-          accumulated_click: existingRecord 
-            ? existingRecord.accumulated_click 
-            : (typeof record.accumulated_click === 'number' ? record.accumulated_click : 0),
-          created_at: existingRecord ? existingRecord.created_at : now,
-          updated_at: now,
-        };
-
-        // Upsert record
-        await putGame(gameRecord);
         
-        if (existingRecord) {
-          results.updated++;
-        } else {
-          results.inserted++;
-        }
-        results.processed++;
+        const batchResult = await dynamoDBClient.send(batchGetCommand);
+        const items = batchResult.Responses?.[tableNames.games] || [];
+        
+        items.forEach((item) => {
+          existingRecordsMap.set(item.game_id, item as GameRecord);
+        });
       } catch (error) {
-        results.errors.push(`Row ${i + 2}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        console.error('Error batch getting games:', error);
+        // If batch get fails, fall back to individual checks for this batch
+        for (const { record } of batch) {
+          try {
+            const existing = await getGame(record.game_id);
+            if (existing) {
+              existingRecordsMap.set(record.game_id, existing);
+            }
+          } catch (err) {
+            console.error(`Error getting game ${record.game_id}:`, err);
+          }
+        }
+      }
+    }
+
+    // Batch write records (25 items per batch)
+    for (let i = 0; i < parsedRecords.length; i += BATCH_SIZE) {
+      const batch = parsedRecords.slice(i, i + BATCH_SIZE);
+      const putRequests: any[] = [];
+      
+      for (const { index, record } of batch) {
+        try {
+          const existingRecord = existingRecordsMap.get(record.game_id);
+          
+          // Prepare game record
+          const gameRecord: GameRecord = {
+            game_id: record.game_id,
+            game_name: record.game_name || '',
+            student_id: record.student_id || '',
+            subject: record.subject || '',
+            difficulty: record.difficulty || '',
+            teacher_id: record.teacher_id || '',
+            last_update: now,
+            scratch_id: record.scratch_id || '',
+            scratch_api: record.scratch_api || '',
+            accumulated_click: existingRecord 
+              ? existingRecord.accumulated_click 
+              : (typeof record.accumulated_click === 'number' ? record.accumulated_click : 0),
+            created_at: existingRecord ? existingRecord.created_at : now,
+            updated_at: now,
+          };
+
+          putRequests.push({
+            PutRequest: {
+              Item: gameRecord,
+            },
+          });
+          
+          if (existingRecord) {
+            results.updated++;
+          } else {
+            results.inserted++;
+          }
+          results.processed++;
+        } catch (error) {
+          results.errors.push(`Row ${index + 2}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+      }
+      
+      // Execute batch write
+      if (putRequests.length > 0) {
+        try {
+          const batchWriteCommand = new BatchWriteCommand({
+            RequestItems: {
+              [tableNames.games]: putRequests,
+            },
+          });
+          
+          await dynamoDBClient.send(batchWriteCommand);
+        } catch (error) {
+          console.error('Error batch writing games:', error);
+          // If batch write fails, fall back to individual writes for this batch
+          for (const request of putRequests) {
+            try {
+              await putGame(request.PutRequest.Item);
+            } catch (err) {
+              console.error('Error writing game:', err);
+            }
+          }
+        }
       }
     }
 

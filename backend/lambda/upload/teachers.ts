@@ -6,7 +6,7 @@
  * - No delete functionality
  */
 
-import { PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
+import { PutCommand, GetCommand, BatchGetCommand, BatchWriteCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import * as XLSX from 'xlsx';
 import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
@@ -91,7 +91,7 @@ export const handler = async (
       };
     }
 
-    // Process each row - upsert (update if exists, insert if new)
+    // Process records in batches for better performance
     const results = {
       processed: 0,
       inserted: 0,
@@ -99,64 +99,139 @@ export const handler = async (
       errors: [] as string[],
     };
 
+    const now = new Date().toISOString();
+    
+    // Map all rows to records first, validating required fields
+    const parsedRecords: Array<{ index: number; record: any }> = [];
     for (let i = 0; i < dataRows.length; i++) {
       const row = dataRows[i];
+      const record: any = {};
+      headers.forEach((header, index) => {
+        record[header] = row[index];
+      });
+
+      // Validate required field
+      if (!record.teacher_id) {
+        results.errors.push(`Row ${i + 2}: Missing teacher_id`);
+        continue;
+      }
+
+      parsedRecords.push({ index: i, record });
+    }
+
+    // Batch check which records already exist (25 items per batch)
+    const BATCH_SIZE = 25;
+    const existingRecordsMap = new Map<string, TeacherRecord>();
+    
+    for (let i = 0; i < parsedRecords.length; i += BATCH_SIZE) {
+      const batch = parsedRecords.slice(i, i + BATCH_SIZE);
+      const keys = batch.map(({ record }) => ({ teacher_id: record.teacher_id }));
       
       try {
-        // Map row data to object using headers
-        const record: any = {};
-        headers.forEach((header, index) => {
-          record[header] = row[index];
+        const batchGetCommand = new BatchGetCommand({
+          RequestItems: {
+            [tableNames.teachers]: {
+              Keys: keys,
+            },
+          },
         });
-
-        // Validate required field
-        if (!record.teacher_id) {
-          results.errors.push(`Row ${i + 2}: Missing teacher_id`);
-          continue;
-        }
-
-        // Check if record exists
-        const existingRecord = await getTeacher(record.teacher_id);
-        const now = new Date().toISOString();
-
-        // Parse responsible_class - it may be a JSON string
-        let responsibleClass: string[] = [];
-        if (record.responsible_class) {
-          if (typeof record.responsible_class === 'string') {
-            try {
-              responsibleClass = JSON.parse(record.responsible_class);
-            } catch {
-              // If not valid JSON, treat as single class
-              responsibleClass = [record.responsible_class];
+        
+        const batchResult = await dynamoDBClient.send(batchGetCommand);
+        const items = batchResult.Responses?.[tableNames.teachers] || [];
+        
+        items.forEach((item) => {
+          existingRecordsMap.set(item.teacher_id, item as TeacherRecord);
+        });
+      } catch (error) {
+        console.error('Error batch getting teachers:', error);
+        // If batch get fails, fall back to individual checks for this batch
+        for (const { record } of batch) {
+          try {
+            const existing = await getTeacher(record.teacher_id);
+            if (existing) {
+              existingRecordsMap.set(record.teacher_id, existing);
             }
-          } else if (Array.isArray(record.responsible_class)) {
-            responsibleClass = record.responsible_class;
+          } catch (err) {
+            console.error(`Error getting teacher ${record.teacher_id}:`, err);
           }
         }
+      }
+    }
 
-        // Prepare teacher record
-        const teacherRecord: TeacherRecord = {
-          teacher_id: record.teacher_id,
-          name: record.name || '',
-          password: record.password || '',
-          responsible_class: responsibleClass,
-          last_login: record.last_login || now,
-          is_admin: record.is_admin === true || record.is_admin === 'true' || record.is_admin === 1,
-          created_at: existingRecord ? existingRecord.created_at : now,
-          updated_at: now,
-        };
+    // Batch write records (25 items per batch)
+    for (let i = 0; i < parsedRecords.length; i += BATCH_SIZE) {
+      const batch = parsedRecords.slice(i, i + BATCH_SIZE);
+      const putRequests: any[] = [];
+      
+      for (const { index, record } of batch) {
+        try {
+          const existingRecord = existingRecordsMap.get(record.teacher_id);
+          
+          // Parse responsible_class - it may be a JSON string
+          let responsibleClass: string[] = [];
+          if (record.responsible_class) {
+            if (typeof record.responsible_class === 'string') {
+              try {
+                responsibleClass = JSON.parse(record.responsible_class);
+              } catch {
+                // If not valid JSON, treat as single class
+                responsibleClass = [record.responsible_class];
+              }
+            } else if (Array.isArray(record.responsible_class)) {
+              responsibleClass = record.responsible_class;
+            }
+          }
 
-        // Upsert record
-        await putTeacher(teacherRecord);
-        
-        if (existingRecord) {
-          results.updated++;
-        } else {
-          results.inserted++;
+          // Prepare teacher record
+          const teacherRecord: TeacherRecord = {
+            teacher_id: record.teacher_id,
+            name: record.name || '',
+            password: record.password || '',
+            responsible_class: responsibleClass,
+            last_login: record.last_login || now,
+            is_admin: record.is_admin === true || record.is_admin === 'true' || record.is_admin === 1,
+            created_at: existingRecord ? existingRecord.created_at : now,
+            updated_at: now,
+          };
+
+          putRequests.push({
+            PutRequest: {
+              Item: teacherRecord,
+            },
+          });
+          
+          if (existingRecord) {
+            results.updated++;
+          } else {
+            results.inserted++;
+          }
+          results.processed++;
+        } catch (error) {
+          results.errors.push(`Row ${index + 2}: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
-        results.processed++;
-      } catch (error) {
-        results.errors.push(`Row ${i + 2}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+      
+      // Execute batch write
+      if (putRequests.length > 0) {
+        try {
+          const batchWriteCommand = new BatchWriteCommand({
+            RequestItems: {
+              [tableNames.teachers]: putRequests,
+            },
+          });
+          
+          await dynamoDBClient.send(batchWriteCommand);
+        } catch (error) {
+          console.error('Error batch writing teachers:', error);
+          // If batch write fails, fall back to individual writes for this batch
+          for (const request of putRequests) {
+            try {
+              await putTeacher(request.PutRequest.Item);
+            } catch (err) {
+              console.error('Error writing teacher:', err);
+            }
+          }
+        }
       }
     }
 
