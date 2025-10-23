@@ -80,6 +80,37 @@ export const handler = async (
       row && row.length > 0 && row.some(cell => cell !== null && cell !== undefined && cell !== '')
     );
 
+    // Validate headers - check for required and expected fields
+    const requiredHeaders = ['game_id'];
+    const expectedHeaders = [
+      'game_id', 'game_name', 'student_id', 'subject',
+      'difficulty', 'teacher_id', 'scratch_id', 'scratch_api', 'accumulated_click'
+    ];
+
+    // Check for missing required headers
+    const missingRequired = requiredHeaders.filter(h => !headers.includes(h));
+    if (missingRequired.length > 0) {
+      return {
+        statusCode: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({
+          success: false,
+          message: `Missing required column(s): ${missingRequired.join(', ')}. Please check your Excel file headers.`,
+          expectedHeaders: expectedHeaders,
+        }),
+      };
+    }
+
+    // Check for unexpected headers (typos or wrong column names)
+    const unexpectedHeaders = headers.filter((h: string) => h && !expectedHeaders.includes(h));
+    if (unexpectedHeaders.length > 0) {
+      console.warn('Unexpected headers found:', unexpectedHeaders);
+      // Note: This is a warning, not an error - we'll still process the file
+    }
+
     // Validate maximum 4000 records
     if (dataRows.length > 4000) {
       return {
