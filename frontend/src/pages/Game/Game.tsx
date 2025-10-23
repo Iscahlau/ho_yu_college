@@ -5,8 +5,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { RootState, AppDispatch } from '../../store/store';
 import { setGames } from '../../store/slices/gamesSlice';
+import { updateMarks } from '../../store/slices/authSlice';
 import { getScratchEmbedUrl } from '../../utils/helpers';
-import { fetchGames } from '../../services/gamesService';
+import { fetchGames, trackGameClick } from '../../services/gamesService';
 import type { Game } from '../../store/slices/gamesSlice';
 
 /**
@@ -24,7 +25,9 @@ function GamePage() {
   const { t } = useTranslation();
   const dispatch = useDispatch<AppDispatch>();
   const { games } = useSelector((state: RootState) => state.games);
+  const { user } = useSelector((state: RootState) => state.auth);
   const [gameInfo, setGameInfo] = useState<Game | null>(null);
+  const [clickTracked, setClickTracked] = useState(false);
 
   // Load games from backend if not already loaded
   useEffect(() => {
@@ -56,6 +59,38 @@ function GamePage() {
       setGameInfo(foundGame || null);
     }
   }, [gameId, games]);
+
+  // Track game click and update marks when game loads
+  useEffect(() => {
+    const trackClick = async () => {
+      if (!gameInfo || clickTracked) return;
+
+      try {
+        // Track click with user context if logged in
+        const response = await trackGameClick(
+          gameInfo.gameId,
+          user?.id,
+          user?.role
+        );
+
+        if (response.success && response.data) {
+          console.log('Click tracked:', response.data);
+          
+          // Update marks in Redux store if marks were updated (student only)
+          if (response.data.marks !== undefined && user?.role === 'student') {
+            dispatch(updateMarks(response.data.marks));
+          }
+        }
+      } catch (error) {
+        console.error('Failed to track game click:', error);
+        // Continue showing the game even if tracking fails
+      } finally {
+        setClickTracked(true);
+      }
+    };
+
+    trackClick();
+  }, [gameInfo, user, clickTracked, dispatch]);
 
   // If no gameId is provided, show an error message
   if (!gameId) {
