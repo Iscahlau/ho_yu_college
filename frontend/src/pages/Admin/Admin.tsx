@@ -311,7 +311,7 @@ function Admin() {
                     </Typography>
                   </Box>
                   <Typography variant="body2" sx={{ color: '#718096', mb: 2, lineHeight: 1.6 }}>
-                    Upload Excel/CSV file to add, update, or delete student records
+                    Upload Excel/CSV file to add, update student records
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
                     <Chip label=".xlsx" size="small" variant="outlined" />
@@ -447,7 +447,7 @@ function Admin() {
                     </Typography>
                   </Box>
                   <Typography variant="body2" sx={{ color: '#718096', mb: 2, lineHeight: 1.6 }}>
-                    Upload Excel/CSV file to add, update, or delete game records
+                    Upload Excel/CSV file to add, update game records
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
                     <Chip label=".xlsx" size="small" variant="outlined" />
