@@ -113,7 +113,7 @@ Resources:
         UploadStudentsApi:
           Type: Api
           Properties:
-            Path: /students/upload
+            Path: /upload/students
             Method: post
 
   # Lambda function for uploading teachers
@@ -126,7 +126,7 @@ Resources:
         UploadTeachersApi:
           Type: Api
           Properties:
-            Path: /teachers/upload
+            Path: /upload/teachers
             Method: post
 
   # Lambda function for uploading games
@@ -139,7 +139,7 @@ Resources:
         UploadGamesApi:
           Type: Api
           Properties:
-            Path: /games/upload
+            Path: /upload/games
             Method: post
 
 Outputs:

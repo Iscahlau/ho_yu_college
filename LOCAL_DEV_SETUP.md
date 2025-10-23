@@ -75,9 +75,9 @@ This document describes the completed migration to a local development environme
 - DownloadStudentsFunction: `GET /students/download`
 - DownloadTeachersFunction: `GET /teachers/download`
 - DownloadGamesFunction: `GET /games/download`
-- UploadStudentsFunction: `POST /students/upload`
-- UploadTeachersFunction: `POST /teachers/upload`
-- UploadGamesFunction: `POST /games/upload`
+- UploadStudentsFunction: `POST /upload/students`
+- UploadTeachersFunction: `POST /upload/teachers`
+- UploadGamesFunction: `POST /upload/games`
 
 All functions are configured with:
 - DYNAMODB_MODE=local

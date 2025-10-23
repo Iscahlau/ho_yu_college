@@ -1,46 +1,47 @@
 /**
  * Games Lambda Handler - List all games
- * Returns all games from DynamoDB
+ * Returns all games from DynamoDB with optional pagination
  */
 
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, ScanCommand } from '@aws-sdk/lib-dynamodb';
+import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-
-// Create DynamoDB client
-const mode = process.env.DYNAMODB_MODE || 'aws';
-const clientConfig: any = {
-  region: process.env.AWS_REGION || 'us-east-1',
-};
-
-if (mode === 'local') {
-  const endpoint = process.env.DYNAMODB_ENDPOINT || 'http://localhost:8002';
-  clientConfig.endpoint = endpoint;
-  clientConfig.credentials = {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'local',
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'local',
-  };
-  console.log(`[DynamoDB] Connecting to local DynamoDB at ${endpoint}`);
-}
-
-const client = new DynamoDBClient(clientConfig);
-const dynamoDBClient = DynamoDBDocumentClient.from(client);
-
-const tableNames = {
-  games: process.env.GAMES_TABLE_NAME || 'ho-yu-games',
-};
+import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
 
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   try {
-    console.log('Fetching all games from DynamoDB');
+    console.log('Fetching games from DynamoDB');
+
+    // Support pagination via query parameters
+    const limit = event.queryStringParameters?.limit 
+      ? parseInt(event.queryStringParameters.limit, 10) 
+      : undefined;
+    const lastEvaluatedKey = event.queryStringParameters?.lastKey 
+      ? JSON.parse(decodeURIComponent(event.queryStringParameters.lastKey)) 
+      : undefined;
 
     const command = new ScanCommand({
       TableName: tableNames.games,
+      Limit: limit,
+      ExclusiveStartKey: lastEvaluatedKey,
     });
 
     const result = await dynamoDBClient.send(command);
+
+    // Build response with pagination metadata
+    const response: any = {
+      items: result.Items || [],
+      count: result.Items?.length || 0,
+    };
+
+    // Include pagination token if there are more items
+    if (result.LastEvaluatedKey) {
+      response.lastKey = encodeURIComponent(JSON.stringify(result.LastEvaluatedKey));
+      response.hasMore = true;
+    } else {
+      response.hasMore = false;
+    }
 
     return {
       statusCode: 200,
@@ -48,7 +49,7 @@ export const handler = async (
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
       },
-      body: JSON.stringify(result.Items || []),
+      body: JSON.stringify(response),
     };
   } catch (error) {
     console.error('Error fetching games:', error);
