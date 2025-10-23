@@ -20,6 +20,9 @@ export function createDynamoDBClient(): DynamoDBDocumentClient {
 
   // Configure for local DynamoDB
   if (mode === 'local') {
+    // Use DYNAMODB_ENDPOINT from environment (set by SAM template or default to localhost)
+    // When running in SAM Local Lambda containers, this will be http://dynamodb-local:8000
+    // When running outside Docker (e.g., scripts), this can be http://localhost:8002
     const endpoint = process.env.DYNAMODB_ENDPOINT || 'http://localhost:8002';
     
     clientConfig.endpoint = endpoint;
