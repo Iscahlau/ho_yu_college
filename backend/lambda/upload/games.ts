@@ -80,6 +80,37 @@ export const handler = async (
       row && row.length > 0 && row.some(cell => cell !== null && cell !== undefined && cell !== '')
     );
 
+    // Validate headers - check for required and expected fields
+    const requiredHeaders = ['game_id'];
+    const expectedHeaders = [
+      'game_id', 'game_name', 'student_id', 'subject',
+      'difficulty', 'teacher_id', 'scratch_id', 'scratch_api', 'accumulated_click'
+    ];
+
+    // Check for missing required headers
+    const missingRequired = requiredHeaders.filter(h => !headers.includes(h));
+    if (missingRequired.length > 0) {
+      return {
+        statusCode: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({
+          success: false,
+          message: `Missing required column(s): ${missingRequired.join(', ')}. Please check your Excel file headers.`,
+          expectedHeaders: expectedHeaders,
+        }),
+      };
+    }
+
+    // Check for unexpected headers (typos or wrong column names)
+    const unexpectedHeaders = headers.filter((h: string) => h && !expectedHeaders.includes(h));
+    if (unexpectedHeaders.length > 0) {
+      console.warn('Unexpected headers found:', unexpectedHeaders);
+      // Note: This is a warning, not an error - we'll still process the file
+    }
+
     // Validate maximum 4000 records
     if (dataRows.length > 4000) {
       return {
@@ -235,7 +266,31 @@ export const handler = async (
             },
           });
           
-          await dynamoDBClient.send(batchWriteCommand);
+          const batchResult = await dynamoDBClient.send(batchWriteCommand);
+          
+          // Check for unprocessed items
+          const unprocessedItems = batchResult.UnprocessedItems?.[tableNames.games];
+          if (unprocessedItems && unprocessedItems.length > 0) {
+            console.warn(`Batch write had ${unprocessedItems.length} unprocessed items for games`);
+            // Try individual writes for unprocessed items
+            for (const unprocessedItem of unprocessedItems) {
+              try {
+                await putGame(unprocessedItem.PutRequest!.Item as GameRecord);
+              } catch (err) {
+                const gameId = (unprocessedItem.PutRequest!.Item as any).game_id;
+                const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+                console.error(`Error writing unprocessed game ${gameId}:`, err);
+                results.errors.push(`Game ${gameId}: ${errorMsg}`);
+                // Adjust counts since this item failed
+                if (existingRecordsMap.has(gameId)) {
+                  results.updated--;
+                } else {
+                  results.inserted--;
+                }
+                results.processed--;
+              }
+            }
+          }
         } catch (error) {
           console.error('Error batch writing games:', error);
           // If batch write fails, fall back to individual writes for this batch
@@ -259,6 +314,22 @@ export const handler = async (
           }
         }
       }
+    }
+
+    // Check if any records were successfully processed
+    if (results.processed === 0) {
+      return {
+        statusCode: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({
+          success: false,
+          message: 'Failed to upload game data. No records were successfully processed.',
+          errors: results.errors.length > 0 ? results.errors : ['Unknown error occurred during upload'],
+        }),
+      };
     }
 
     return {

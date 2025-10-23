@@ -237,7 +237,31 @@ export const handler = async (
             },
           });
           
-          await dynamoDBClient.send(batchWriteCommand);
+          const batchResult = await dynamoDBClient.send(batchWriteCommand);
+          
+          // Check for unprocessed items
+          const unprocessedItems = batchResult.UnprocessedItems?.[tableNames.teachers];
+          if (unprocessedItems && unprocessedItems.length > 0) {
+            console.warn(`Batch write had ${unprocessedItems.length} unprocessed items for teachers`);
+            // Try individual writes for unprocessed items
+            for (const unprocessedItem of unprocessedItems) {
+              try {
+                await putTeacher(unprocessedItem.PutRequest!.Item as TeacherRecord);
+              } catch (err) {
+                const teacherId = (unprocessedItem.PutRequest!.Item as any).teacher_id;
+                const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+                console.error(`Error writing unprocessed teacher ${teacherId}:`, err);
+                results.errors.push(`Teacher ${teacherId}: ${errorMsg}`);
+                // Adjust counts since this item failed
+                if (existingRecordsMap.has(teacherId)) {
+                  results.updated--;
+                } else {
+                  results.inserted--;
+                }
+                results.processed--;
+              }
+            }
+          }
         } catch (error) {
           console.error('Error batch writing teachers:', error);
           // If batch write fails, fall back to individual writes for this batch
@@ -261,6 +285,22 @@ export const handler = async (
           }
         }
       }
+    }
+
+    // Check if any records were successfully processed
+    if (results.processed === 0) {
+      return {
+        statusCode: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({
+          success: false,
+          message: 'Failed to upload teacher data. No records were successfully processed.',
+          errors: results.errors.length > 0 ? results.errors : ['Unknown error occurred during upload'],
+        }),
+      };
     }
 
     return {
