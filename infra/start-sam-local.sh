@@ -12,7 +12,7 @@ cd /Users/iscah/WebstormProjects/ho_yu_college/infra
 python3 -m samcli local start-api \
   --host 0.0.0.0 \
   --port 3000 \
-  --docker-network ho-yu-network
+  --docker-network backend_ho-yu-network
 
 echo ""
 echo "SAM Local API stopped"

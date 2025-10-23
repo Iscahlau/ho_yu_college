@@ -16,23 +16,37 @@ Globals:
         GAMES_TABLE_NAME: ho-yu-games
   Api:
     Cors:
-      AllowMethods: "'*'"
-      AllowHeaders: "'Content-Type,Authorization'"
+      AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+      AllowHeaders: "'Content-Type,Authorization,X-Requested-With'"
       AllowOrigin: "'*'"
+      AllowCredentials: false
 
 Resources:
   # Lambda function for authentication/login
   LoginFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../backend/lambda/auth/
-      Handler: login.handler
+      CodeUri: ../backend/lambda/
+      Handler: auth/login.handler
       Events:
         LoginApi:
           Type: Api
           Properties:
             Path: /auth/login
             Method: post
+
+  # Lambda function for listing all games
+  ListGamesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/lambda/
+      Handler: games/list.handler
+      Events:
+        ListGamesApi:
+          Type: Api
+          Properties:
+            Path: /games
+            Method: get
 
   # Lambda function for game click tracking
   GameClickFunction:
