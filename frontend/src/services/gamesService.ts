@@ -32,12 +32,14 @@ function transformGameData(apiGame: any): Game {
  * Fetch all games
  */
 export async function fetchGames(): Promise<ApiResponse<Game[]>> {
-  const response = await api.apiFetch<any[]>(GAMES_ENDPOINT);
-  
+  const response = await api.apiFetch<any>(GAMES_ENDPOINT);
+
   if (response.success && response.data) {
+    // Backend returns { items: [...], count: number, hasMore: boolean }
+    const items = response.data.items || [];
     return {
-      ...response,
-      data: response.data.map(transformGameData),
+      success: true,
+      data: items.map(transformGameData),
     };
   }
   
