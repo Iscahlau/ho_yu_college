@@ -345,7 +345,7 @@ No database schema changes required. The optimization is purely in the Lambda fu
 ./start-local.sh
 
 # Test upload endpoint
-curl -X POST http://localhost:3000/students/upload \
+curl -X POST http://localhost:3000/upload/students \
   -H "Content-Type: application/json" \
   -d '{"file": "base64-encoded-file-content"}'
 

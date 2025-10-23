@@ -64,7 +64,7 @@ STU110     | Test User10| 测试10 | 500   | 3A    | 10       | TCH002     | pas
 base64_content=$(base64 -w 0 test-students.xlsx)
 
 # Send upload request
-curl -X POST http://localhost:3000/students/upload \
+curl -X POST http://localhost:3000/upload/students \
   -H "Content-Type: application/json" \
   -d "{\"file\":\"$base64_content\"}"
 ```
@@ -123,7 +123,7 @@ TCH103     | Test Teacher3| pass123  | ["3A", "3B"]      | true
 **Upload:**
 ```bash
 base64_content=$(base64 -w 0 test-teachers.xlsx)
-curl -X POST http://localhost:3000/teachers/upload \
+curl -X POST http://localhost:3000/upload/teachers \
   -H "Content-Type: application/json" \
   -d "{\"file\":\"$base64_content\"}"
 ```
@@ -159,7 +159,7 @@ game_id      | game_name  | student_id | subject | difficulty | teacher_id | scr
 base64_content=$(base64 -w 0 test-games.xlsx)
 
 # Time the upload
-time curl -X POST http://localhost:3000/games/upload \
+time curl -X POST http://localhost:3000/upload/games \
   -H "Content-Type: application/json" \
   -d "{\"file\":\"$base64_content\"}"
 ```
@@ -277,19 +277,19 @@ Create files with different sizes:
 **Test each file:**
 ```bash
 # 100 rows
-time curl -X POST http://localhost:3000/students/upload \
+time curl -X POST http://localhost:3000/upload/students \
   -H "Content-Type: application/json" \
   -d "{\"file\":\"$(base64 -w 0 test-100.xlsx)\"}" \
   -o /dev/null -s
 
 # 500 rows
-time curl -X POST http://localhost:3000/students/upload \
+time curl -X POST http://localhost:3000/upload/students \
   -H "Content-Type: application/json" \
   -d "{\"file\":\"$(base64 -w 0 test-500.xlsx)\"}" \
   -o /dev/null -s
 
 # 1000 rows
-time curl -X POST http://localhost:3000/students/upload \
+time curl -X POST http://localhost:3000/upload/students \
   -H "Content-Type: application/json" \
   -d "{\"file\":\"$(base64 -w 0 test-1000.xlsx)\"}" \
   -o /dev/null -s
@@ -317,7 +317,7 @@ The old implementation would take:
 
 1. **Upload initial data:**
 ```bash
-curl -X POST http://localhost:3000/students/upload \
+curl -X POST http://localhost:3000/upload/students \
   -H "Content-Type: application/json" \
   -d "{\"file\":\"$(base64 -w 0 test-students.xlsx)\"}"
 ```
@@ -328,7 +328,7 @@ curl -X POST http://localhost:3000/students/upload \
 
 4. **Upload modified data:**
 ```bash
-curl -X POST http://localhost:3000/students/upload \
+curl -X POST http://localhost:3000/upload/students \
   -H "Content-Type: application/json" \
   -d "{\"file\":\"$(base64 -w 0 test-students-modified.xlsx)\"}"
 ```
@@ -342,7 +342,7 @@ curl -X POST http://localhost:3000/students/upload \
 1. **Upload games with initial click counts:**
 ```bash
 # File has accumulated_click = 10 for all games
-curl -X POST http://localhost:3000/games/upload \
+curl -X POST http://localhost:3000/upload/games \
   -H "Content-Type: application/json" \
   -d "{\"file\":\"$(base64 -w 0 test-games.xlsx)\"}"
 ```
@@ -357,7 +357,7 @@ curl -X POST http://localhost:3000/games/1000000001/click \
 
 4. **Re-upload the same games file:**
 ```bash
-curl -X POST http://localhost:3000/games/upload \
+curl -X POST http://localhost:3000/upload/games \
   -H "Content-Type: application/json" \
   -d "{\"file\":\"$(base64 -w 0 test-games.xlsx)\"}"
 ```

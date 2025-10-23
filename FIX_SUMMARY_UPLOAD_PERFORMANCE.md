@@ -236,7 +236,7 @@ New Tests:
 ./start-local.sh
 
 # Test upload endpoint
-curl -X POST http://localhost:3000/students/upload \
+curl -X POST http://localhost:3000/upload/students \
   -H "Content-Type: application/json" \
   -d '{"file": "<base64-encoded-file>"}'
 

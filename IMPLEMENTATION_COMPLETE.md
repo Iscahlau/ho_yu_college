@@ -105,7 +105,7 @@ This document confirms the successful implementation of performance optimization
 ./start-local.sh
 
 # Test upload
-curl -X POST http://localhost:3000/students/upload \
+curl -X POST http://localhost:3000/upload/students \
   -H "Content-Type: application/json" \
   -d '{"file": "<base64-file>"}'
 
