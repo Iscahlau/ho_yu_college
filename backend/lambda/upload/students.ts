@@ -260,6 +260,22 @@ export const handler = async (
       }
     }
 
+    // Check if any records were successfully processed
+    if (results.processed === 0) {
+      return {
+        statusCode: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({
+          success: false,
+          message: 'Failed to upload student data. No records were successfully processed.',
+          errors: results.errors.length > 0 ? results.errors : ['Unknown error occurred during upload'],
+        }),
+      };
+    }
+
     return {
       statusCode: 200,
       headers: {
