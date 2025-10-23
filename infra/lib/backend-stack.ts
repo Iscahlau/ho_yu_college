@@ -88,12 +88,14 @@ export class BackendStack extends cdk.Stack {
       code: lambda.Code.fromAsset('../backend/lambda/games'),
       environment: {
         GAMES_TABLE_NAME: gamesTable.tableName,
+        STUDENTS_TABLE_NAME: studentsTable.tableName,
       },
       timeout: cdk.Duration.seconds(10),
     });
 
-    // Grant Lambda permissions to read and update games table
+    // Grant Lambda permissions to read and update games and students tables
     gamesTable.grantReadWriteData(gameClickLambda);
+    studentsTable.grantReadWriteData(gameClickLambda);
 
     // API Gateway resources and methods
     const gamesResource = api.root.addResource('games');

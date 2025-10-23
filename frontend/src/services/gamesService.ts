@@ -63,7 +63,31 @@ export async function fetchGameById(gameId: string): Promise<ApiResponse<Game>> 
 }
 
 /**
- * Increment game click count
+ * Track game click and update student marks
+ * @param gameId - The game ID
+ * @param studentId - Optional student ID (only for students)
+ * @param role - Optional user role ('student' | 'teacher' | 'admin')
+ * @returns Response containing updated click count and marks (if student)
+ */
+export async function trackGameClick(
+  gameId: string,
+  studentId?: string,
+  role?: 'student' | 'teacher' | 'admin'
+): Promise<ApiResponse<{ accumulated_click: number; marks?: number }>> {
+  return api.apiFetch<{ accumulated_click: number; marks?: number }>(
+    `${GAMES_ENDPOINT}/${gameId}/click`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        student_id: studentId,
+        role: role,
+      }),
+    }
+  );
+}
+
+/**
+ * Increment game click count (deprecated - use trackGameClick instead)
  */
 export async function incrementGameClick(gameId: string): Promise<ApiResponse<void>> {
   return api.apiFetch<void>(`${GAMES_ENDPOINT}/${gameId}/click`, {
@@ -164,6 +188,7 @@ export async function enrichGameWithScratchData(game: Game): Promise<Game> {
 export default {
   fetchGames,
   fetchGameById,
+  trackGameClick,
   incrementGameClick,
   fetchScratchProject,
   fetchScratchGameName,

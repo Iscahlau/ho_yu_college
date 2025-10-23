@@ -1,14 +1,15 @@
 /**
  * Game Click Lambda Function Tests
- * Unit tests for game click increment logic
+ * Unit tests for game click increment logic and student mark updates
  */
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { handler } from '../../lambda/games/click';
-import { mockGames } from '../mocks';
+import { mockGames, mockStudents } from '../mocks';
 
-// Store click counts in memory for testing - outside the mock to share across tests
+// Store click counts and student marks in memory for testing
 const clickCounts = new Map<string, number>();
+const studentMarks = new Map<string, number>();
 
 // Mock AWS SDK
 jest.mock('@aws-sdk/client-dynamodb');
@@ -17,7 +18,7 @@ jest.mock('@aws-sdk/lib-dynamodb', () => {
     DynamoDBDocumentClient: {
       from: jest.fn(() => ({
         send: jest.fn((command: any) => {
-          const { mockGames } = require('../mocks');
+          const { mockGames, mockStudents } = require('../mocks');
           
           // Handle GetCommand - check if game exists
           if (command.input?.TableName && command.input?.Key?.game_id) {
@@ -30,7 +31,7 @@ jest.mock('@aws-sdk/lib-dynamodb', () => {
                 return Promise.resolve({ Attributes: undefined });
               }
               
-              // Simulate atomic ADD operation
+              // Simulate atomic ADD operation for accumulated_click
               const currentCount = clickCounts.get(gameId) || game.accumulated_click;
               const newCount = currentCount + 1;
               clickCounts.set(gameId, newCount);
@@ -47,6 +48,31 @@ jest.mock('@aws-sdk/lib-dynamodb', () => {
             return Promise.resolve({ Item: game });
           }
           
+          // Handle student marks update
+          if (command.input?.TableName && command.input?.Key?.student_id) {
+            const studentId = command.input.Key.student_id;
+            const student = mockStudents.find((s: any) => s.student_id === studentId);
+            
+            if (!student) {
+              return Promise.resolve({ Attributes: undefined });
+            }
+            
+            if (command.input.UpdateExpression) {
+              // Simulate atomic ADD operation for marks
+              const currentMarks = studentMarks.get(studentId) || student.marks;
+              const marksToAdd = command.input.ExpressionAttributeValues[':marksIncrement'];
+              const newMarks = currentMarks + marksToAdd;
+              studentMarks.set(studentId, newMarks);
+              
+              return Promise.resolve({
+                Attributes: {
+                  ...student,
+                  marks: newMarks,
+                },
+              });
+            }
+          }
+          
           return Promise.resolve({ Item: undefined });
         }),
       })),
@@ -58,19 +84,27 @@ jest.mock('@aws-sdk/lib-dynamodb', () => {
 
 // Set environment variables
 process.env.GAMES_TABLE_NAME = 'ho-yu-games';
+process.env.STUDENTS_TABLE_NAME = 'ho-yu-students';
 
 describe('Game Click Lambda Handler', () => {
-  // Reset click counts before each test
+  // Reset click counts and student marks before each test
   beforeEach(() => {
     clickCounts.clear();
+    studentMarks.clear();
     // Initialize with mock data
     mockGames.forEach((game: any) => {
       clickCounts.set(game.game_id, game.accumulated_click);
     });
+    mockStudents.forEach((student: any) => {
+      studentMarks.set(student.student_id, student.marks);
+    });
   });
 
-  const createEvent = (gameId: string | null): APIGatewayProxyEvent => ({
-    body: null,
+  const createEvent = (
+    gameId: string | null,
+    body?: any
+  ): APIGatewayProxyEvent => ({
+    body: body ? JSON.stringify(body) : null,
     headers: {},
     multiValueHeaders: {},
     httpMethod: 'POST',
@@ -235,6 +269,121 @@ describe('Game Click Lambda Handler', () => {
       expect(body).toHaveProperty('accumulated_click');
       expect(typeof body.success).toBe('boolean');
       expect(typeof body.accumulated_click).toBe('number');
+    });
+  });
+
+  describe('Student Mark Updates', () => {
+    test('should update student marks for Beginner difficulty game', async () => {
+      const beginnerGame = mockGames.find((g: any) => g.difficulty === 'Beginner');
+      const student = mockStudents[0];
+      const initialMarks = student.marks;
+
+      const event = createEvent(beginnerGame!.game_id, {
+        student_id: student.student_id,
+        role: 'student',
+      });
+      const result: APIGatewayProxyResult = await handler(event);
+
+      expect(result.statusCode).toBe(200);
+      const body = JSON.parse(result.body);
+      expect(body.marks).toBe(initialMarks + 5);
+    });
+
+    test('should update student marks for Intermediate difficulty game', async () => {
+      const intermediateGame = mockGames.find((g: any) => g.difficulty === 'Intermediate');
+      const student = mockStudents[1];
+      const initialMarks = student.marks;
+
+      const event = createEvent(intermediateGame!.game_id, {
+        student_id: student.student_id,
+        role: 'student',
+      });
+      const result: APIGatewayProxyResult = await handler(event);
+
+      expect(result.statusCode).toBe(200);
+      const body = JSON.parse(result.body);
+      expect(body.marks).toBe(initialMarks + 10);
+    });
+
+    test('should update student marks for Advanced difficulty game', async () => {
+      const advancedGame = mockGames.find((g: any) => g.difficulty === 'Advanced');
+      const student = mockStudents[2];
+      const initialMarks = student.marks;
+
+      const event = createEvent(advancedGame!.game_id, {
+        student_id: student.student_id,
+        role: 'student',
+      });
+      const result: APIGatewayProxyResult = await handler(event);
+
+      expect(result.statusCode).toBe(200);
+      const body = JSON.parse(result.body);
+      expect(body.marks).toBe(initialMarks + 15);
+    });
+
+    test('should NOT update marks for teacher role', async () => {
+      const game = mockGames[0];
+      const event = createEvent(game.game_id, {
+        student_id: 'TCH001',
+        role: 'teacher',
+      });
+      const result: APIGatewayProxyResult = await handler(event);
+
+      expect(result.statusCode).toBe(200);
+      const body = JSON.parse(result.body);
+      expect(body.marks).toBeUndefined();
+      expect(body.accumulated_click).toBeDefined();
+    });
+
+    test('should NOT update marks for admin role', async () => {
+      const game = mockGames[0];
+      const event = createEvent(game.game_id, {
+        student_id: 'TCH001',
+        role: 'admin',
+      });
+      const result: APIGatewayProxyResult = await handler(event);
+
+      expect(result.statusCode).toBe(200);
+      const body = JSON.parse(result.body);
+      expect(body.marks).toBeUndefined();
+      expect(body.accumulated_click).toBeDefined();
+    });
+
+    test('should still track click even without user context', async () => {
+      const game = mockGames[0];
+      const event = createEvent(game.game_id);
+      const result: APIGatewayProxyResult = await handler(event);
+
+      expect(result.statusCode).toBe(200);
+      const body = JSON.parse(result.body);
+      expect(body.success).toBe(true);
+      expect(body.accumulated_click).toBeDefined();
+      expect(body.marks).toBeUndefined();
+    });
+
+    test('should accumulate marks for multiple clicks by same student', async () => {
+      const game1 = mockGames.find((g: any) => g.difficulty === 'Beginner');
+      const game2 = mockGames.find((g: any) => g.difficulty === 'Advanced');
+      const student = mockStudents[0];
+      const initialMarks = student.marks;
+
+      // First click on Beginner game
+      let event = createEvent(game1!.game_id, {
+        student_id: student.student_id,
+        role: 'student',
+      });
+      let result: APIGatewayProxyResult = await handler(event);
+      let body = JSON.parse(result.body);
+      expect(body.marks).toBe(initialMarks + 5);
+
+      // Second click on Advanced game
+      event = createEvent(game2!.game_id, {
+        student_id: student.student_id,
+        role: 'student',
+      });
+      result = await handler(event);
+      body = JSON.parse(result.body);
+      expect(body.marks).toBe(initialMarks + 5 + 15);
     });
   });
 });
