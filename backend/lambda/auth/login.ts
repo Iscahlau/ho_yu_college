@@ -3,9 +3,34 @@
  * Handles student and teacher authentication
  */
 
-import { GetCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
+
+// Create DynamoDB client
+const mode = process.env.DYNAMODB_MODE || 'aws';
+const clientConfig: any = {
+  region: process.env.AWS_REGION || 'us-east-1',
+};
+
+if (mode === 'local') {
+  const endpoint = process.env.DYNAMODB_ENDPOINT || 'http://localhost:8002';
+  clientConfig.endpoint = endpoint;
+  clientConfig.credentials = {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'local',
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'local',
+  };
+  console.log(`[DynamoDB] Connecting to local DynamoDB at ${endpoint}`);
+}
+
+const client = new DynamoDBClient(clientConfig);
+const dynamoDBClient = DynamoDBDocumentClient.from(client);
+
+const tableNames = {
+  students: process.env.STUDENTS_TABLE_NAME || 'ho-yu-students',
+  teachers: process.env.TEACHERS_TABLE_NAME || 'ho-yu-teachers',
+  games: process.env.GAMES_TABLE_NAME || 'ho-yu-games',
+};
 
 interface LoginRequest {
   id: string;

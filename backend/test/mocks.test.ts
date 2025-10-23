@@ -7,9 +7,9 @@ import {
   mockStudents,
   mockTeachers,
   mockGames,
-  MOCK_STUDENT_PASSWORD_HASH,
-  MOCK_TEACHER_PASSWORD_HASH,
-  MOCK_ADMIN_PASSWORD_HASH,
+  MOCK_STUDENT_PASSWORD,
+  MOCK_TEACHER_PASSWORD,
+  MOCK_ADMIN_PASSWORD,
 } from './mocks';
 
 describe('Mock Students Data', () => {
@@ -77,10 +77,9 @@ describe('Mock Students Data', () => {
     });
   });
 
-  test('passwords should be properly hashed', () => {
+  test('passwords should match expected values', () => {
     mockStudents.forEach((student: any) => {
-      expect(student.password).toHaveLength(64); // SHA-256 produces 64 hex characters
-      expect(student.password).toBe(MOCK_STUDENT_PASSWORD_HASH);
+      expect(student.password).toBe(MOCK_STUDENT_PASSWORD);
     });
   });
 });
@@ -144,12 +143,11 @@ describe('Mock Teachers Data', () => {
     });
   });
 
-  test('passwords should be properly hashed', () => {
+  test('passwords should match expected values', () => {
     mockTeachers.forEach((teacher: any) => {
-      expect(teacher.password).toHaveLength(64); // SHA-256 produces 64 hex characters
-      // Check if password is either teacher or admin hash
-      const validHashes = [MOCK_TEACHER_PASSWORD_HASH, MOCK_ADMIN_PASSWORD_HASH];
-      expect(validHashes).toContain(teacher.password);
+      // Check if password is either teacher or admin password
+      const validPasswords = [MOCK_TEACHER_PASSWORD, MOCK_ADMIN_PASSWORD];
+      expect(validPasswords).toContain(teacher.password);
     });
   });
 });

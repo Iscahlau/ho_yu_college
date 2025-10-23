@@ -1,78 +1,82 @@
 # Backend - Ho Yu College Scratch Game Platform
 
-This directory contains the backend infrastructure and services for the Ho Yu College Scratch Game Platform.
+This directory contains the backend Lambda functions, DynamoDB scripts, and tests for the Ho Yu College Scratch Game Platform.
 
 ## Structure
 
 ```
 backend/
-├── bin/              # CDK app entry point
-├── aws/              # AWS infrastructure code (CDK stacks, excluding Lambda)
-│   ├── lib/          # CDK stack definitions
-│   └── README.md     # AWS infrastructure documentation
-├── database/         # Local mock database for development
-│   ├── schema/       # SQL table definitions
-│   ├── seeds/        # Mock data population scripts
-│   ├── scripts/      # Database initialization and reset scripts
-│   └── README.md     # Database setup and DataGrip instructions
-├── lambda/           # Lambda function handlers (application logic)
-│   ├── auth/         # Authentication handlers
-│   └── games/        # Game management handlers
-├── mock-server/      # Local development mock server
-├── test/             # Unit tests and mock data
-│   ├── lambda/       # Lambda function tests
-│   └── mocks/        # Mock data for testing and local development
-├── cdk.json          # CDK configuration
-├── jest.config.js    # Jest test configuration
-├── package.json      # Dependencies and scripts
-└── tsconfig.json     # TypeScript configuration
+├── lambda/            # Lambda function handlers (application logic)
+│   ├── auth/          # Authentication handlers
+│   ├── games/         # Game management handlers
+│   ├── download/      # Data export handlers
+│   ├── upload/        # Data import handlers
+│   └── utils/         # Shared utilities (DynamoDB client)
+├── scripts/           # DynamoDB Local initialization and seeding
+├── test/              # Unit tests and mock data
+│   ├── lambda/        # Lambda function tests
+│   └── mocks/         # Mock data for testing and local development
+├── docker-compose.dynamodb.yml  # DynamoDB Local container setup
+├── jest.config.js     # Jest test configuration
+├── package.json       # Dependencies and scripts
+└── tsconfig.json      # TypeScript configuration
 ```
 
-**Note**: AWS CDK infrastructure code is now organized in the `aws/` directory, while Lambda functions remain in `lambda/` to maintain clear separation between infrastructure definitions and application business logic.
+**Note**: Infrastructure code (AWS CDK) has been moved to the `../infra/` directory for better separation of concerns.
 
 ## Development
 
-### Local Mock Database
+## Development
 
-For visual database management and SQL-based development, set up a local database:
+### Local Development with DynamoDB Local
 
-```bash
-cd database
-./scripts/init-sqlite.sh  # Creates SQLite database with mock data
-```
-
-**See [database/README.md](database/README.md) for comprehensive setup instructions including:**
-- SQLite setup (zero-configuration)
-- PostgreSQL with Docker (production-like environment)
-- DataGrip connection instructions
-- Database schema and mock data details
-
-### Local Development with Mock Server
-
-For local frontend development without AWS deployment, use the mock server:
+The recommended way to develop locally is using AWS SAM Local with DynamoDB Local. This mirrors the production environment:
 
 ```bash
-npm run mock-server
+# From project root - one command to start everything
+./start-local.sh
 ```
 
-This starts a local Express server on port 3000 that simulates the AWS backend APIs using mock data.
+This will start:
+- DynamoDB Local on port 8002
+- DynamoDB Admin UI on port 8001
+- SAM Local API Gateway on port 3000
 
-**See [mock-server/README.md](mock-server/README.md) for detailed documentation.**
+For manual setup and troubleshooting, see [../infra/README.md](../infra/README.md).
+
+### DynamoDB Management
+
+Start/stop DynamoDB Local independently:
+
+```bash
+# Start DynamoDB Local
+npm run dynamodb:start
+
+# Initialize tables
+npm run dynamodb:init
+
+# Seed with mock data
+npm run dynamodb:seed
+
+# All-in-one setup
+npm run dynamodb:setup
+
+# Stop DynamoDB
+npm run dynamodb:stop
+
+# Remove all data
+npm run dynamodb:down
+```
 
 ### AWS Deployment
 
+Infrastructure deployment is managed from the `../infra/` directory:
+
 ```bash
-# Install dependencies
+cd ../infra
 npm install
-
-# Build TypeScript
 npm run build
-
-# Generate CloudFormation template
-npx cdk synth
-
-# Deploy to AWS (requires AWS credentials)
-npx cdk deploy
+npm run deploy
 ```
 
 ## Available Scripts
@@ -82,8 +86,11 @@ npx cdk deploy
 | `npm run build` | Compile TypeScript to JavaScript |
 | `npm run watch` | Watch and compile TypeScript on changes |
 | `npm test` | Run Jest unit tests |
-| `npm run cdk` | Run AWS CDK commands |
-| `npm run mock-server` | Start local mock server for development |
+| `npm run dynamodb:start` | Start DynamoDB Local container |
+| `npm run dynamodb:stop` | Stop DynamoDB Local container |
+| `npm run dynamodb:init` | Initialize DynamoDB tables |
+| `npm run dynamodb:seed` | Seed tables with mock data |
+| `npm run dynamodb:setup` | One-command DynamoDB setup |
 
 ## Testing
 
@@ -123,14 +130,14 @@ See [lambda/games/README.md](lambda/games/README.md) for detailed documentation.
 
 ## Infrastructure
 
-The AWS infrastructure is defined using AWS CDK in the `aws/lib/` directory:
+The AWS infrastructure is defined using AWS CDK in the `../infra/` directory:
 
 - **API Gateway**: RESTful API endpoints
 - **Lambda**: Serverless compute for business logic
 - **DynamoDB**: NoSQL database for data storage
 - **S3**: Static file hosting and storage
 
-See [aws/README.md](aws/README.md) for detailed infrastructure documentation.
+See [../infra/README.md](../infra/README.md) for detailed infrastructure documentation and deployment instructions.
 
 ### Data Model Requirements
 
@@ -181,15 +188,19 @@ If you encounter TypeScript errors during build:
 If CDK deployment fails:
 
 1. Verify AWS credentials: `aws sts get-caller-identity`
-2. Ensure CDK is bootstrapped: `npx cdk bootstrap`
+2. Ensure CDK is bootstrapped: `cd ../infra && npx cdk bootstrap`
 3. Check CloudFormation console for detailed error messages
 
-### Mock Server Issues
+### Local Development Issues
 
-If the mock server won't start:
+If local development encounters issues:
 
-1. Check that port 3000 is available
-2. Ensure all dependencies are installed: `npm install`
-3. Try setting a different port: `PORT=3001 npm run mock-server`
+1. Ensure Docker is running: `docker info`
+2. Check DynamoDB Local is running: `docker ps | grep dynamodb`
+3. Verify services are accessible:
+   - DynamoDB: http://localhost:8002
+   - DynamoDB Admin: http://localhost:8001
+   - API Gateway: http://localhost:3000
+4. Check logs: `cd backend && npm run dynamodb:logs`
 
-See [mock-server/README.md](mock-server/README.md) for more troubleshooting tips.
+See [../infra/README.md](../infra/README.md) for comprehensive troubleshooting.

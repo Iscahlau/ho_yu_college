@@ -85,7 +85,7 @@ export class BackendStack extends cdk.Stack {
       functionName: 'ho-yu-game-click',
       runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'click.handler',
-      code: lambda.Code.fromAsset('lambda/games'),
+      code: lambda.Code.fromAsset('../backend/lambda/games'),
       environment: {
         GAMES_TABLE_NAME: gamesTable.tableName,
       },

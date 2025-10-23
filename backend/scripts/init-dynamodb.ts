@@ -20,6 +20,9 @@ const client = new DynamoDBClient({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'local',
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'local',
   },
+  requestHandler: {
+    requestTimeout: 10000, // 10 second timeout to prevent hanging
+  },
 });
 
 const TABLE_NAMES = {
@@ -199,12 +202,37 @@ async function createGamesTable(): Promise<void> {
 }
 
 /**
+ * Test DynamoDB connection
+ */
+async function testConnection(): Promise<void> {
+  console.log('Testing DynamoDB Local connection...');
+  try {
+    const listCommand = new ListTablesCommand({});
+    await client.send(listCommand);
+    console.log('✓ Connected to DynamoDB Local\n');
+  } catch (error: any) {
+    console.error('✗ Failed to connect to DynamoDB Local');
+    console.error('  Endpoint:', process.env.DYNAMODB_ENDPOINT || 'http://localhost:8002');
+    console.error('  Error:', error.message);
+    console.error('\nTroubleshooting:');
+    console.error('  1. Make sure DynamoDB Local is running: docker ps | grep dynamodb');
+    console.error('  2. Check DynamoDB logs: docker logs ho-yu-dynamodb-local');
+    console.error('  3. Restart containers: npm run dynamodb:down && npm run dynamodb:start');
+    console.error('  4. Wait a few more seconds for DynamoDB to be ready');
+    throw new Error('Cannot connect to DynamoDB Local');
+  }
+}
+
+/**
  * Main function to initialize all tables
  */
 async function initializeTables(reset: boolean = false): Promise<void> {
   try {
     console.log('Initializing DynamoDB Local tables...\n');
     
+    // Test connection first to fail fast
+    await testConnection();
+
     // List existing tables
     const listCommand = new ListTablesCommand({});
     const listResult = await client.send(listCommand);
@@ -219,10 +247,24 @@ async function initializeTables(reset: boolean = false): Promise<void> {
       console.log('');
     }
 
-    // Create tables
-    await createStudentsTable();
-    await createTeachersTable();
-    await createGamesTable();
+    // Create tables only if they don't exist
+    if (!await tableExists(TABLE_NAMES.students)) {
+      await createStudentsTable();
+    } else {
+      console.log(`Table ${TABLE_NAMES.students} already exists, skipping creation`);
+    }
+
+    if (!await tableExists(TABLE_NAMES.teachers)) {
+      await createTeachersTable();
+    } else {
+      console.log(`Table ${TABLE_NAMES.teachers} already exists, skipping creation`);
+    }
+
+    if (!await tableExists(TABLE_NAMES.games)) {
+      await createGamesTable();
+    } else {
+      console.log(`Table ${TABLE_NAMES.games} already exists, skipping creation`);
+    }
 
     console.log('\n✓ All tables created successfully!');
     console.log('\nNext steps:');

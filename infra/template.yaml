@@ -1,0 +1,145 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Ho Yu College - Local Development Stack
+
+Globals:
+  Function:
+    Timeout: 10
+    Runtime: nodejs20.x
+    Environment:
+      Variables:
+        DYNAMODB_MODE: local
+        DYNAMODB_ENDPOINT: http://dynamodb-local:8000
+        AWS_REGION: us-east-1
+        STUDENTS_TABLE_NAME: ho-yu-students
+        TEACHERS_TABLE_NAME: ho-yu-teachers
+        GAMES_TABLE_NAME: ho-yu-games
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+      AllowHeaders: "'Content-Type,Authorization,X-Requested-With'"
+      AllowOrigin: "'*'"
+      AllowCredentials: false
+
+Resources:
+  # Lambda function for authentication/login
+  LoginFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/lambda/
+      Handler: auth/login.handler
+      Events:
+        LoginApi:
+          Type: Api
+          Properties:
+            Path: /auth/login
+            Method: post
+
+  # Lambda function for listing all games
+  ListGamesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/lambda/
+      Handler: games/list.handler
+      Events:
+        ListGamesApi:
+          Type: Api
+          Properties:
+            Path: /games
+            Method: get
+
+  # Lambda function for game click tracking
+  GameClickFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/lambda/games/
+      Handler: click.handler
+      Events:
+        GameClickApi:
+          Type: Api
+          Properties:
+            Path: /games/{gameId}/click
+            Method: post
+
+  # Lambda function for downloading students
+  DownloadStudentsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/lambda/download/
+      Handler: students.handler
+      Events:
+        DownloadStudentsApi:
+          Type: Api
+          Properties:
+            Path: /students/download
+            Method: get
+
+  # Lambda function for downloading teachers
+  DownloadTeachersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/lambda/download/
+      Handler: teachers.handler
+      Events:
+        DownloadTeachersApi:
+          Type: Api
+          Properties:
+            Path: /teachers/download
+            Method: get
+
+  # Lambda function for downloading games
+  DownloadGamesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/lambda/download/
+      Handler: games.handler
+      Events:
+        DownloadGamesApi:
+          Type: Api
+          Properties:
+            Path: /games/download
+            Method: get
+
+  # Lambda function for uploading students
+  UploadStudentsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/lambda/upload/
+      Handler: students.handler
+      Events:
+        UploadStudentsApi:
+          Type: Api
+          Properties:
+            Path: /students/upload
+            Method: post
+
+  # Lambda function for uploading teachers
+  UploadTeachersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/lambda/upload/
+      Handler: teachers.handler
+      Events:
+        UploadTeachersApi:
+          Type: Api
+          Properties:
+            Path: /teachers/upload
+            Method: post
+
+  # Lambda function for uploading games
+  UploadGamesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../backend/lambda/upload/
+      Handler: games.handler
+      Events:
+        UploadGamesApi:
+          Type: Api
+          Properties:
+            Path: /games/upload
+            Method: post
+
+Outputs:
+  ApiEndpoint:
+    Description: "API Gateway endpoint URL for local development"
+    Value: !Sub "http://localhost:3000"

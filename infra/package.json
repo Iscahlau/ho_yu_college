@@ -1,0 +1,31 @@
+{
+  "name": "infra",
+  "version": "1.0.0",
+  "description": "Infrastructure as Code for Ho Yu College platform",
+  "main": "backend.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk",
+    "synth": "cdk synth",
+    "deploy": "cdk deploy",
+    "diff": "cdk diff",
+    "sam:start": "bash start-sam-local.sh",
+    "local:start": "cd ../backend && node simple-server.js",
+    "local:dynamodb": "cd ../backend && npm run dynamodb:setup"
+  },
+  "keywords": ["cdk", "infrastructure", "aws"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-cdk-lib": "^2.216.0",
+    "constructs": "^10.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "aws-cdk": "^2.1029.2",
+    "source-map-support": "^0.5.21",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
+}
