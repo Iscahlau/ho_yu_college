@@ -65,10 +65,11 @@ function Login() {
                     }
                 }
             } else {
-                setError(response.error || 'Login failed. Please check your credentials.');
+                // Use bilingual error message for login failures
+                setError(t('errors.loginFailedBilingual'));
             }
         } catch (err) {
-            setError('An unexpected error occurred. Please try again.');
+            setError(t('errors.unexpectedErrorBilingual'));
         } finally {
             setLoading(false);
         }

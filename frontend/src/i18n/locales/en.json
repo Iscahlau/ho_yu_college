@@ -64,6 +64,13 @@
   },
   "errors": {
     "loginFailed": "Login failed. Please check your credentials.",
+    "loginFailedBilingual": "Login failed. Please check your credentials. / 登入失敗。請檢查您的憑證。",
+    "unexpectedError": "An unexpected error occurred. Please try again.",
+    "unexpectedErrorBilingual": "An unexpected error occurred. Please try again. / 發生意外錯誤。請重試。",
+    "pleaseLogin": "Please log in to access this page.",
+    "pleaseLoginBilingual": "Please log in to access this page. / 請登入以訪問此頁面。",
+    "noPermission": "You do not have permission to access this page.",
+    "noPermissionBilingual": "You do not have permission to access this page. / 您無權訪問此頁面。",
     "unauthorized": "You are not authorized to access this page.",
     "fileUploadFailed": "File upload failed. Please try again.",
     "invalidFileFormat": "Invalid file format.",
