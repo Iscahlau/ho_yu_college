@@ -150,10 +150,10 @@ async function createGamesTable(): Promise<void> {
   const command = new CreateTableCommand({
     TableName: tableName,
     KeySchema: [
-      { AttributeName: 'game_id', KeyType: 'HASH' },
+      { AttributeName: 'scratch_game_id', KeyType: 'HASH' },
     ],
     AttributeDefinitions: [
-      { AttributeName: 'game_id', AttributeType: 'S' },
+      { AttributeName: 'scratch_game_id', AttributeType: 'S' },
       { AttributeName: 'teacher_id', AttributeType: 'S' },
       { AttributeName: 'student_id', AttributeType: 'S' },
     ],

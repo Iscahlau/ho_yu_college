@@ -21,9 +21,9 @@ jest.mock('@aws-sdk/lib-dynamodb', () => {
           const { mockGames, mockStudents } = require('../mocks');
           
           // Handle GetCommand - check if game exists
-          if (command.input?.TableName && command.input?.Key?.game_id) {
-            const gameId = command.input.Key.game_id;
-            const game = mockGames.find((g: any) => g.game_id === gameId);
+          if (command.input?.TableName && command.input?.Key?.scratch_game_id) {
+            const gameId = command.input.Key.scratch_game_id;
+            const game = mockGames.find((g: any) => g.scratch_game_id === gameId);
             
             // If UpdateExpression is present, it's an UpdateCommand
             if (command.input.UpdateExpression) {
@@ -93,7 +93,7 @@ describe('Game Click Lambda Handler', () => {
     studentMarks.clear();
     // Initialize with mock data
     mockGames.forEach((game: any) => {
-      clickCounts.set(game.game_id, game.accumulated_click);
+      clickCounts.set(game.scratch_game_id, game.accumulated_click);
     });
     mockStudents.forEach((student: any) => {
       studentMarks.set(student.student_id, student.marks);
@@ -141,7 +141,7 @@ describe('Game Click Lambda Handler', () => {
   describe('Click Increment', () => {
     test('should successfully increment click count for existing game', async () => {
       const game = mockGames[0];
-      const event = createEvent(game.game_id);
+      const event = createEvent(game.scratch_game_id);
       const result: APIGatewayProxyResult = await handler(event);
 
       expect(result.statusCode).toBe(200);
@@ -155,19 +155,19 @@ describe('Game Click Lambda Handler', () => {
       const initialCount = game.accumulated_click;
       
       // First increment
-      let event = createEvent(game.game_id);
+      let event = createEvent(game.scratch_game_id);
       let result: APIGatewayProxyResult = await handler(event);
       let body = JSON.parse(result.body);
       expect(body.accumulated_click).toBe(initialCount + 1);
 
       // Second increment
-      event = createEvent(game.game_id);
+      event = createEvent(game.scratch_game_id);
       result = await handler(event);
       body = JSON.parse(result.body);
       expect(body.accumulated_click).toBe(initialCount + 2);
 
       // Third increment
-      event = createEvent(game.game_id);
+      event = createEvent(game.scratch_game_id);
       result = await handler(event);
       body = JSON.parse(result.body);
       expect(body.accumulated_click).toBe(initialCount + 3);
@@ -180,19 +180,19 @@ describe('Game Click Lambda Handler', () => {
       const initialCount2 = game2.accumulated_click;
 
       // Increment game 1
-      let event = createEvent(game1.game_id);
+      let event = createEvent(game1.scratch_game_id);
       let result: APIGatewayProxyResult = await handler(event);
       let body = JSON.parse(result.body);
       expect(body.accumulated_click).toBe(initialCount1 + 1);
 
       // Increment game 2
-      event = createEvent(game2.game_id);
+      event = createEvent(game2.scratch_game_id);
       result = await handler(event);
       body = JSON.parse(result.body);
       expect(body.accumulated_click).toBe(initialCount2 + 1);
 
       // Increment game 1 again - should be independent
-      event = createEvent(game1.game_id);
+      event = createEvent(game1.scratch_game_id);
       result = await handler(event);
       body = JSON.parse(result.body);
       expect(body.accumulated_click).toBe(initialCount1 + 2);
@@ -203,7 +203,7 @@ describe('Game Click Lambda Handler', () => {
       const testGames = [mockGames[2], mockGames[5], mockGames[10], mockGames[15]];
       
       for (const game of testGames) {
-        const event = createEvent(game.game_id);
+        const event = createEvent(game.scratch_game_id);
         const result: APIGatewayProxyResult = await handler(event);
         
         expect(result.statusCode).toBe(200);
@@ -217,7 +217,7 @@ describe('Game Click Lambda Handler', () => {
   describe('Response Headers', () => {
     test('should include CORS headers in successful response', async () => {
       const game = mockGames[0];
-      const event = createEvent(game.game_id);
+      const event = createEvent(game.scratch_game_id);
       const result: APIGatewayProxyResult = await handler(event);
 
       expect(result.headers).toBeDefined();
@@ -243,13 +243,13 @@ describe('Game Click Lambda Handler', () => {
 
       // Simulate rapid clicks
       for (let i = 0; i < numClicks; i++) {
-        const event = createEvent(game.game_id);
+        const event = createEvent(game.scratch_game_id);
         const result: APIGatewayProxyResult = await handler(event);
         expect(result.statusCode).toBe(200);
       }
 
       // Verify final count
-      const event = createEvent(game.game_id);
+      const event = createEvent(game.scratch_game_id);
       const result: APIGatewayProxyResult = await handler(event);
       const body = JSON.parse(result.body);
       
@@ -261,7 +261,7 @@ describe('Game Click Lambda Handler', () => {
   describe('Response Format', () => {
     test('should return success flag and click count', async () => {
       const game = mockGames[0];
-      const event = createEvent(game.game_id);
+      const event = createEvent(game.scratch_game_id);
       const result: APIGatewayProxyResult = await handler(event);
 
       const body = JSON.parse(result.body);
@@ -278,7 +278,7 @@ describe('Game Click Lambda Handler', () => {
       const student = mockStudents[0];
       const initialMarks = student.marks;
 
-      const event = createEvent(beginnerGame!.game_id, {
+      const event = createEvent(beginnerGame!.scratch_game_id, {
         student_id: student.student_id,
         role: 'student',
       });
@@ -294,7 +294,7 @@ describe('Game Click Lambda Handler', () => {
       const student = mockStudents[1];
       const initialMarks = student.marks;
 
-      const event = createEvent(intermediateGame!.game_id, {
+      const event = createEvent(intermediateGame!.scratch_game_id, {
         student_id: student.student_id,
         role: 'student',
       });
@@ -310,7 +310,7 @@ describe('Game Click Lambda Handler', () => {
       const student = mockStudents[2];
       const initialMarks = student.marks;
 
-      const event = createEvent(advancedGame!.game_id, {
+      const event = createEvent(advancedGame!.scratch_game_id, {
         student_id: student.student_id,
         role: 'student',
       });
@@ -323,7 +323,7 @@ describe('Game Click Lambda Handler', () => {
 
     test('should NOT update marks for teacher role', async () => {
       const game = mockGames[0];
-      const event = createEvent(game.game_id, {
+      const event = createEvent(game.scratch_game_id, {
         student_id: 'TCH001',
         role: 'teacher',
       });
@@ -337,7 +337,7 @@ describe('Game Click Lambda Handler', () => {
 
     test('should NOT update marks for admin role', async () => {
       const game = mockGames[0];
-      const event = createEvent(game.game_id, {
+      const event = createEvent(game.scratch_game_id, {
         student_id: 'TCH001',
         role: 'admin',
       });
@@ -351,7 +351,7 @@ describe('Game Click Lambda Handler', () => {
 
     test('should still track click even without user context', async () => {
       const game = mockGames[0];
-      const event = createEvent(game.game_id);
+      const event = createEvent(game.scratch_game_id);
       const result: APIGatewayProxyResult = await handler(event);
 
       expect(result.statusCode).toBe(200);
@@ -368,7 +368,7 @@ describe('Game Click Lambda Handler', () => {
       const initialMarks = student.marks;
 
       // First click on Beginner game
-      let event = createEvent(game1!.game_id, {
+      let event = createEvent(game1!.scratch_game_id, {
         student_id: student.student_id,
         role: 'student',
       });
@@ -377,7 +377,7 @@ describe('Game Click Lambda Handler', () => {
       expect(body.marks).toBe(initialMarks + 5);
 
       // Second click on Advanced game
-      event = createEvent(game2!.game_id, {
+      event = createEvent(game2!.scratch_game_id, {
         student_id: student.student_id,
         role: 'student',
       });

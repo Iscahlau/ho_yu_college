@@ -3,7 +3,7 @@
  * 20 game records with various subjects, difficulties, and student assignments
  */
 export declare const mockGames: ({
-    game_id: string;
+    scratch_game_id: string;
     game_name: string;
     student_id: string;
     subject: "Chinese Language";
@@ -11,10 +11,9 @@ export declare const mockGames: ({
     teacher_id: string;
     last_update: string;
     scratch_id: string;
-    scratch_api: string;
     accumulated_click: number;
 } | {
-    game_id: string;
+    scratch_game_id: string;
     game_name: string;
     student_id: string;
     subject: "English Language";
@@ -22,10 +21,9 @@ export declare const mockGames: ({
     teacher_id: string;
     last_update: string;
     scratch_id: string;
-    scratch_api: string;
     accumulated_click: number;
 } | {
-    game_id: string;
+    scratch_game_id: string;
     game_name: string;
     student_id: string;
     subject: "Mathematics";
@@ -33,10 +31,9 @@ export declare const mockGames: ({
     teacher_id: string;
     last_update: string;
     scratch_id: string;
-    scratch_api: string;
     accumulated_click: number;
 } | {
-    game_id: string;
+    scratch_game_id: string;
     game_name: string;
     student_id: string;
     subject: "Humanities and Science";
@@ -44,10 +41,9 @@ export declare const mockGames: ({
     teacher_id: string;
     last_update: string;
     scratch_id: string;
-    scratch_api: string;
     accumulated_click: number;
 } | {
-    game_id: string;
+    scratch_game_id: string;
     game_name: string;
     student_id: string;
     subject: "Chinese Language";
@@ -55,10 +51,9 @@ export declare const mockGames: ({
     teacher_id: string;
     last_update: string;
     scratch_id: string;
-    scratch_api: string;
     accumulated_click: number;
 } | {
-    game_id: string;
+    scratch_game_id: string;
     game_name: string;
     student_id: string;
     subject: "English Language";
@@ -66,10 +61,9 @@ export declare const mockGames: ({
     teacher_id: string;
     last_update: string;
     scratch_id: string;
-    scratch_api: string;
     accumulated_click: number;
 } | {
-    game_id: string;
+    scratch_game_id: string;
     game_name: string;
     student_id: string;
     subject: "Mathematics";
@@ -77,10 +71,9 @@ export declare const mockGames: ({
     teacher_id: string;
     last_update: string;
     scratch_id: string;
-    scratch_api: string;
     accumulated_click: number;
 } | {
-    game_id: string;
+    scratch_game_id: string;
     game_name: string;
     student_id: string;
     subject: "Humanities and Science";
@@ -88,10 +81,9 @@ export declare const mockGames: ({
     teacher_id: string;
     last_update: string;
     scratch_id: string;
-    scratch_api: string;
     accumulated_click: number;
 } | {
-    game_id: string;
+    scratch_game_id: string;
     game_name: string;
     student_id: string;
     subject: "Chinese Language";
@@ -99,10 +91,9 @@ export declare const mockGames: ({
     teacher_id: string;
     last_update: string;
     scratch_id: string;
-    scratch_api: string;
     accumulated_click: number;
 } | {
-    game_id: string;
+    scratch_game_id: string;
     game_name: string;
     student_id: string;
     subject: "English Language";
@@ -110,10 +101,9 @@ export declare const mockGames: ({
     teacher_id: string;
     last_update: string;
     scratch_id: string;
-    scratch_api: string;
     accumulated_click: number;
 } | {
-    game_id: string;
+    scratch_game_id: string;
     game_name: string;
     student_id: string;
     subject: "Mathematics";
@@ -121,10 +111,9 @@ export declare const mockGames: ({
     teacher_id: string;
     last_update: string;
     scratch_id: string;
-    scratch_api: string;
     accumulated_click: number;
 } | {
-    game_id: string;
+    scratch_game_id: string;
     game_name: string;
     student_id: string;
     subject: "Humanities and Science";
@@ -132,6 +121,5 @@ export declare const mockGames: ({
     teacher_id: string;
     last_update: string;
     scratch_id: string;
-    scratch_api: string;
     accumulated_click: number;
 })[];

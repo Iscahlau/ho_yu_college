@@ -246,7 +246,7 @@ export const TEACHER_SCHEMA_MAPPING = {
  * This describes how Excel/CSV columns map to DynamoDB attributes
  */
 export const GAME_SCHEMA_MAPPING = {
-  game_id: { type: 'string', required: true, description: 'Unique game identifier' },
+  scratch_game_id: { type: 'string', required: true, description: 'Unique Scratch project identifier' },
   game_name: { type: 'string', required: false, description: 'Display name of the game' },
   student_id: { type: 'string', required: false, description: 'ID of student who created the game' },
   subject: { type: 'string', required: false, description: 'Subject category' },
@@ -254,7 +254,6 @@ export const GAME_SCHEMA_MAPPING = {
   teacher_id: { type: 'string', required: false, description: 'Associated teacher ID' },
   last_update: { type: 'date', required: false, description: 'Last update timestamp' },
   scratch_id: { type: 'string', required: false, description: 'Scratch project ID' },
-  scratch_api: { type: 'string', required: false, description: 'Scratch project URL' },
   accumulated_click: { type: 'number', required: false, description: 'Total click count (preserved on update)' },
   created_at: { type: 'date', required: false, description: 'Record creation timestamp (auto-generated)' },
   updated_at: { type: 'date', required: false, description: 'Record update timestamp (auto-generated)' },

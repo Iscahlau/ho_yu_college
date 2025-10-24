@@ -2,7 +2,7 @@
  * Upload Games Lambda Handler
  * Handles Excel/CSV file uploads for game data
  * - Skips header row
- * - Upserts records based on game_id
+ * - Upserts records based on scratch_game_id
  * - No delete functionality
  */
 
@@ -12,7 +12,7 @@ import * as XLSX from 'xlsx';
 import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
 
 interface GameRecord {
-  game_id: string;
+  scratch_game_id: string;
   game_name: string;
   student_id: string;
   subject: string;
@@ -20,7 +20,6 @@ interface GameRecord {
   teacher_id: string;
   last_update: string;
   scratch_id: string;
-  scratch_api: string;
   accumulated_click: number;
   created_at?: string;
   updated_at?: string;
@@ -81,10 +80,10 @@ export const handler = async (
     );
 
     // Validate headers - check for required and expected fields
-    const requiredHeaders = ['game_id'];
+    const requiredHeaders = ['scratch_game_id'];
     const expectedHeaders = [
-      'game_id', 'game_name', 'student_id', 'subject',
-      'difficulty', 'teacher_id', 'scratch_id', 'scratch_api', 'accumulated_click'
+      'scratch_game_id', 'game_name', 'student_id', 'subject',
+      'difficulty', 'teacher_id', 'scratch_id', 'accumulated_click'
     ];
 
     // Check for missing required headers
@@ -146,8 +145,8 @@ export const handler = async (
       });
 
       // Validate required field
-      if (!record.game_id) {
-        results.errors.push(`Row ${i + 2}: Missing game_id`);
+      if (!record.scratch_game_id) {
+        results.errors.push(`Row ${i + 2}: Missing scratch_game_id`);
         continue;
       }
 
@@ -160,7 +159,7 @@ export const handler = async (
     
     for (let i = 0; i < parsedRecords.length; i += BATCH_SIZE) {
       const batch = parsedRecords.slice(i, i + BATCH_SIZE);
-      const keys = batch.map(({ record }) => ({ game_id: record.game_id }));
+      const keys = batch.map(({ record }) => ({ scratch_game_id: record.scratch_game_id }));
       
       try {
         const batchGetCommand = new BatchGetCommand({
@@ -175,19 +174,19 @@ export const handler = async (
         const items = batchResult.Responses?.[tableNames.games] || [];
         
         items.forEach((item) => {
-          existingRecordsMap.set(item.game_id, item as GameRecord);
+          existingRecordsMap.set(item.scratch_game_id, item as GameRecord);
         });
       } catch (error) {
         console.error('Error batch getting games:', error);
         // If batch get fails, fall back to individual checks for this batch
         for (const { record } of batch) {
           try {
-            const existing = await getGame(record.game_id);
+            const existing = await getGame(record.scratch_game_id);
             if (existing) {
-              existingRecordsMap.set(record.game_id, existing);
+              existingRecordsMap.set(record.scratch_game_id, existing);
             }
           } catch (err) {
-            console.error(`Error getting game ${record.game_id}:`, err);
+            console.error(`Error getting game ${record.scratch_game_id}:`, err);
           }
         }
       }
@@ -200,11 +199,11 @@ export const handler = async (
       
       for (const { index, record } of batch) {
         try {
-          const existingRecord = existingRecordsMap.get(record.game_id);
+          const existingRecord = existingRecordsMap.get(record.scratch_game_id);
           
           // Prepare game record
           const gameRecord: GameRecord = {
-            game_id: record.game_id,
+            scratch_game_id: record.scratch_game_id,
             game_name: record.game_name || '',
             student_id: record.student_id || '',
             subject: record.subject || '',
@@ -212,7 +211,6 @@ export const handler = async (
             teacher_id: record.teacher_id || '',
             last_update: now,
             scratch_id: record.scratch_id || '',
-            scratch_api: record.scratch_api || '',
             accumulated_click: existingRecord 
               ? existingRecord.accumulated_click 
               : (typeof record.accumulated_click === 'number' ? record.accumulated_click : 0),
@@ -229,8 +227,7 @@ export const handler = async (
               gameRecord.subject !== existingRecord.subject ||
               gameRecord.difficulty !== existingRecord.difficulty ||
               gameRecord.teacher_id !== existingRecord.teacher_id ||
-              gameRecord.scratch_id !== existingRecord.scratch_id ||
-              gameRecord.scratch_api !== existingRecord.scratch_api
+              gameRecord.scratch_id !== existingRecord.scratch_id
             );
           }
 
@@ -277,7 +274,7 @@ export const handler = async (
               try {
                 await putGame(unprocessedItem.PutRequest!.Item as GameRecord);
               } catch (err) {
-                const gameId = (unprocessedItem.PutRequest!.Item as any).game_id;
+                const gameId = (unprocessedItem.PutRequest!.Item as any).scratch_game_id;
                 const errorMsg = err instanceof Error ? err.message : 'Unknown error';
                 console.error(`Error writing unprocessed game ${gameId}:`, err);
                 results.errors.push(`Game ${gameId}: ${errorMsg}`);
@@ -299,7 +296,7 @@ export const handler = async (
             try {
               await putGame(request.PutRequest.Item);
             } catch (err) {
-              const gameId = request.PutRequest.Item.game_id;
+              const gameId = request.PutRequest.Item.scratch_game_id;
               const errorMsg = err instanceof Error ? err.message : 'Unknown error';
               console.error(`Error writing game ${gameId}:`, err);
               results.errors.push(`Game ${gameId}: ${errorMsg}`);
@@ -368,7 +365,7 @@ async function getGame(gameId: string) {
   try {
     const command = new GetCommand({
       TableName: tableNames.games,
-      Key: { game_id: gameId },
+      Key: { scratch_game_id: gameId },
     });
     const result = await dynamoDBClient.send(command);
     return result.Item as GameRecord | undefined;

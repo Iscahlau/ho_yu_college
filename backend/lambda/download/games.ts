@@ -11,7 +11,7 @@ import * as XLSX from 'xlsx';
 import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
 
 interface GameRecord {
-  game_id: string;
+  scratch_game_id: string;
   game_name: string;
   student_id: string;
   subject: string;
@@ -19,7 +19,6 @@ interface GameRecord {
   teacher_id: string;
   last_update: string;
   scratch_id: string;
-  scratch_api: string;
   accumulated_click: number;
 }
 
@@ -34,12 +33,12 @@ export const handler = async (
     const result = await dynamoDBClient.send(scanCommand);
     const games = result.Items as GameRecord[];
 
-    // Sort games by game_id
-    games.sort((a, b) => a.game_id.localeCompare(b.game_id));
+    // Sort games by scratch_game_id
+    games.sort((a, b) => a.scratch_game_id.localeCompare(b.scratch_game_id));
 
     // Prepare data for Excel
     const excelData = games.map(game => ({
-      game_id: game.game_id,
+      scratch_game_id: game.scratch_game_id,
       game_name: game.game_name,
       student_id: game.student_id,
       subject: game.subject,
@@ -47,7 +46,6 @@ export const handler = async (
       teacher_id: game.teacher_id,
       last_update: game.last_update,
       scratch_id: game.scratch_id,
-      scratch_api: game.scratch_api,
       accumulated_click: game.accumulated_click,
     }));
 
@@ -58,7 +56,7 @@ export const handler = async (
 
     // Set column widths for better readability
     worksheet['!cols'] = [
-      { wch: 12 }, // game_id
+      { wch: 15 }, // scratch_game_id
       { wch: 30 }, // game_name
       { wch: 12 }, // student_id
       { wch: 25 }, // subject
@@ -66,7 +64,6 @@ export const handler = async (
       { wch: 12 }, // teacher_id
       { wch: 20 }, // last_update
       { wch: 15 }, // scratch_id
-      { wch: 40 }, // scratch_api
       { wch: 15 }, // accumulated_click
     ];
 

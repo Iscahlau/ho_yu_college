@@ -159,7 +159,7 @@ describe('Mock Games Data', () => {
 
   test('all games should have required fields', () => {
     mockGames.forEach((game: any) => {
-      expect(game).toHaveProperty('game_id');
+      expect(game).toHaveProperty('scratch_game_id');
       expect(game).toHaveProperty('game_name');
       expect(game).toHaveProperty('student_id');
       expect(game).toHaveProperty('subject');
@@ -167,19 +167,18 @@ describe('Mock Games Data', () => {
       expect(game).toHaveProperty('teacher_id');
       expect(game).toHaveProperty('last_update');
       expect(game).toHaveProperty('scratch_id');
-      expect(game).toHaveProperty('scratch_api');
       expect(game).toHaveProperty('accumulated_click');
     });
   });
 
   test('game IDs should be numeric strings', () => {
     mockGames.forEach((game: any) => {
-      expect(game.game_id).toMatch(/^\d+$/);
+      expect(game.scratch_game_id).toMatch(/^\d+$/);
     });
   });
 
   test('game IDs should be unique', () => {
-    const ids = mockGames.map((g: any) => g.game_id);
+    const ids = mockGames.map((g: any) => g.scratch_game_id);
     const uniqueIds = new Set(ids);
     expect(uniqueIds.size).toBe(mockGames.length);
   });
@@ -227,17 +226,9 @@ describe('Mock Games Data', () => {
     });
   });
 
-  test('scratch_api should be valid Scratch project URL', () => {
+  test('scratch_game_id should be numeric string representing Scratch project ID', () => {
     mockGames.forEach((game: any) => {
-      expect(game.scratch_api).toMatch(/^https:\/\/scratch\.mit\.edu\/projects\/\d+$/);
-    });
-  });
-
-  test('game_id must match the last segment of scratch_api URL', () => {
-    mockGames.forEach((game: any) => {
-      const urlParts = game.scratch_api.split('/');
-      const projectId = urlParts[urlParts.length - 1];
-      expect(game.game_id).toBe(projectId);
+      expect(game.scratch_game_id).toMatch(/^\d+$/);
     });
   });
 

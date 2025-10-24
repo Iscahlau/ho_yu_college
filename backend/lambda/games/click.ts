@@ -52,7 +52,7 @@ export const handler = async (
     // First verify the game exists and get its difficulty
     const getCommand = new GetCommand({
       TableName: tableNames.games,
-      Key: { game_id: gameId },
+      Key: { scratch_game_id: gameId },
     });
 
     const getResult = await dynamoDBClient.send(getCommand);
@@ -74,7 +74,7 @@ export const handler = async (
     // This ensures thread-safety even with concurrent requests
     const updateCommand = new UpdateCommand({
       TableName: tableNames.games,
-      Key: { game_id: gameId },
+      Key: { scratch_game_id: gameId },
       UpdateExpression: 'ADD accumulated_click :increment',
       ExpressionAttributeValues: {
         ':increment': 1,

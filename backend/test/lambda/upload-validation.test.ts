@@ -13,11 +13,11 @@ import * as XLSX from 'xlsx';
 describe('Upload Validation - Zero Records Processed', () => {
   describe('Games Upload Handler', () => {
     test('should return error when no records are processed', async () => {
-      // Create an Excel file with only invalid records (missing game_id)
+      // Create an Excel file with only invalid records (missing scratch_game_id)
       const worksheetData = [
-        ['game_id', 'game_name', 'student_id', 'subject'],
-        ['', 'Invalid Game 1', 'STU001', 'Math'], // Missing game_id
-        ['', 'Invalid Game 2', 'STU002', 'Science'], // Missing game_id
+        ['scratch_game_id', 'game_name', 'student_id', 'subject'],
+        ['', 'Invalid Game 1', 'STU001', 'Math'], // Missing scratch_game_id
+        ['', 'Invalid Game 2', 'STU002', 'Science'], // Missing scratch_game_id
       ];
       
       const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);

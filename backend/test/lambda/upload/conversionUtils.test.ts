@@ -329,14 +329,13 @@ describe('Data Conversion Utilities', () => {
     });
 
     test('GAME_SCHEMA_MAPPING should have all required fields', () => {
-      expect(GAME_SCHEMA_MAPPING.game_id).toBeDefined();
-      expect(GAME_SCHEMA_MAPPING.game_id.required).toBe(true);
-      expect(GAME_SCHEMA_MAPPING.game_id.type).toBe('string');
+      expect(GAME_SCHEMA_MAPPING.scratch_game_id).toBeDefined();
+      expect(GAME_SCHEMA_MAPPING.scratch_game_id.required).toBe(true);
+      expect(GAME_SCHEMA_MAPPING.scratch_game_id.type).toBe('string');
       
       expect(GAME_SCHEMA_MAPPING.accumulated_click).toBeDefined();
       expect(GAME_SCHEMA_MAPPING.accumulated_click.type).toBe('number');
       
-      expect(GAME_SCHEMA_MAPPING.scratch_api).toBeDefined();
       expect(GAME_SCHEMA_MAPPING.subject).toBeDefined();
       expect(GAME_SCHEMA_MAPPING.difficulty).toBeDefined();
     });
