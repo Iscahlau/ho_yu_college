@@ -384,6 +384,64 @@ describe('Data Conversion Utilities', () => {
       });
     });
 
+    test('should convert numeric password to string for students', () => {
+      // Excel often reads numeric passwords as numbers (e.g., 123456)
+      const headers = ['student_id', 'name_1', 'password', 'class_no'];
+      const row = ['STU001', 'John', 123456, 1]; // password and class_no as numbers
+      const rawData = mapRowToObject(headers, row);
+      
+      const studentRecord = {
+        student_id: toString(rawData.student_id),
+        name_1: toString(rawData.name_1),
+        password: toString(rawData.password),
+        class_no: toString(rawData.class_no),
+      };
+      
+      expect(studentRecord).toEqual({
+        student_id: 'STU001',
+        name_1: 'John',
+        password: '123456', // Should be converted to string
+        class_no: '1', // Should be converted to string
+      });
+    });
+
+    test('should convert numeric password with leading zeros to string', () => {
+      // Excel may read "000123" as number 123
+      const headers = ['student_id', 'password', 'class_no'];
+      const row = ['STU001', 123, 1]; // Excel strips leading zeros
+      const rawData = mapRowToObject(headers, row);
+      
+      const studentRecord = {
+        student_id: toString(rawData.student_id),
+        password: toString(rawData.password),
+        class_no: toString(rawData.class_no),
+      };
+      
+      expect(studentRecord.password).toBe('123');
+      expect(studentRecord.class_no).toBe('1');
+      expect(typeof studentRecord.password).toBe('string');
+      expect(typeof studentRecord.class_no).toBe('string');
+    });
+
+    test('should convert numeric password to string for teachers', () => {
+      // Excel often reads numeric passwords as numbers
+      const headers = ['teacher_id', 'name', 'password'];
+      const row = ['TCH001', 'Mr. Smith', 654321]; // password as number
+      const rawData = mapRowToObject(headers, row);
+      
+      const teacherRecord = {
+        teacher_id: toString(rawData.teacher_id),
+        name: toString(rawData.name),
+        password: toString(rawData.password),
+      };
+      
+      expect(teacherRecord).toEqual({
+        teacher_id: 'TCH001',
+        name: 'Mr. Smith',
+        password: '654321', // Should be converted to string
+      });
+    });
+
     test('should convert teacher row with JSON array from Excel to DynamoDB format', () => {
       const headers = ['teacher_id', 'name', 'responsible_class', 'is_admin'];
       const row = ['TCH001', 'Mr. Wong', '["1A", "2A"]', 'false'];
