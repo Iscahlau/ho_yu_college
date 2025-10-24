@@ -68,8 +68,12 @@ const authSlice = createSlice({
         saveAuthState(state);
       }
     },
+    resetPlayTimer: (state) => {
+      state.loginTime = Date.now();
+      saveAuthState(state);
+    },
   },
 });
 
-export const { login, logout, updateMarks } = authSlice.actions;
+export const { login, logout, updateMarks, resetPlayTimer } = authSlice.actions;
 export default authSlice.reducer;
