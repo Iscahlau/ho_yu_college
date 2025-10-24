@@ -10,7 +10,7 @@ import { PutCommand, GetCommand, BatchGetCommand, BatchWriteCommand } from '@aws
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import * as XLSX from 'xlsx';
 import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
-import { toBoolean } from './utils/conversionUtils';
+import { toBoolean, toString } from './utils/conversionUtils';
 
 interface TeacherRecord {
   teacher_id: string;
@@ -187,7 +187,7 @@ export const handler = async (
           const teacherRecord: TeacherRecord = {
             teacher_id: record.teacher_id,
             name: record.name || '',
-            password: record.password || '',
+            password: toString(record.password),
             responsible_class: responsibleClass,
             last_login: record.last_login || now,
             is_admin: toBoolean(record.is_admin, false),

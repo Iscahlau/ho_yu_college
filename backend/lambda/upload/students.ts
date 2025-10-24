@@ -183,7 +183,7 @@ export const handler = async (
             last_login: record.last_login || now,
             last_update: now,
             teacher_id: record.teacher_id || '',
-            password: record.password || '',
+            password: toString(record.password),
             created_at: existingRecord ? existingRecord.created_at : now,
             updated_at: now,
           };
