@@ -202,7 +202,7 @@ function Navbar() {
                             {isAuthenticated && user && (
                                 <Typography variant="body1" sx={{fontWeight: 500, whiteSpace: 'nowrap', mt:1}} id='user-info'>
                                     <PermIdentityOutlinedIcon sx={{verticalAlign: 'middle', mr: 0.5}} /> 
-                                    {user.name2} {user.id} {t('nav.marks')}:{user.marks}
+                                    {user.name2} {user.id} {user.role === 'student' && `${t('nav.marks')}:${user.marks}`}
                                 </Typography>
                             )}
                         </Box>
@@ -243,9 +243,11 @@ function Navbar() {
                                                 <Typography variant="body2" color="text.secondary" sx={{ ml: 4 }}>
                                                     ID: {user.id}
                                                 </Typography>
-                                                <Typography variant="body2" color="text.secondary" sx={{ ml: 4 }}>
-                                                    {t('nav.marks')}: {user.marks}
-                                                </Typography>
+                                                {user.role === 'student' && (
+                                                    <Typography variant="body2" color="text.secondary" sx={{ ml: 4 }}>
+                                                        {t('nav.marks')}: {user.marks}
+                                                    </Typography>
+                                                )}
                                             </Box>
                                         }
                                     />
