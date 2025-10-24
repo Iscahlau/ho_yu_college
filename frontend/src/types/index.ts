@@ -23,7 +23,7 @@ export interface Teacher {
 }
 
 export interface GameData {
-  game_id: string;
+  scratch_game_id: string;
   game_name: string;
   student_id: string;
   subject: 'Chinese Language' | 'English Language' | 'Mathematics' | 'Humanities and Science';
@@ -31,7 +31,6 @@ export interface GameData {
   teacher_id: string;
   last_update: string;
   scratch_id: string;
-  scratch_api: string;
   accumulated_click: number;
 }
 

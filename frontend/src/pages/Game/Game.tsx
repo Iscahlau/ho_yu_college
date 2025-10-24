@@ -47,14 +47,12 @@ function GamePage() {
     loadGames();
   }, [games.length, dispatch]);
 
-  // Find game information from Redux store by matching scratchId
+  // Find game information from Redux store by matching gameId (which is now the Scratch project ID)
   useEffect(() => {
     if (gameId && games.length > 0) {
       const foundGame = games.find(game => {
-        // Extract scratchId from scratch_api URL
-        const scratchIdMatch = game.scratchApi.match(/\/projects\/(\d+)/);
-        const scratchId = scratchIdMatch ? scratchIdMatch[1] : game.scratchId;
-        return scratchId === gameId;
+        // Match by gameId (which is the Scratch project ID) or scratchId
+        return game.gameId === gameId || game.scratchId === gameId;
       });
       setGameInfo(foundGame || null);
     }

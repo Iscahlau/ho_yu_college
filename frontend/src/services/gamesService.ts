@@ -14,7 +14,7 @@ const GAMES_ENDPOINT = import.meta.env.VITE_GAMES_ENDPOINT || '/games';
  */
 function transformGameData(apiGame: any): Game {
   return {
-    gameId: apiGame.game_id,
+    gameId: apiGame.scratch_game_id,
     gameName: apiGame.game_name,
     studentId: apiGame.student_id,
     subject: apiGame.subject,
@@ -22,7 +22,6 @@ function transformGameData(apiGame: any): Game {
     teacherId: apiGame.teacher_id,
     lastUpdate: apiGame.last_update,
     scratchId: apiGame.scratch_id,
-    scratchApi: apiGame.scratch_api,
     accumulatedClick: apiGame.accumulated_click,
     thumbnailUrl: apiGame.thumbnailUrl,
   };
@@ -157,9 +156,8 @@ export async function fetchScratchThumbnail(scratchId: string): Promise<string |
  * const enrichedGame = await enrichGameWithScratchData(game);
  */
 export async function enrichGameWithScratchData(game: Game): Promise<Game> {
-  // Extract Scratch ID from game
-  const scratchIdMatch = game.scratchApi.match(/\/projects\/(\d+)/);
-  const scratchId = scratchIdMatch ? scratchIdMatch[1] : game.scratchId;
+  // Use scratchId directly or fall back to gameId (which is the Scratch project ID)
+  const scratchId = game.scratchId || game.gameId;
   
   if (!scratchId) {
     return game;

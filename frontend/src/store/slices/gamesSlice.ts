@@ -12,7 +12,6 @@ export interface Game {
   teacherId: string;
   lastUpdate: string;
   scratchId: string;
-  scratchApi: string;
   accumulatedClick: number;
   thumbnailUrl?: string;
 }
