@@ -261,6 +261,26 @@ describe('Mock Games Data', () => {
     expect(difficulties).toContain('Intermediate');
     expect(difficulties).toContain('Advanced');
   });
+
+  test('description field should be optional', () => {
+    // Some games should have descriptions
+    const gamesWithDescription = mockGames.filter((g: any) => g.description && g.description.length > 0);
+    expect(gamesWithDescription.length).toBeGreaterThan(0);
+    
+    // Some games may not have descriptions (optional field)
+    const gamesWithoutDescription = mockGames.filter((g: any) => !g.description);
+    // It's OK if all have descriptions or some don't - field is optional
+    expect(gamesWithDescription.length + gamesWithoutDescription.length).toBe(mockGames.length);
+  });
+
+  test('games with description should have non-empty strings', () => {
+    mockGames.forEach((game: any) => {
+      if (game.description) {
+        expect(typeof game.description).toBe('string');
+        expect(game.description.length).toBeGreaterThan(0);
+      }
+    });
+  });
 });
 
 describe('Mock Data Relationships', () => {

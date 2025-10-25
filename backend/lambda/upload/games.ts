@@ -22,6 +22,7 @@ interface GameRecord {
   scratch_id: string;
   scratch_api: string;
   accumulated_click: number;
+  description?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -84,7 +85,7 @@ export const handler = async (
     const requiredHeaders = ['game_id'];
     const expectedHeaders = [
       'game_id', 'game_name', 'student_id', 'subject',
-      'difficulty', 'teacher_id', 'scratch_id', 'scratch_api', 'accumulated_click'
+      'difficulty', 'teacher_id', 'scratch_id', 'scratch_api', 'accumulated_click', 'description'
     ];
 
     // Check for missing required headers
@@ -216,6 +217,7 @@ export const handler = async (
             accumulated_click: existingRecord 
               ? existingRecord.accumulated_click 
               : (typeof record.accumulated_click === 'number' ? record.accumulated_click : 0),
+            description: record.description || '',
             created_at: existingRecord ? existingRecord.created_at : now,
             updated_at: now,
           };
@@ -230,7 +232,8 @@ export const handler = async (
               gameRecord.difficulty !== existingRecord.difficulty ||
               gameRecord.teacher_id !== existingRecord.teacher_id ||
               gameRecord.scratch_id !== existingRecord.scratch_id ||
-              gameRecord.scratch_api !== existingRecord.scratch_api
+              gameRecord.scratch_api !== existingRecord.scratch_api ||
+              gameRecord.description !== existingRecord.description
             );
           }
 
