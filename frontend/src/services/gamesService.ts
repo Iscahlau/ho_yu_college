@@ -24,6 +24,7 @@ function transformGameData(apiGame: any): Game {
     scratchId: apiGame.scratch_id,
     scratchApi: apiGame.scratch_api,
     accumulatedClick: apiGame.accumulated_click,
+    description: apiGame.description,
     thumbnailUrl: apiGame.thumbnailUrl,
   };
 }

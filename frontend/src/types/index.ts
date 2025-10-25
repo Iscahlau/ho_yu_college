@@ -33,6 +33,7 @@ export interface GameData {
   scratch_id: string;
   scratch_api: string;
   accumulated_click: number;
+  description?: string;
 }
 
 // API Types
