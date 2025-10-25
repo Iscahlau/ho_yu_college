@@ -14,6 +14,7 @@ export interface Game {
   scratchId: string;
   scratchApi: string;
   accumulatedClick: number;
+  description?: string;
   thumbnailUrl?: string;
 }
 

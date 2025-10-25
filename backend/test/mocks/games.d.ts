@@ -13,6 +13,7 @@ export declare const mockGames: ({
     scratch_id: string;
     scratch_api: string;
     accumulated_click: number;
+    description: string;
 } | {
     game_id: string;
     game_name: string;
@@ -24,6 +25,7 @@ export declare const mockGames: ({
     scratch_id: string;
     scratch_api: string;
     accumulated_click: number;
+    description: string;
 } | {
     game_id: string;
     game_name: string;
@@ -35,6 +37,7 @@ export declare const mockGames: ({
     scratch_id: string;
     scratch_api: string;
     accumulated_click: number;
+    description: string;
 } | {
     game_id: string;
     game_name: string;
@@ -46,6 +49,7 @@ export declare const mockGames: ({
     scratch_id: string;
     scratch_api: string;
     accumulated_click: number;
+    description: string;
 } | {
     game_id: string;
     game_name: string;
@@ -57,6 +61,7 @@ export declare const mockGames: ({
     scratch_id: string;
     scratch_api: string;
     accumulated_click: number;
+    description: string;
 } | {
     game_id: string;
     game_name: string;
@@ -68,6 +73,7 @@ export declare const mockGames: ({
     scratch_id: string;
     scratch_api: string;
     accumulated_click: number;
+    description: string;
 } | {
     game_id: string;
     game_name: string;
@@ -79,6 +85,7 @@ export declare const mockGames: ({
     scratch_id: string;
     scratch_api: string;
     accumulated_click: number;
+    description: string;
 } | {
     game_id: string;
     game_name: string;
@@ -90,6 +97,7 @@ export declare const mockGames: ({
     scratch_id: string;
     scratch_api: string;
     accumulated_click: number;
+    description: string;
 } | {
     game_id: string;
     game_name: string;
@@ -101,6 +109,7 @@ export declare const mockGames: ({
     scratch_id: string;
     scratch_api: string;
     accumulated_click: number;
+    description: string;
 } | {
     game_id: string;
     game_name: string;
@@ -112,6 +121,7 @@ export declare const mockGames: ({
     scratch_id: string;
     scratch_api: string;
     accumulated_click: number;
+    description: string;
 } | {
     game_id: string;
     game_name: string;
@@ -123,6 +133,7 @@ export declare const mockGames: ({
     scratch_id: string;
     scratch_api: string;
     accumulated_click: number;
+    description: string;
 } | {
     game_id: string;
     game_name: string;
@@ -134,4 +145,65 @@ export declare const mockGames: ({
     scratch_id: string;
     scratch_api: string;
     accumulated_click: number;
+    description: string;
+} | {
+    game_id: string;
+    game_name: string;
+    student_id: string;
+    subject: "English Language";
+    difficulty: "Intermediate";
+    teacher_id: string;
+    last_update: string;
+    scratch_id: string;
+    scratch_api: string;
+    accumulated_click: number;
+    description?: undefined;
+} | {
+    game_id: string;
+    game_name: string;
+    student_id: string;
+    subject: "Humanities and Science";
+    difficulty: "Beginner";
+    teacher_id: string;
+    last_update: string;
+    scratch_id: string;
+    scratch_api: string;
+    accumulated_click: number;
+    description?: undefined;
+} | {
+    game_id: string;
+    game_name: string;
+    student_id: string;
+    subject: "English Language";
+    difficulty: "Advanced";
+    teacher_id: string;
+    last_update: string;
+    scratch_id: string;
+    scratch_api: string;
+    accumulated_click: number;
+    description?: undefined;
+} | {
+    game_id: string;
+    game_name: string;
+    student_id: string;
+    subject: "Mathematics";
+    difficulty: "Advanced";
+    teacher_id: string;
+    last_update: string;
+    scratch_id: string;
+    scratch_api: string;
+    accumulated_click: number;
+    description?: undefined;
+} | {
+    game_id: string;
+    game_name: string;
+    student_id: string;
+    subject: "Humanities and Science";
+    difficulty: "Intermediate";
+    teacher_id: string;
+    last_update: string;
+    scratch_id: string;
+    scratch_api: string;
+    accumulated_click: number;
+    description?: undefined;
 })[];

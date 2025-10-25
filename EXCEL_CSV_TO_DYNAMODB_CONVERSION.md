@@ -239,12 +239,13 @@ toDateString('invalid', false)       // 'invalid'
 | scratch_id | scratch_id | String | | Scratch project ID |
 | scratch_api | scratch_api | String | | Scratch project URL |
 | accumulated_click | accumulated_click | Number | | Total click count |
+| description | description | String | | Optional game description |
 | created_at | created_at | Date | | Auto-generated on creation |
 | updated_at | updated_at | Date | | Auto-updated on each save |
 
 **Conversion Example:**
 ```typescript
-// Excel row: ['1207260630', 'Character Match', 'STU001', 'Chinese Language', 'Beginner', 'TCH001', '2024-01-10', '123456789', 'https://...', '15']
+// Excel row: ['1207260630', 'Character Match', 'STU001', 'Chinese Language', 'Beginner', 'TCH001', '2024-01-10', '123456789', 'https://...', '15', 'Match Chinese characters...']
 // Converted to:
 {
   game_id: '1207260630',               // toString()
@@ -257,12 +258,15 @@ toDateString('invalid', false)       // 'invalid'
   scratch_id: '123456789',             // toString()
   scratch_api: 'https://...',          // toString()
   accumulated_click: 15,               // toNumber() or preserved from existing
+  description: 'Match Chinese characters...', // toString() - optional
   created_at: '2024-01-10T...',        // Preserved or new
   updated_at: '2024-01-10T...'         // Current timestamp
 }
 ```
 
-**Special Note:** On update, `accumulated_click` is preserved from the existing record, not overwritten from the file.
+**Special Note:** 
+- On update, `accumulated_click` is preserved from the existing record, not overwritten from the file.
+- The `description` field is optional and can be empty or omitted from the Excel file.
 
 ## Upsert Logic
 

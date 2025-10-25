@@ -21,6 +21,7 @@ interface GameRecord {
   scratch_id: string;
   scratch_api: string;
   accumulated_click: number;
+  description?: string;
 }
 
 export const handler = async (
@@ -49,6 +50,7 @@ export const handler = async (
       scratch_id: game.scratch_id,
       scratch_api: game.scratch_api,
       accumulated_click: game.accumulated_click,
+      description: game.description || '',
     }));
 
     // Create Excel workbook
@@ -68,6 +70,7 @@ export const handler = async (
       { wch: 15 }, // scratch_id
       { wch: 40 }, // scratch_api
       { wch: 15 }, // accumulated_click
+      { wch: 50 }, // description
     ];
 
     // Generate Excel file buffer
