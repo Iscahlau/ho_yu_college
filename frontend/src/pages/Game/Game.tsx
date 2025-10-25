@@ -160,6 +160,12 @@ function GamePage() {
               {gameInfo.gameName}
             </Typography>
             
+            {gameInfo.description && (
+              <Typography variant="body1" sx={{ mt: 1, mb: 2, color: 'text.secondary' }}>
+                {gameInfo.description}
+              </Typography>
+            )}
+            
             <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
               <Box>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
