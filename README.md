@@ -106,7 +106,7 @@ npm run dev:frontend
 # This will start the frontend dev server at http://localhost:5173
 ```
 
-See [Infrastructure Documentation](infra/README.md) for detailed setup and troubleshooting.
+See [Infrastructure Documentation](docs/INFRASTRUCTURE.md) for detailed setup and troubleshooting.
 
 ### Manual Local Development
 
@@ -125,7 +125,7 @@ npm run dev:frontend  # Runs on http://localhost:5173
 
 **DynamoDB Admin UI**: Access at http://localhost:8001 to view and manage data.
 
-See [DynamoDB Local Guide](backend/DYNAMODB_LOCAL_GUIDE.md) for comprehensive setup instructions.
+See [DynamoDB Local Guide](docs/DYNAMODB_LOCAL_GUIDE.md) for comprehensive setup instructions.
 
 ### Available npm Scripts
 
@@ -176,76 +176,32 @@ npm run synth       # Generate CloudFormation template
 npm run deploy      # Deploy to AWS (requires credentials)
 ```
 
-See [Infrastructure Documentation](infra/README.md) for detailed deployment instructions.
+See [Infrastructure Documentation](docs/INFRASTRUCTURE.md) for detailed deployment instructions.
 
 ## 📖 Documentation
 
-### Core Documentation
-- **[API Documentation](API.md)** - Complete REST API reference with endpoints, request/response formats, and examples
-- **[Main README](README.md)** - Project overview, quick start, and general information (this file)
-- **[Infrastructure Documentation](infra/README.md)** - AWS CDK and SAM Local setup, local development, and deployment
-- **[DynamoDB Local Guide](backend/DYNAMODB_LOCAL_GUIDE.md)** - Complete guide for local DynamoDB development
-- **[Copilot Instructions](.github/copilot-instructions.md)** - Development guide with validated commands and timings
+### Quick Links
+- **[DOCS.md](DOCS.md)** - 📚 **Complete documentation index** with architecture, API reference, and guides
+- **[API.md](API.md)** - 🌐 REST API reference with all endpoints and examples
+- **[README.md](README.md)** - 📄 This file - project overview and quick start
 
-### Additional Documentation
-- **[Frontend Source Documentation](frontend/src/README.md)** - Frontend code structure and API usage examples
-- **[Manual Testing Guide](docs/MANUAL_TESTING_GUIDE.md)** - Step-by-step testing procedures
-- **[Known Limitations](docs/KNOWN_LIMITATIONS.md)** - Current limitations and known issues
+### Detailed Guides
+- **[docs/INFRASTRUCTURE.md](docs/INFRASTRUCTURE.md)** - AWS CDK, SAM Local, deployment
+- **[docs/DYNAMODB_LOCAL_GUIDE.md](docs/DYNAMODB_LOCAL_GUIDE.md)** - DynamoDB Local setup
+- **[docs/FRONTEND.md](docs/FRONTEND.md)** - Frontend architecture and code structure
+- **[docs/MANUAL_TESTING_GUIDE.md](docs/MANUAL_TESTING_GUIDE.md)** - Testing procedures
+- **[docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md)** - Known issues
+
+### Developer Resources
+- **[.github/copilot-instructions.md](.github/copilot-instructions.md)** - Development standards and validated commands
 
 ### Game Page Usage
 
-The game page (`/game/:gameId`) embeds Scratch games using an iframe and automatically fetches game metadata from the Scratch API. The page is responsive and works on both desktop and mobile devices.
+The game page (`/game/:gameId`) embeds Scratch games using an iframe. Navigate to `/game/{scratchId}` where `{scratchId}` is the Scratch project ID. The platform automatically fetches game metadata from the Scratch API and displays game details.
 
-**Features:**
-- Automatically fetches game name and thumbnail from Scratch API
-- Displays game description, instructions, and author information
-- Graceful fallback when API is unavailable
-- Responsive design for all devices
+**Example:** `/game/60917032` displays the game with metadata from `https://api.scratch.mit.edu/projects/60917032`
 
-**How to use:**
-1. Navigate to `/game/{scratchId}` where `{scratchId}` is the Scratch project ID
-2. Example: `/game/60917032` will display the game details and embed the Scratch project
-3. The page fetches metadata from: `https://api.scratch.mit.edu/projects/{scratchId}`
-4. The game is embedded using: `https://scratch.mit.edu/projects/{scratchId}/embed`
-
-**Implementation details:**
-- The gameId is extracted from the URL route parameter
-- Metadata is fetched from the Scratch API on page load
-- Game card displays: thumbnail, title, description, instructions, and author
-- The `getScratchEmbedUrl()` helper function generates the embed URL
-- The iframe uses responsive sizing with a 485:402 aspect ratio
-- If API fails, shows warning but game remains playable with fallback values
-
-**Configuration:**
-- The Scratch API base URL can be configured via `VITE_SCRATCH_API_BASE` environment variable
-  - Default: `https://api.scratch.mit.edu/projects`
-- The Scratch embed base URL can be configured via `VITE_SCRATCH_EMBED_BASE` environment variable
-  - Default: `https://scratch.mit.edu/projects`
-
-### Scratch API Integration
-
-The platform integrates with the official Scratch API to retrieve game metadata:
-
-**Available Functions:**
-- `fetchScratchProject(id)` - Get complete project metadata
-- `fetchScratchGameName(id)` - Get only the game title
-- `fetchScratchThumbnail(id)` - Get only the thumbnail URL
-- `enrichGameWithScratchData(game)` - Automatically enrich game objects with Scratch data
-
-**API Response includes:**
-- `title` - Game name (e.g., "Castle Defender ⚔️")
-- `image` - Thumbnail URL (e.g., `https://cdn2.scratch.mit.edu/get_image/project/{id}_480x360.png`)
-- `description` - Game description
-- `instructions` - How to play instructions
-- `author.username` - Creator's Scratch username
-
-**Error Handling:**
-- Invalid project IDs return `null` with console logging
-- Network failures are caught and logged
-- UI shows warning messages but remains functional
-- Fallback values ensure the game is always playable
-
-For detailed API usage and code examples, see [Frontend Source Documentation](frontend/src/README.md).
+For detailed implementation and Scratch API integration, see [docs/FRONTEND.md](docs/FRONTEND.md).
 
 ## 🛠️ Development
 
@@ -280,7 +236,7 @@ Run the complete local development stack:
 npm run dev:local
 ```
 
-See [Infrastructure Documentation](infra/README.md) for detailed local development setup.
+See [Infrastructure Documentation](docs/INFRASTRUCTURE.md) for detailed local development setup.
 
 ### Deployment
 Deploy the infrastructure to AWS:
