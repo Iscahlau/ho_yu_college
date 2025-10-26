@@ -21,8 +21,6 @@ interface TeacherRecord {
   responsible_class: string[]; // JSON array stored as array in DynamoDB
   last_login: string;
   is_admin: boolean;
-  created_at?: string;
-  updated_at?: string;
 }
 
 export const handler = async (
@@ -193,8 +191,6 @@ export const handler = async (
             responsible_class: responsibleClass,
             last_login: record.last_login || now,
             is_admin: toBoolean(record.is_admin, false),
-            created_at: existingRecord ? existingRecord.created_at : now,
-            updated_at: now,
           };
 
           // Check if data has actually changed
@@ -206,11 +202,6 @@ export const handler = async (
               JSON.stringify(teacherRecord.responsible_class) !== JSON.stringify(existingRecord.responsible_class) ||
               teacherRecord.is_admin !== existingRecord.is_admin
             );
-          }
-
-          // Only update timestamps if there are actual changes
-          if (!hasChanges && existingRecord) {
-            teacherRecord.updated_at = existingRecord.updated_at;
           }
 
           putRequests.push({

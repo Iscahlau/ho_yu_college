@@ -102,9 +102,9 @@ describe('Upload Validation - Zero Records Processed', () => {
     test('should return error when no records are processed', async () => {
       // Create an Excel file with only invalid records (missing teacher_id)
       const worksheetData = [
-        ['teacher_id', 'name', 'email'],
-        ['', 'Invalid Teacher 1', 'teacher1@example.com'], // Missing teacher_id
-        ['', 'Invalid Teacher 2', 'teacher2@example.com'], // Missing teacher_id
+        ['teacher_id', 'name', 'password'],
+        ['', 'Invalid Teacher 1', 'pass123'], // Missing teacher_id
+        ['', 'Invalid Teacher 2', 'pass123'], // Missing teacher_id
       ];
       
       const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);

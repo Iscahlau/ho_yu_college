@@ -92,12 +92,10 @@ export const STUDENTS_REQUIRED_HEADERS = ['student_id'] as const;
 export const TEACHERS_EXPECTED_HEADERS = [
   'teacher_id',
   'name',
-  'email',
   'password',
-  'classes',
+  'responsible_class',
   'is_admin',
   'last_login',
-  'last_update',
 ] as const;
 
 /**
@@ -157,12 +155,10 @@ export const STUDENTS_COLUMN_WIDTHS = [
 export const TEACHERS_COLUMN_WIDTHS = [
   { wch: 12 }, // teacher_id
   { wch: 25 }, // name
-  { wch: 30 }, // email
   { wch: 15 }, // password
-  { wch: 30 }, // classes
+  { wch: 30 }, // responsible_class
   { wch: 10 }, // is_admin
   { wch: 20 }, // last_login
-  { wch: 20 }, // last_update
 ] as const;
 
 // ===== HTTP STATUS CODES =====

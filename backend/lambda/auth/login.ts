@@ -85,7 +85,7 @@ const determineUserRole = (user: StudentRecord | TeacherRecord): UserRole => {
   if ('is_admin' in user && user.is_admin) {
     return 'admin';
   }
-  if ('teacher_id' in user && 'classes' in user) {
+  if ('teacher_id' in user && 'responsible_class' in user) {
     return 'teacher';
   }
   return 'student';

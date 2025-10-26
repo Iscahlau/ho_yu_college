@@ -48,14 +48,10 @@ export interface StudentRecord {
 export interface TeacherRecord {
   teacher_id: string;
   name: string;
-  email: string;
   password: string;
-  classes: string[];
-  is_admin: boolean;
+  responsible_class: string[];
   last_login: string;
-  last_update: string;
-  created_at?: string;
-  updated_at?: string;
+  is_admin: boolean;
 }
 
 // ===== REQUEST/RESPONSE TYPES =====

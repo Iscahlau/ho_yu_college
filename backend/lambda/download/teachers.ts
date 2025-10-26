@@ -40,12 +40,10 @@ export const handler = async (
     const excelData = teachers.map(teacher => ({
       teacher_id: teacher.teacher_id,
       name: teacher.name,
-      email: teacher.email || '',
       password: teacher.password,
-      classes: teacher.classes?.join(', ') || '', // Convert array to comma-separated string
+      responsible_class: teacher.responsible_class?.join(', ') || '', // Convert array to comma-separated string
       is_admin: teacher.is_admin ? 'Yes' : 'No',
       last_login: teacher.last_login,
-      last_update: teacher.last_update,
     }));
 
     // Create Excel workbook
