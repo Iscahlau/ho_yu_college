@@ -65,6 +65,17 @@ This constraint is validated in the test suite to ensure data integrity.
 - AWS SAM CLI (installed automatically by start-local.sh if missing)
 - AWS CLI (for production deployment only)
 
+### Installation
+
+This project uses npm workspaces for centralized dependency management:
+
+```bash
+# Install all dependencies (from project root)
+npm install
+
+# This will install dependencies for frontend, backend, and infra
+```
+
 ### Local Development (Recommended)
 
 The project includes a complete local development environment using AWS SAM Local that mirrors production:
@@ -72,6 +83,8 @@ The project includes a complete local development environment using AWS SAM Loca
 ```bash
 # One-command startup (from project root)
 ./start-local.sh
+# or
+npm run dev:local
 ```
 
 This script will:
@@ -87,11 +100,10 @@ This script will:
 
 **Start the Frontend:**
 ```bash
-# In a new terminal
-cd frontend
-npm install
-echo "VITE_API_URL=http://localhost:3000" > .env.local
-npm run dev  # Runs on http://localhost:5173
+# In a new terminal (from project root)
+npm run dev:frontend
+
+# This will start the frontend dev server at http://localhost:5173
 ```
 
 See [Infrastructure Documentation](infra/README.md) for detailed setup and troubleshooting.
@@ -101,33 +113,55 @@ See [Infrastructure Documentation](infra/README.md) for detailed setup and troub
 If you prefer to start services individually:
 
 ```bash
-# Terminal 1: Start DynamoDB Local
-cd backend
-npm install
-npm run dynamodb:setup  # Start DynamoDB, create tables, seed data
+# Terminal 1: Start DynamoDB Local (from project root)
+npm run dynamodb:start
 
-# Terminal 2: Start SAM Local API Gateway
-cd infra
-npm install
-npm run build
+# Terminal 2: Start SAM Local API Gateway (from project root)
 npm run sam:start  # Runs on http://localhost:3000
 
-# Terminal 3: Start frontend
-cd frontend
-npm install
-echo "VITE_API_URL=http://localhost:3000" > .env.local
-npm run dev  # Runs on http://localhost:5173
+# Terminal 3: Start frontend (from project root)
+npm run dev:frontend  # Runs on http://localhost:5173
 ```
 
 **DynamoDB Admin UI**: Access at http://localhost:8001 to view and manage data.
 
 See [DynamoDB Local Guide](backend/DYNAMODB_LOCAL_GUIDE.md) for comprehensive setup instructions.
 
-### Frontend Setup
+### Available npm Scripts
+
+The root `package.json` provides convenient workspace-wide commands:
+
 ```bash
-cd frontend
-npm install
-npm run dev  # Start development server at http://localhost:5173
+# Development
+npm run dev                 # Start frontend dev server
+npm run dev:frontend        # Start frontend dev server
+npm run dev:backend         # Start backend (DynamoDB + SAM)
+npm run dev:local           # Start all services (./start-local.sh)
+
+# Building
+npm run build               # Build all workspaces
+npm run build:frontend      # Build frontend only
+npm run build:backend       # Build backend only
+npm run build:infra         # Build infrastructure only
+
+# Testing
+npm test                    # Run backend tests
+npm run test:backend        # Run backend tests
+
+# Deployment
+npm run deploy              # Build backend and deploy to AWS
+npm run synth               # Generate CloudFormation template
+
+# Database
+npm run dynamodb:start      # Start DynamoDB Local
+npm run dynamodb:stop       # Stop DynamoDB Local
+npm run dynamodb:setup      # Start, initialize, and seed DynamoDB
+
+# Cleaning
+npm run clean               # Clean all workspaces
+npm run clean:frontend      # Clean frontend only
+npm run clean:backend       # Clean backend only
+npm run clean:infra         # Clean infrastructure only
 ```
 
 ### Production Deployment
@@ -146,10 +180,17 @@ See [Infrastructure Documentation](infra/README.md) for detailed deployment inst
 
 ## 📖 Documentation
 
-For detailed development instructions, build commands, troubleshooting, and best practices, see:
-- **[Copilot Instructions](.github/copilot-instructions.md)** - Comprehensive development guide with validated commands and timings
-- **[Infrastructure Documentation](infra/README.md)** - AWS CDK and SAM Local setup, local development, and deployment guide
-- **[DynamoDB Local Setup Guide](backend/DYNAMODB_LOCAL_GUIDE.md)** - Complete guide for local DynamoDB development
+### Core Documentation
+- **[API Documentation](API.md)** - Complete REST API reference with endpoints, request/response formats, and examples
+- **[Main README](README.md)** - Project overview, quick start, and general information (this file)
+- **[Infrastructure Documentation](infra/README.md)** - AWS CDK and SAM Local setup, local development, and deployment
+- **[DynamoDB Local Guide](backend/DYNAMODB_LOCAL_GUIDE.md)** - Complete guide for local DynamoDB development
+- **[Copilot Instructions](.github/copilot-instructions.md)** - Development guide with validated commands and timings
+
+### Additional Documentation
+- **[Frontend Source Documentation](frontend/src/README.md)** - Frontend code structure and API usage examples
+- **[Manual Testing Guide](docs/MANUAL_TESTING_GUIDE.md)** - Step-by-step testing procedures
+- **[Known Limitations](docs/KNOWN_LIMITATIONS.md)** - Current limitations and known issues
 
 ### Game Page Usage
 
@@ -208,21 +249,35 @@ For detailed API usage and code examples, see [Frontend Source Documentation](fr
 
 ## 🛠️ Development
 
+### Workspace Structure
+
+This project uses npm workspaces for centralized dependency management. All dependencies are managed from the root `package.json`.
+
 ### Building
-- Frontend: `cd frontend && npm run build`
-- Backend Lambda: `cd backend && npm run build`
-- Infrastructure: `cd infra && npm run build`
+```bash
+# Build all workspaces
+npm run build
+
+# Build specific workspace
+npm run build:frontend
+npm run build:backend
+npm run build:infra
+```
 
 ### Testing
 Backend tests:
 ```bash
-cd backend && npm test
+npm test
+# or
+npm run test:backend
 ```
 
 ### Local Development
 Run the complete local development stack:
 ```bash
 ./start-local.sh
+# or
+npm run dev:local
 ```
 
 See [Infrastructure Documentation](infra/README.md) for detailed local development setup.
@@ -230,7 +285,8 @@ See [Infrastructure Documentation](infra/README.md) for detailed local developme
 ### Deployment
 Deploy the infrastructure to AWS:
 ```bash
-cd infra && npm run deploy
+npm run deploy
+# This will build backend and deploy to AWS
 ```
 
 ## 📁 Project Structure
@@ -251,6 +307,12 @@ cd infra && npm run deploy
 │   ├── backend.ts     # CDK app entry point
 │   ├── template.yaml  # SAM template for local development
 │   └── package.json
+├── docs/               # Additional documentation
+│   ├── MANUAL_TESTING_GUIDE.md
+│   └── KNOWN_LIMITATIONS.md
+├── API.md              # REST API documentation
+├── README.md           # This file
+├── package.json        # Root workspace configuration
 ├── start-local.sh      # One-command local development startup
 └── .github/
     └── copilot-instructions.md

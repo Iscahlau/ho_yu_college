@@ -1,0 +1,53 @@
+{
+  "name": "ho-yu-college",
+  "version": "1.0.0",
+  "description": "Ho Yu College - Scratch Game Platform",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "infra"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=frontend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "dev:backend": "npm run dynamodb:setup --workspace=backend && npm run sam:start --workspace=infra",
+    "dev:local": "./start-local.sh",
+    "build": "npm run build --workspaces",
+    "build:frontend": "npm run build --workspace=frontend",
+    "build:backend": "npm run build --workspace=backend",
+    "build:infra": "npm run build --workspace=infra",
+    "test": "npm run test --workspace=backend",
+    "test:backend": "npm run test --workspace=backend",
+    "clean": "npm run clean --workspaces --if-present && rm -rf node_modules",
+    "clean:frontend": "cd frontend && rm -rf node_modules build dist",
+    "clean:backend": "cd backend && rm -rf node_modules build",
+    "clean:infra": "cd infra && rm -rf node_modules cdk.out",
+    "install:all": "npm install && npm install --workspaces",
+    "deploy": "npm run build:backend && npm run deploy --workspace=infra",
+    "synth": "npm run build:backend && npm run synth --workspace=infra",
+    "dynamodb:start": "npm run dynamodb:start --workspace=backend",
+    "dynamodb:stop": "npm run dynamodb:stop --workspace=backend",
+    "dynamodb:setup": "npm run dynamodb:setup --workspace=backend",
+    "sam:start": "npm run sam:start --workspace=infra",
+    "lint": "npm run lint --workspace=frontend --if-present"
+  },
+  "keywords": [
+    "education",
+    "scratch",
+    "games",
+    "platform",
+    "aws"
+  ],
+  "author": "Ho Yu College",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Iscahlau/ho_yu_college.git"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=10.0.0"
+  },
+  "devDependencies": {}
+}
