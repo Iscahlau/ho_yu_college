@@ -1,5 +1,6 @@
 {
   "app": "npx ts-node --prefer-ts-exts backend.ts",
+  "output": "build/cdk.out",
   "watch": {
     "include": [
       "**"

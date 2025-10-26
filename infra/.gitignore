@@ -7,6 +7,11 @@ node_modules
 .cdk.staging
 cdk.out
 
+# CDK build output
+build/
+build/cdk.out/
+build/cdk-outputs.json
+
 # SAM build directory
 .aws-sam
 

@@ -8,7 +8,7 @@
     "watch": "tsc -w",
     "cdk": "cdk",
     "synth": "cdk synth",
-    "deploy": "cdk deploy",
+    "deploy": "bash scripts/deploy.sh",
     "diff": "cdk diff",
     "sam:start": "bash start-sam-local.sh",
     "local:dynamodb": "cd ../backend && npm run dynamodb:setup"

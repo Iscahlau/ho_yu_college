@@ -60,7 +60,7 @@ This constraint is validated in the test suite to ensure data integrity.
 
 ### Prerequisites
 - Node.js v18+ (v20.19.5 recommended)
-- npm v10+
+- Yarn v1.22+ (package manager)
 - Docker and Docker Compose (for DynamoDB Local)
 - AWS SAM CLI (installed automatically by start-local.sh if missing)
 - AWS CLI (for production deployment only)
@@ -71,7 +71,7 @@ This project uses npm workspaces for centralized dependency management:
 
 ```bash
 # Install all dependencies (from project root)
-npm install
+yarn install
 
 # This will install dependencies for frontend, backend, and infra
 ```
@@ -101,7 +101,7 @@ This script will:
 **Start the Frontend:**
 ```bash
 # In a new terminal (from project root)
-npm run dev:frontend
+yarn dev:frontend
 
 # This will start the frontend dev server at http://localhost:5173
 ```
@@ -114,69 +114,83 @@ If you prefer to start services individually:
 
 ```bash
 # Terminal 1: Start DynamoDB Local (from project root)
-npm run dynamodb:start
+yarn dynamodb:start
 
 # Terminal 2: Start SAM Local API Gateway (from project root)
-npm run sam:start  # Runs on http://localhost:3000
+yarn sam:start  # Runs on http://localhost:3000
 
 # Terminal 3: Start frontend (from project root)
-npm run dev:frontend  # Runs on http://localhost:5173
+yarn dev:frontend  # Runs on http://localhost:5173
 ```
 
 **DynamoDB Admin UI**: Access at http://localhost:8001 to view and manage data.
 
 See [DynamoDB Local Guide](docs/DYNAMODB_LOCAL_GUIDE.md) for comprehensive setup instructions.
 
-### Available npm Scripts
+### Available Scripts
 
 The root `package.json` provides convenient workspace-wide commands:
 
 ```bash
 # Development
-npm run dev                 # Start frontend dev server
-npm run dev:frontend        # Start frontend dev server
-npm run dev:backend         # Start backend (DynamoDB + SAM)
-npm run dev:local           # Start all services (./start-local.sh)
+yarn dev                 # Start frontend dev server
+yarn dev:frontend        # Start frontend dev server
+yarn dev:backend         # Start backend (DynamoDB + SAM)
+yarn dev:local           # Start all services (./start-local.sh)
 
 # Building
-npm run build               # Build all workspaces
-npm run build:frontend      # Build frontend only
-npm run build:backend       # Build backend only
-npm run build:infra         # Build infrastructure only
+yarn build               # Build all workspaces
+yarn build:frontend      # Build frontend only
+yarn build:backend       # Build backend only
+yarn build:infra         # Build infrastructure only
 
 # Testing
-npm test                    # Run backend tests
-npm run test:backend        # Run backend tests
+yarn test                    # Run backend tests
+yarn test:backend        # Run backend tests
 
 # Deployment
-npm run deploy              # Build backend and deploy to AWS
-npm run synth               # Generate CloudFormation template
+yarn deploy              # Full deployment: backend + frontend (automated)
+yarn synth               # Generate CloudFormation template
 
 # Database
-npm run dynamodb:start      # Start DynamoDB Local
+yarn dynamodb:start      # Start DynamoDB Local
 npm run dynamodb:stop       # Stop DynamoDB Local
 npm run dynamodb:setup      # Start, initialize, and seed DynamoDB
 
 # Cleaning
-npm run clean               # Clean all workspaces
-npm run clean:frontend      # Clean frontend only
-npm run clean:backend       # Clean backend only
-npm run clean:infra         # Clean infrastructure only
+yarn clean               # Clean all workspaces
+yarn clean:frontend      # Clean frontend only
+yarn clean:backend       # Clean backend only
+yarn clean:infra         # Clean infrastructure only
 ```
 
 ### Production Deployment
 
-The infrastructure is managed using AWS CDK in the `infra/` directory:
+The infrastructure is managed using AWS CDK with an automated deployment script:
 
 ```bash
-cd infra
-npm install
-npm run build       # Compile TypeScript
-npm run synth       # Generate CloudFormation template
-npm run deploy      # Deploy to AWS (requires credentials)
+# One-command deployment (from project root)
+yarn deploy
+
+# This will:
+# 1. Build backend Lambda functions
+# 2. Deploy CDK infrastructure (API Gateway, Lambda, DynamoDB, S3, CloudFront)
+# 3. Extract API Gateway endpoint
+# 4. Generate frontend .env file
+# 5. Build frontend
+# 6. Upload to S3
+# 7. Invalidate CloudFront cache
 ```
 
-See [Infrastructure Documentation](docs/INFRASTRUCTURE.md) for detailed deployment instructions.
+**Manual deployment**:
+```bash
+cd infra
+yarn build       # Compile TypeScript
+yarn synth       # Generate CloudFormation template
+yarn deploy      # Run automated deployment script
+```
+
+See [Deployment Guide](docs/DEPLOYMENT.md) for comprehensive deployment instructions and troubleshooting.
 
 ## 📖 Documentation
 
