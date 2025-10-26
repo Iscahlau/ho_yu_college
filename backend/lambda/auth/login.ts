@@ -85,7 +85,7 @@ const determineUserRole = (user: StudentRecord | TeacherRecord): UserRole => {
   if ('is_admin' in user && user.is_admin) {
     return 'admin';
   }
-  if ('teacher_id' in user && 'responsible_class' in user) {
+  if ('teacher_id' in user) {
     return 'teacher';
   }
   return 'student';
@@ -97,7 +97,7 @@ export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   const logger = createLambdaLogger(event);
-  
+
   try {
     const body = parseRequestBody<LoginRequest>(event.body);
     const { id, password } = body;
