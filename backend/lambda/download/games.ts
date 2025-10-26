@@ -13,6 +13,7 @@ import {
   createInternalErrorResponse,
   getDateString,
 } from '../utils/response';
+import { createLambdaLogger } from '../utils/logger';
 import { createExcelWorkbook } from '../utils/excel';
 import { GAMES_COLUMN_WIDTHS } from '../constants';
 import type { GameRecord } from '../types';
@@ -20,7 +21,11 @@ import type { GameRecord } from '../types';
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
+  const logger = createLambdaLogger(event);
+  
   try {
+    logger.info('Starting games download');
+    
     // Get all games from DynamoDB
     const scanCommand = new ScanCommand({
       TableName: tableNames.games,
@@ -49,11 +54,13 @@ export const handler = async (
     // Create Excel workbook
     const excelBuffer = createExcelWorkbook(excelData, 'Games', [...GAMES_COLUMN_WIDTHS]);
 
+    logger.info({ count: games.length }, 'Games download completed successfully');
+
     // Return Excel file as response
     const filename = `games_${getDateString()}.xlsx`;
     return createExcelResponse(excelBuffer, filename);
   } catch (error) {
-    console.error('Error downloading games:', error);
+    logger.error({ error }, 'Error downloading games');
     return createInternalErrorResponse(error as Error);
   }
 };

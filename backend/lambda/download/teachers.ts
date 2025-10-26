@@ -13,6 +13,7 @@ import {
   createInternalErrorResponse,
   getDateString,
 } from '../utils/response';
+import { createLambdaLogger } from '../utils/logger';
 import { createExcelWorkbook } from '../utils/excel';
 import { TEACHERS_COLUMN_WIDTHS } from '../constants';
 import type { TeacherRecord } from '../types';
@@ -20,7 +21,11 @@ import type { TeacherRecord } from '../types';
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
+  const logger = createLambdaLogger(event);
+  
   try {
+    logger.info('Starting teachers download');
+    
     // Get all teachers from DynamoDB
     const scanCommand = new ScanCommand({
       TableName: tableNames.teachers,
@@ -46,11 +51,13 @@ export const handler = async (
     // Create Excel workbook
     const excelBuffer = createExcelWorkbook(excelData, 'Teachers', [...TEACHERS_COLUMN_WIDTHS]);
 
+    logger.info({ count: teachers.length }, 'Teachers download completed successfully');
+
     // Return Excel file as response
     const filename = `teachers_${getDateString()}.xlsx`;
     return createExcelResponse(excelBuffer, filename);
   } catch (error) {
-    console.error('Error downloading teachers:', error);
+    logger.error({ error }, 'Error downloading teachers');
     return createInternalErrorResponse(error as Error);
   }
 };

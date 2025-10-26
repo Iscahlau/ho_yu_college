@@ -11,6 +11,8 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import * as XLSX from 'xlsx';
 import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
 import { toBoolean, toString } from './utils/conversionUtils';
+import { createLambdaLogger } from '../utils/logger';
+import logger from '../utils/logger';
 
 interface TeacherRecord {
   teacher_id: string;
@@ -144,7 +146,7 @@ export const handler = async (
           existingRecordsMap.set(item.teacher_id, item as TeacherRecord);
         });
       } catch (error) {
-        console.error('Error batch getting teachers:', error);
+        logger.error({ error }, 'Error batch getting teachers');
         // If batch get fails, fall back to individual checks for this batch
         for (const { record } of batch) {
           try {
@@ -153,7 +155,7 @@ export const handler = async (
               existingRecordsMap.set(record.teacher_id, existing);
             }
           } catch (err) {
-            console.error(`Error getting teacher ${record.teacher_id}:`, err);
+            logger.error({ error: err, teacher_id: record.teacher_id }, `Error getting teacher ${record.teacher_id}`);
           }
         }
       }
@@ -242,7 +244,7 @@ export const handler = async (
           // Check for unprocessed items
           const unprocessedItems = batchResult.UnprocessedItems?.[tableNames.teachers];
           if (unprocessedItems && unprocessedItems.length > 0) {
-            console.warn(`Batch write had ${unprocessedItems.length} unprocessed items for teachers`);
+            logger.warn({ count: unprocessedItems.length }, `Batch write had ${unprocessedItems.length} unprocessed items for teachers`);
             // Try individual writes for unprocessed items
             for (const unprocessedItem of unprocessedItems) {
               try {
@@ -250,7 +252,7 @@ export const handler = async (
               } catch (err) {
                 const teacherId = (unprocessedItem.PutRequest!.Item as any).teacher_id;
                 const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-                console.error(`Error writing unprocessed teacher ${teacherId}:`, err);
+                logger.error({ error: err, teacherId }, `Error writing unprocessed teacher ${teacherId}`);
                 results.errors.push(`Teacher ${teacherId}: ${errorMsg}`);
                 // Adjust counts since this item failed
                 if (existingRecordsMap.has(teacherId)) {
@@ -263,7 +265,7 @@ export const handler = async (
             }
           }
         } catch (error) {
-          console.error('Error batch writing teachers:', error);
+          logger.error({ error }, 'Error batch writing teachers');
           // If batch write fails, fall back to individual writes for this batch
           for (let j = 0; j < putRequests.length; j++) {
             const request = putRequests[j];
@@ -272,7 +274,7 @@ export const handler = async (
             } catch (err) {
               const teacherId = request.PutRequest.Item.teacher_id;
               const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-              console.error(`Error writing teacher ${teacherId}:`, err);
+              logger.error({ error: err, teacherId }, `Error writing teacher ${teacherId}`);
               results.errors.push(`Teacher ${teacherId}: ${errorMsg}`);
               // Adjust counts since this item failed
               if (existingRecordsMap.has(teacherId)) {
@@ -319,7 +321,7 @@ export const handler = async (
       }),
     };
   } catch (error) {
-    console.error('Error:', error);
+    const contextLogger = createLambdaLogger(event); contextLogger.error({ error }, 'Error in teacher upload handler');
     return {
       statusCode: 500,
       headers: {
@@ -344,7 +346,7 @@ async function getTeacher(teacherId: string) {
     const result = await dynamoDBClient.send(command);
     return result.Item as TeacherRecord | undefined;
   } catch (error) {
-    console.error(`Error getting teacher ${teacherId}:`, error);
+    logger.error({ error, teacherId }, `Error getting teacher ${teacherId}`);
     return undefined;
   }
 }

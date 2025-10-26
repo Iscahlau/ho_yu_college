@@ -29,7 +29,7 @@ Resources:
   LoginFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../backend/lambda/
+      CodeUri: ../backend/build/lambda/
       Handler: auth/login.handler
       Events:
         LoginApi:
@@ -42,7 +42,7 @@ Resources:
   ListGamesFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../backend/lambda/
+      CodeUri: ../backend/build/lambda/
       Handler: games/list.handler
       Events:
         ListGamesApi:
@@ -55,7 +55,7 @@ Resources:
   GameClickFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../backend/lambda/
+      CodeUri: ../backend/build/lambda/
       Handler: games/click.handler
       Events:
         GameClickApi:
@@ -68,7 +68,7 @@ Resources:
   DownloadStudentsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../backend/lambda/
+      CodeUri: ../backend/build/lambda/
       Handler: download/students.handler
       Events:
         DownloadStudentsApi:
@@ -81,7 +81,7 @@ Resources:
   DownloadTeachersFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../backend/lambda/
+      CodeUri: ../backend/build/lambda/
       Handler: download/teachers.handler
       Events:
         DownloadTeachersApi:
@@ -94,7 +94,7 @@ Resources:
   DownloadGamesFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../backend/lambda/
+      CodeUri: ../backend/build/lambda/
       Handler: download/games.handler
       Events:
         DownloadGamesApi:
@@ -107,7 +107,7 @@ Resources:
   UploadStudentsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../backend/lambda/
+      CodeUri: ../backend/build/lambda/
       Handler: upload/students.handler
       Events:
         UploadStudentsApi:
@@ -120,7 +120,7 @@ Resources:
   UploadTeachersFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../backend/lambda/
+      CodeUri: ../backend/build/lambda/
       Handler: upload/teachers.handler
       Events:
         UploadTeachersApi:
@@ -133,7 +133,7 @@ Resources:
   UploadGamesFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../backend/lambda/
+      CodeUri: ../backend/build/lambda/
       Handler: upload/games.handler
       Events:
         UploadGamesApi:

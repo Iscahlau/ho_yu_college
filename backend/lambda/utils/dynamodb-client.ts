@@ -5,6 +5,7 @@
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
+import logger from './logger';
 
 /**
  * Create a DynamoDB client based on environment configuration
@@ -31,9 +32,9 @@ export function createDynamoDBClient(): DynamoDBDocumentClient {
       secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'local',
     };
 
-    console.log(`[DynamoDB] Connecting to local DynamoDB at ${endpoint}`);
+    logger.info({ endpoint }, 'Connecting to local DynamoDB');
   } else {
-    console.log(`[DynamoDB] Connecting to AWS DynamoDB in ${clientConfig.region}`);
+    logger.info({ region: clientConfig.region }, 'Connecting to AWS DynamoDB');
   }
 
   const client = new DynamoDBClient(clientConfig);

@@ -16,6 +16,8 @@ import {
   parseRequestBody,
   getCurrentTimestamp,
 } from '../utils/response';
+import { createLambdaLogger } from '../utils/logger';
+import logger from '../utils/logger';
 import {
   parseExcelFile,
   filterEmptyRows,
@@ -132,14 +134,14 @@ const fetchExistingRecords = async (
                 const batchResult = await dynamoDBClient.send(batchGetCommand);
                 return batchResult.Responses?.[tableNames.games] ?? [];
             } catch (error) {
-                console.error('Error batch getting games:', error);
+                logger.error({ error }, 'Error batch getting games');
                 // Fallback to individual gets using Promise.all
                 const individualResults = await Promise.all(
                     batch.map(async ({ record }) => {
                         try {
                             return await getGame(String(record.game_id));
                         } catch (err) {
-                            console.error(`Error getting game ${record.game_id}:`, err);
+                            logger.error({ error: err, game_id: record.game_id }, `Error getting game ${record.game_id}`);
                             return undefined;
                         }
                     })
@@ -206,7 +208,7 @@ const handleUnprocessedItems = async (
             } catch (err) {
                 const gameId = (unprocessedItem.PutRequest!.Item as any).game_id;
                 const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-                console.error(`Error writing unprocessed game ${gameId}:`, err);
+                logger.error({ error: err, gameId }, `Error writing unprocessed game ${gameId}`);
                 results.errors.push(`Game ${gameId}: ${errorMsg}`);
 
                 // Adjust counts
@@ -240,11 +242,11 @@ const executeBatchWrite = async (
         const unprocessedItems = batchResult.UnprocessedItems?.[tableNames.games];
 
         if (unprocessedItems && unprocessedItems.length > 0) {
-            console.warn(`Batch write had ${unprocessedItems.length} unprocessed items`);
+            logger.warn({ count: unprocessedItems.length }, `Batch write had ${unprocessedItems.length} unprocessed items`);
             await handleUnprocessedItems(unprocessedItems, existingRecordsMap, results);
         }
     } catch (error) {
-        console.error('Error batch writing games:', error);
+        logger.error({ error }, 'Error batch writing games');
         // Fallback to individual writes using Promise.all
         await Promise.all(
             putRequests.map(async (request) => {
@@ -253,7 +255,7 @@ const executeBatchWrite = async (
                 } catch (err) {
                     const gameId = request.PutRequest.Item.game_id;
                     const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-                    console.error(`Error writing game ${gameId}:`, err);
+                    logger.error({ error: err, gameId }, `Error writing game ${gameId}`);
                     results.errors.push(`Game ${gameId}: ${errorMsg}`);
 
                     // Adjust counts
@@ -303,7 +305,7 @@ const getGame = async (gameId: string): Promise<GameRecord | undefined> => {
         const result = await dynamoDBClient.send(command);
         return result.Item as GameRecord | undefined;
     } catch (error) {
-        console.error(`Error getting game ${gameId}:`, error);
+        logger.error({ error, gameId }, `Error getting game ${gameId}`);
         return undefined;
     }
 };
@@ -327,12 +329,17 @@ const putGame = async (game: GameRecord): Promise<void> => {
 export const handler = async (
     event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
+    const logger = createLambdaLogger(event);
+    
     try {
+        logger.info('Starting game upload');
+        
         // Parse request body
         const body = parseRequestBody<UploadRequest>(event.body);
         const { file: base64File } = body;
 
         if (!base64File) {
+            logger.warn('Upload attempt with no file');
             return createBadRequestResponse('No file uploaded');
         }
 
@@ -392,7 +399,8 @@ export const handler = async (
             errors: results.errors.length > 0 ? results.errors : undefined,
         });
     } catch (error) {
-        console.error('Error in game upload handler:', error);
+        const contextLogger = createLambdaLogger(event);
+        contextLogger.error({ error }, 'Error in game upload handler');
         return createInternalErrorResponse(error as Error);
     }
 };

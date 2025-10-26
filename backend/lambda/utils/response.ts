@@ -5,6 +5,7 @@
 
 import { APIGatewayProxyResult } from 'aws-lambda';
 import { JSON_RESPONSE_HEADERS, EXCEL_RESPONSE_HEADERS, HTTP_STATUS } from '../constants';
+import logger from './logger';
 import type { ErrorResponse, SuccessResponse } from '../types';
 
 /**
@@ -116,7 +117,7 @@ export const createInternalErrorResponse = (
   const message = 'Internal server error';
   const errorDetails = error instanceof Error ? error.message : String(error);
   
-  console.error('Internal server error:', errorDetails);
+  logger.error({ error: errorDetails }, 'Internal server error');
   
   return createErrorResponse(HTTP_STATUS.INTERNAL_SERVER_ERROR, message, {
     error: errorDetails,
@@ -140,7 +141,7 @@ export const parseRequestBody = <T = any>(
   try {
     return JSON.parse(body) as T;
   } catch (error) {
-    console.error('Failed to parse request body:', error);
+    logger.error({ error }, 'Failed to parse request body');
     return defaultValue;
   }
 };

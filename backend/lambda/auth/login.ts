@@ -14,6 +14,7 @@ import {
   parseRequestBody,
   getCurrentTimestamp,
 } from '../utils/response';
+import { createLambdaLogger } from '../utils/logger';
 import type {
   LoginRequest,
   LoginResponse,
@@ -54,7 +55,7 @@ const getTeacher = async (teacherId: string): Promise<TeacherRecord | undefined>
 /**
  * Update last login timestamp for a user
  */
-const updateLastLogin = async (id: string, role: UserRole): Promise<void> => {
+const updateLastLogin = async (id: string, role: UserRole, logger: any): Promise<void> => {
   const tableName = role === 'student' ? tableNames.students : tableNames.teachers;
   const keyField = role === 'student' ? 'student_id' : 'teacher_id';
   const now = getCurrentTimestamp();
@@ -70,9 +71,9 @@ const updateLastLogin = async (id: string, role: UserRole): Promise<void> => {
 
   try {
     await dynamoDBClient.send(command);
-    console.log(`Updated last login for ${role} ${id}`);
+    logger.info({ role, id }, 'Updated last login timestamp');
   } catch (error) {
-    console.error(`Failed to update last login for ${role} ${id}:`, error);
+    logger.error({ role, id, error }, 'Failed to update last login timestamp');
     // Don't throw - login should succeed even if timestamp update fails
   }
 };
@@ -95,12 +96,15 @@ const determineUserRole = (user: StudentRecord | TeacherRecord): UserRole => {
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
+  const logger = createLambdaLogger(event);
+  
   try {
     const body = parseRequestBody<LoginRequest>(event.body);
     const { id, password } = body;
 
     // Validate required fields
     if (!id || !password) {
+      logger.warn('Login attempt with missing credentials');
       return createBadRequestResponse('Missing id or password');
     }
 
@@ -118,11 +122,12 @@ export const handler = async (
 
     // Verify user exists and password matches (plain text comparison)
     if (!user || user.password !== password) {
+      logger.warn({ id }, 'Login failed: Invalid credentials');
       return createUnauthorizedResponse('Invalid credentials');
     }
 
     // Update last login timestamp
-    await updateLastLogin(id, role);
+    await updateLastLogin(id, role, logger);
 
     // Remove password from response
     const { password: _, ...userWithoutPassword } = user;
@@ -133,9 +138,10 @@ export const handler = async (
       role,
     };
 
+    logger.info({ id, role }, 'Login successful');
     return createSuccessResponse(response);
   } catch (error) {
-    console.error('Error in login handler:', error);
+    logger.error({ error }, 'Error in login handler');
     return createInternalErrorResponse(error as Error);
   }
 };

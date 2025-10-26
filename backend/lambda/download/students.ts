@@ -14,6 +14,7 @@ import {
   createInternalErrorResponse,
   getDateString,
 } from '../utils/response';
+import { createLambdaLogger } from '../utils/logger';
 import { createExcelWorkbook } from '../utils/excel';
 import { STUDENTS_COLUMN_WIDTHS } from '../constants';
 import type { StudentRecord } from '../types';
@@ -21,9 +22,13 @@ import type { StudentRecord } from '../types';
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
+  const logger = createLambdaLogger(event);
+  
   try {
     // Get query parameters (optional class filter)
     const classFilter = event.queryStringParameters?.classes?.split(',') || [];
+
+    logger.info({ classFilter }, 'Starting students download');
 
     // Get all students from DynamoDB
     const scanCommand = new ScanCommand({
@@ -62,11 +67,13 @@ export const handler = async (
     // Create Excel workbook
     const excelBuffer = createExcelWorkbook(excelData, 'Students', [...STUDENTS_COLUMN_WIDTHS]);
 
+    logger.info({ count: students.length }, 'Students download completed successfully');
+
     // Return Excel file as response
     const filename = `students_${getDateString()}.xlsx`;
     return createExcelResponse(excelBuffer, filename);
   } catch (error) {
-    console.error('Error downloading students:', error);
+    logger.error({ error }, 'Error downloading students');
     return createInternalErrorResponse(error as Error);
   }
 };

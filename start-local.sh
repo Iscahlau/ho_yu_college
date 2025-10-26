@@ -71,7 +71,7 @@ cd "$(dirname "$0")"
 PROJECT_ROOT=$(pwd)
 
 # Step 1: Start DynamoDB Local
-print_info "Step 1/4: Starting DynamoDB Local..."
+print_info "Step 1/5: Starting DynamoDB Local..."
 cd "$PROJECT_ROOT/backend"
 
 if docker ps | grep -q "ho-yu-dynamodb-local"; then
@@ -83,15 +83,20 @@ else
 fi
 
 # Step 2: Initialize DynamoDB tables
-print_info "Step 2/4: Initializing DynamoDB tables..."
+print_info "Step 2/5: Initializing DynamoDB tables..."
 npm run dynamodb:init
 
 # Step 3: Seed DynamoDB with mock data
-print_info "Step 3/4: Seeding DynamoDB with mock data..."
+print_info "Step 3/5: Seeding DynamoDB with mock data..."
 npm run dynamodb:seed
 
-# Step 4: Build and start SAM Local API
-print_info "Step 4/4: Building and starting SAM Local API Gateway..."
+# Step 4: Build backend Lambda functions
+print_info "Step 4/5: Building backend Lambda functions..."
+print_info "Compiling TypeScript and preparing dependencies..."
+npm run build
+
+# Step 5: Build and start SAM Local API
+print_info "Step 5/5: Building and starting SAM Local API Gateway..."
 cd "$PROJECT_ROOT/infra"
 
 # Install dependencies if needed

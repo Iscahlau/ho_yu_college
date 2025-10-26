@@ -10,13 +10,16 @@ import {
   createSuccessResponse,
   createInternalErrorResponse,
 } from '../utils/response';
+import { createLambdaLogger } from '../utils/logger';
 import type { ListGamesResponse } from '../types';
 
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
+  const logger = createLambdaLogger(event);
+  
   try {
-    console.log('Fetching games from DynamoDB');
+    logger.info('Fetching games from DynamoDB');
 
     // Support pagination via query parameters
     const limit = event.queryStringParameters?.limit
@@ -46,9 +49,10 @@ export const handler = async (
       response.lastKey = encodeURIComponent(JSON.stringify(result.LastEvaluatedKey));
     }
 
+    logger.info({ count: response.count, hasMore: response.hasMore }, 'Successfully fetched games');
     return createSuccessResponse(response);
   } catch (error) {
-    console.error('Error fetching games:', error);
+    logger.error({ error }, 'Error fetching games');
     return createInternalErrorResponse(error as Error);
   }
 };

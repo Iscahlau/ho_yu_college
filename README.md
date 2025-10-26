@@ -27,6 +27,19 @@ A web-based platform designed for primary schools to facilitate Scratch game lea
 - **Compute**: AWS Lambda
 - **Database**: DynamoDB
 - **Storage**: S3 (static hosting)
+- **Logging**: Pino logger with structured JSON logging
+
+### Logging
+
+The backend uses [Pino](https://getpino.io/) for high-performance structured logging:
+
+- **Structured Logs**: All logs include contextual data (request IDs, user IDs, error details)
+- **Environment-Aware**: Pretty-printed logs for local development, JSON format for production/CloudWatch
+- **Request Context**: Automatic request tracking with Lambda-specific metadata
+- **Performance**: Optimized for AWS Lambda cold starts
+- **Configuration**: Log level controlled via `LOG_LEVEL` environment variable (default: `info`)
+
+**Log Levels**: `trace`, `debug`, `info`, `warn`, `error`, `fatal`
 
 ### Data Model
 

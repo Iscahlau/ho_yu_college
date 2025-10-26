@@ -11,6 +11,8 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import * as XLSX from 'xlsx';
 import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
 import { toString } from './utils/conversionUtils';
+import { createLambdaLogger } from '../utils/logger';
+import logger from '../utils/logger';
 
 interface StudentRecord {
   student_id: string;
@@ -148,7 +150,7 @@ export const handler = async (
           existingRecordsMap.set(item.student_id, item as StudentRecord);
         });
       } catch (error) {
-        console.error('Error batch getting students:', error);
+        logger.error({ error }, 'Error batch getting students');
         // If batch get fails, fall back to individual checks for this batch
         for (const { record } of batch) {
           try {
@@ -157,7 +159,7 @@ export const handler = async (
               existingRecordsMap.set(record.student_id, existing);
             }
           } catch (err) {
-            console.error(`Error getting student ${record.student_id}:`, err);
+            logger.error({ error: err, student_id: record.student_id }, `Error getting student ${record.student_id}`);
           }
         }
       }
@@ -239,7 +241,7 @@ export const handler = async (
           // Check for unprocessed items
           const unprocessedItems = batchResult.UnprocessedItems?.[tableNames.students];
           if (unprocessedItems && unprocessedItems.length > 0) {
-            console.warn(`Batch write had ${unprocessedItems.length} unprocessed items for students`);
+            logger.warn({ count: unprocessedItems.length }, `Batch write had ${unprocessedItems.length} unprocessed items for students`);
             // Try individual writes for unprocessed items
             for (const unprocessedItem of unprocessedItems) {
               try {
@@ -247,7 +249,7 @@ export const handler = async (
               } catch (err) {
                 const studentId = (unprocessedItem.PutRequest!.Item as any).student_id;
                 const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-                console.error(`Error writing unprocessed student ${studentId}:`, err);
+                logger.error({ error: err, studentId }, `Error writing unprocessed student ${studentId}`);
                 results.errors.push(`Student ${studentId}: ${errorMsg}`);
                 // Adjust counts since this item failed
                 if (existingRecordsMap.has(studentId)) {
@@ -260,7 +262,7 @@ export const handler = async (
             }
           }
         } catch (error) {
-          console.error('Error batch writing students:', error);
+          logger.error({ error }, 'Error batch writing students');
           // If batch write fails, fall back to individual writes for this batch
           for (let j = 0; j < putRequests.length; j++) {
             const request = putRequests[j];
@@ -269,7 +271,7 @@ export const handler = async (
             } catch (err) {
               const studentId = request.PutRequest.Item.student_id;
               const errorMsg = err instanceof Error ? err.message : 'Unknown error';
-              console.error(`Error writing student ${studentId}:`, err);
+              logger.error({ error: err, studentId }, `Error writing student ${studentId}`);
               results.errors.push(`Student ${studentId}: ${errorMsg}`);
               // Adjust counts since this item failed
               if (existingRecordsMap.has(studentId)) {
@@ -316,7 +318,7 @@ export const handler = async (
       }),
     };
   } catch (error) {
-    console.error('Error:', error);
+    const contextLogger = createLambdaLogger(event); contextLogger.error({ error }, 'Error in student upload handler');
     return {
       statusCode: 500,
       headers: {
@@ -341,7 +343,7 @@ async function getStudent(studentId: string) {
     const result = await dynamoDBClient.send(command);
     return result.Item as StudentRecord | undefined;
   } catch (error) {
-    console.error(`Error getting student ${studentId}:`, error);
+    logger.error({ error, studentId }, `Error getting student ${studentId}`);
     return undefined;
   }
 }

@@ -15,16 +15,20 @@ import {
   createInternalErrorResponse,
   parseRequestBody,
 } from '../utils/response';
+import { createLambdaLogger } from '../utils/logger';
 import { MARKS_BY_DIFFICULTY } from '../constants';
 import type { ClickRequestBody } from '../types';
 
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
+  const logger = createLambdaLogger(event);
+  
   try {
     const gameId = event.pathParameters?.gameId;
 
     if (!gameId) {
+      logger.warn('Click request missing gameId parameter');
       return createBadRequestResponse('Missing gameId parameter');
     }
 
@@ -40,6 +44,7 @@ export const handler = async (
     const getResult = await dynamoDBClient.send(getCommand);
 
     if (!getResult.Item) {
+      logger.warn({ gameId }, 'Game not found');
       return createNotFoundResponse('Game not found');
     }
 
@@ -62,15 +67,20 @@ export const handler = async (
     // Update student marks if this is a student clicking
     let updatedMarks: number | undefined;
     if (requestBody.student_id && requestBody.role === 'student' && game.difficulty) {
-      updatedMarks = await updateStudentMarks(requestBody.student_id, game.difficulty);
+      updatedMarks = await updateStudentMarks(requestBody.student_id, game.difficulty, logger);
     }
+
+    logger.info(
+      { gameId, accumulated_click: updateResult.Attributes?.accumulated_click, student_id: requestBody.student_id },
+      'Game click recorded successfully'
+    );
 
     return createSuccessResponse({
       accumulated_click: updateResult.Attributes?.accumulated_click,
       marks: updatedMarks,
     });
   } catch (error) {
-    console.error('Error incrementing game click:', error);
+    logger.error({ error }, 'Error incrementing game click');
     return createInternalErrorResponse(error as Error);
   }
 };
@@ -80,12 +90,13 @@ export const handler = async (
  */
 const updateStudentMarks = async (
   studentId: string,
-  difficulty: string
+  difficulty: string,
+  logger: any
 ): Promise<number | undefined> => {
   const marksToAdd = MARKS_BY_DIFFICULTY[difficulty];
 
   if (!marksToAdd) {
-    console.log(`No marks defined for difficulty: ${difficulty}`);
+    logger.info({ difficulty }, 'No marks defined for difficulty');
     return undefined;
   }
 
@@ -101,9 +112,13 @@ const updateStudentMarks = async (
     });
 
     const studentUpdateResult = await dynamoDBClient.send(studentUpdateCommand);
+    logger.info(
+      { studentId, difficulty, marksAdded: marksToAdd, totalMarks: studentUpdateResult.Attributes?.marks },
+      'Student marks updated'
+    );
     return studentUpdateResult.Attributes?.marks;
   } catch (error) {
-    console.error('Failed to update student marks:', error);
+    logger.error({ studentId, difficulty, error }, 'Failed to update student marks');
     // Don't throw - click tracking should succeed even if mark update fails
     return undefined;
   }

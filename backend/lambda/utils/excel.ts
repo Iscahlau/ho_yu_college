@@ -4,6 +4,7 @@
  */
 
 import * as XLSX from 'xlsx';
+import logger from './logger';
 import type { HeaderValidationResult } from '../types';
 
 /**
@@ -69,7 +70,7 @@ export const validateHeaders = (
   );
   
   if (unexpectedHeaders.length > 0) {
-    console.warn('Unexpected headers found:', unexpectedHeaders);
+    logger.warn({ unexpectedHeaders }, 'Unexpected headers found in Excel file');
   }
 
   return { valid: true };
