@@ -6,4 +6,7 @@
  * - No delete functionality
  */
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+/**
+ * Main Lambda handler for game uploads
+ */
 export declare const handler: (event: APIGatewayProxyEvent) => Promise<APIGatewayProxyResult>;

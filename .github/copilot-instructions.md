@@ -12,6 +12,22 @@ This is a Scratch game platform web application designed for primary school use.
 - **Database**: DynamoDB for data storage, S3 for static hosting
 - **Key Features**: Student/teacher login, game management, Excel upload, multi-language support
 
+## Code Quality Standards
+
+### TypeScript & JavaScript Standards
+- **Clean Code Reference**: Follow principles from [Clean Code TypeScript](https://github.com/labs42io/clean-code-typescript)
+- **Syntax Requirements**: Use ES6+ syntax (ES2015 or later), preferably latest ECMAScript features
+  - Use `const` and `let` instead of `var`
+  - Use arrow functions `() => {}` for callbacks and functional expressions
+  - Use template literals for string interpolation
+  - Use destructuring for objects and arrays
+  - Use async/await instead of promise chains
+  - Use optional chaining `?.` and nullish coalescing `??`
+  - Use spread operator `...` for arrays and objects
+  - Use modern array methods: `map()`, `filter()`, `reduce()`, `find()`, etc.
+  - Use classes with proper encapsulation when appropriate
+  - Use modules (import/export) instead of require/module.exports
+
 ## Working Effectively
 
 ### Environment Requirements
