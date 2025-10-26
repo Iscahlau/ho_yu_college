@@ -8,82 +8,37 @@
 
 import { PutCommand, GetCommand, BatchGetCommand, BatchWriteCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import * as XLSX from 'xlsx';
 import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
+import {
+  createBadRequestResponse,
+  createSuccessResponse,
+  createInternalErrorResponse,
+  parseRequestBody,
+  getCurrentTimestamp,
+} from '../utils/response';
+import {
+  parseExcelFile,
+  filterEmptyRows,
+  rowToRecord,
+  validateHeaders,
+  extractHeadersAndRows,
+  validateRecordCount,
+} from '../utils/excel';
+import {
+  BATCH_SIZE,
+  MAX_RECORDS,
+  GAMES_REQUIRED_HEADERS,
+  GAMES_EXPECTED_HEADERS,
+} from '../constants';
+import type {
+  GameRecord,
+  UploadResults,
+  ParsedRecord,
+  UploadRequest,
+} from '../types';
 
-// ===== TYPES & INTERFACES =====
-
-interface GameRecord {
-    game_id: string;
-    game_name: string;
-    student_id: string;
-    subject: string;
-    difficulty: string;
-    teacher_id: string;
-    last_update: string;
-    scratch_id: string;
-    scratch_api: string;
-    accumulated_click: number;
-    description?: string;
-    created_at?: string;
-    updated_at?: string;
-}
-
-interface UploadResults {
-    processed: number;
-    inserted: number;
-    updated: number;
-    errors: string[];
-}
-
-interface ParsedRecord {
-    index: number;
-    record: Record<string, any>;
-}
-
-// ===== CONSTANTS =====
-
-const BATCH_SIZE = 25;
-const MAX_RECORDS = 4000;
-
-const REQUIRED_HEADERS = ['game_id'] as const;
-const EXPECTED_HEADERS = [
-    'game_id', 'game_name', 'student_id', 'subject',
-    'difficulty', 'teacher_id', 'scratch_id', 'scratch_api',
-    'accumulated_click', 'description'
-] as const;
-
-const RESPONSE_HEADERS = {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-} as const;
 
 // ===== HELPER FUNCTIONS =====
-
-/**
- * Validates Excel file headers
- */
-const validateHeaders = (headers: string[]): { valid: boolean; message?: string; expectedHeaders?: string[] } => {
-    const requiredHeaders = [...REQUIRED_HEADERS];
-    const expectedHeaders = [...EXPECTED_HEADERS] as string[];
-
-    const missingRequired = requiredHeaders.filter(h => !headers.includes(h));
-
-    if (missingRequired.length > 0) {
-        return {
-            valid: false,
-            message: `Missing required column(s): ${missingRequired.join(', ')}. Please check your Excel file headers.`,
-            expectedHeaders,
-        };
-    }
-
-    const unexpectedHeaders = headers.filter(h => h && !(expectedHeaders as readonly string[]).includes(h));
-    if (unexpectedHeaders.length > 0) {
-        console.warn('Unexpected headers found:', unexpectedHeaders);
-    }
-
-    return { valid: true };
-};
 
 /**
  * Checks if game data has changed
@@ -133,63 +88,7 @@ const createGameRecord = (
 };
 
 /**
- * Creates error response
- */
-const createErrorResponse = (
-    statusCode: number,
-    message: string,
-    additionalData?: Record<string, any>
-): APIGatewayProxyResult => ({
-    statusCode,
-    headers: RESPONSE_HEADERS,
-    body: JSON.stringify({
-        success: false,
-        message,
-        ...additionalData,
-    }),
-});
-
-/**
- * Creates success response
- */
-const createSuccessResponse = (data: Record<string, any>): APIGatewayProxyResult => ({
-    statusCode: 200,
-    headers: RESPONSE_HEADERS,
-    body: JSON.stringify({
-        success: true,
-        ...data,
-    }),
-});
-
-/**
- * Parses Excel file to array of rows
- */
-const parseExcelFile = (fileBuffer: Buffer): any[][] => {
-    const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
-    const firstSheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[firstSheetName];
-    return XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
-};
-
-/**
- * Filters out empty rows
- */
-const filterEmptyRows = (rows: any[][]): any[][] =>
-    rows.filter(row =>
-        row?.length > 0 && row.some(cell => cell !== null && cell !== undefined && cell !== '')
-    );
-
-/**
- * Converts row to record object using reduce
- */
-const rowToRecord = (row: any[], headers: string[]): Record<string, any> =>
-    headers.reduce((record, header, index) => ({
-        ...record,
-        [header]: row[index]
-    }), {} as Record<string, any>);
-
-/**
- * Parses data rows to records with validation using map and filter
+ * Parses data rows to records with validation
  */
 const parseDataRows = (dataRows: any[][], headers: string[], results: UploadResults): ParsedRecord[] =>
     dataRows
@@ -203,7 +102,7 @@ const parseDataRows = (dataRows: any[][], headers: string[], results: UploadResu
         });
 
 /**
- * Splits array into chunks of specified size using Array.from
+ * Splits array into chunks of specified size
  */
 const chunkArray = <T>(array: T[], size: number): T[][] =>
     Array.from({ length: Math.ceil(array.length / size) }, (_, i) =>
@@ -430,40 +329,33 @@ export const handler = async (
 ): Promise<APIGatewayProxyResult> => {
     try {
         // Parse request body
-        const body = JSON.parse(event.body ?? '{}');
+        const body = parseRequestBody<UploadRequest>(event.body);
         const { file: base64File } = body;
 
         if (!base64File) {
-            return createErrorResponse(400, 'No file uploaded');
+            return createBadRequestResponse('No file uploaded');
         }
 
         // Decode and parse Excel file
         const fileBuffer = Buffer.from(base64File, 'base64');
         const jsonData = parseExcelFile(fileBuffer);
 
-        // Validate file has data
-        if (jsonData.length < 2) {
-            return createErrorResponse(400, 'File is empty or contains no data rows');
-        }
-
-        // Extract headers and data rows using destructuring
-        const [headers, ...rawDataRows] = jsonData;
-        const dataRows = filterEmptyRows(rawDataRows);
+        // Extract headers and validate file has data
+        const { headers, dataRows } = extractHeadersAndRows(jsonData);
 
         // Validate headers
-        const headerValidation = validateHeaders(headers);
+        const headerValidation = validateHeaders(headers, GAMES_REQUIRED_HEADERS, GAMES_EXPECTED_HEADERS);
         if (!headerValidation.valid) {
-            return createErrorResponse(400, headerValidation.message!, {
+            return createBadRequestResponse(headerValidation.message!, {
                 expectedHeaders: headerValidation.expectedHeaders,
             });
         }
 
         // Validate maximum records
-        if (dataRows.length > MAX_RECORDS) {
-            return createErrorResponse(
-                400,
-                `File contains ${dataRows.length} records. Maximum allowed is ${MAX_RECORDS.toLocaleString()} records.`
-            );
+        try {
+            validateRecordCount(dataRows.length, MAX_RECORDS);
+        } catch (error) {
+            return createBadRequestResponse((error as Error).message);
         }
 
         // Initialize results
@@ -474,20 +366,20 @@ export const handler = async (
             errors: [],
         };
 
-        const now = new Date().toISOString();
+        const now = getCurrentTimestamp();
 
-        // Parse and validate all rows using map and filter
+        // Parse and validate all rows
         const parsedRecords = parseDataRows(dataRows, headers, results);
 
-        // Fetch existing records in batches using Promise.all
+        // Fetch existing records in batches
         const existingRecordsMap = await fetchExistingRecords(parsedRecords);
 
-        // Process and write records in batches using Promise.all
+        // Process and write records in batches
         await processBatchWrites(parsedRecords, existingRecordsMap, now, results);
 
         // Check if any records were successfully processed
         if (results.processed === 0) {
-            return createErrorResponse(400, 'No records were successfully processed', {
+            return createBadRequestResponse('No records were successfully processed', {
                 errors: results.errors.length > 0 ? results.errors : ['Unknown error occurred during upload'],
             });
         }
@@ -501,9 +393,7 @@ export const handler = async (
         });
     } catch (error) {
         console.error('Error in game upload handler:', error);
-        return createErrorResponse(500, 'Internal server error', {
-            error: error instanceof Error ? error.message : 'Unknown error'
-        });
+        return createInternalErrorResponse(error as Error);
     }
 };
 

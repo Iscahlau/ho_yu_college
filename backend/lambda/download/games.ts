@@ -7,22 +7,15 @@
 
 import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import * as XLSX from 'xlsx';
 import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
-
-interface GameRecord {
-  game_id: string;
-  game_name: string;
-  student_id: string;
-  subject: string;
-  difficulty: string;
-  teacher_id: string;
-  last_update: string;
-  scratch_id: string;
-  scratch_api: string;
-  accumulated_click: number;
-  description?: string;
-}
+import {
+  createExcelResponse,
+  createInternalErrorResponse,
+  getDateString,
+} from '../utils/response';
+import { createExcelWorkbook } from '../utils/excel';
+import { GAMES_COLUMN_WIDTHS } from '../constants';
+import type { GameRecord } from '../types';
 
 export const handler = async (
   event: APIGatewayProxyEvent
@@ -33,7 +26,7 @@ export const handler = async (
       TableName: tableNames.games,
     });
     const result = await dynamoDBClient.send(scanCommand);
-    const games = result.Items as GameRecord[];
+    const games = (result.Items as GameRecord[]) || [];
 
     // Sort games by game_id
     games.sort((a, b) => a.game_id.localeCompare(b.game_id));
@@ -54,52 +47,14 @@ export const handler = async (
     }));
 
     // Create Excel workbook
-    const worksheet = XLSX.utils.json_to_sheet(excelData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Games');
-
-    // Set column widths for better readability
-    worksheet['!cols'] = [
-      { wch: 12 }, // game_id
-      { wch: 30 }, // game_name
-      { wch: 12 }, // student_id
-      { wch: 25 }, // subject
-      { wch: 15 }, // difficulty
-      { wch: 12 }, // teacher_id
-      { wch: 20 }, // last_update
-      { wch: 15 }, // scratch_id
-      { wch: 40 }, // scratch_api
-      { wch: 15 }, // accumulated_click
-      { wch: 50 }, // description
-    ];
-
-    // Generate Excel file buffer
-    const excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+    const excelBuffer = createExcelWorkbook(excelData, 'Games', [...GAMES_COLUMN_WIDTHS]);
 
     // Return Excel file as response
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'Content-Disposition': `attachment; filename="games_${new Date().toISOString().split('T')[0]}.xlsx"`,
-        'Access-Control-Allow-Origin': '*',
-      },
-      body: excelBuffer.toString('base64'),
-      isBase64Encoded: true,
-    };
+    const filename = `games_${getDateString()}.xlsx`;
+    return createExcelResponse(excelBuffer, filename);
   } catch (error) {
     console.error('Error downloading games:', error);
-    return {
-      statusCode: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-      body: JSON.stringify({ 
-        success: false,
-        message: 'Failed to download games data',
-        error: error instanceof Error ? error.message : 'Unknown error'
-      }),
-    };
+    return createInternalErrorResponse(error as Error);
   }
 };
+

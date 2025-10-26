@@ -6,23 +6,17 @@
  * - Returns Excel file (.xlsx) with proper structure
  */
 
-import { ScanCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
+import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import * as XLSX from 'xlsx';
 import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
-
-interface StudentRecord {
-  student_id: string;
-  name_1: string;
-  name_2: string;
-  marks: number;
-  class: string;
-  class_no: string;
-  last_login: string;
-  last_update: string;
-  teacher_id: string;
-  password: string;
-}
+import {
+  createExcelResponse,
+  createInternalErrorResponse,
+  getDateString,
+} from '../utils/response';
+import { createExcelWorkbook } from '../utils/excel';
+import { STUDENTS_COLUMN_WIDTHS } from '../constants';
+import type { StudentRecord } from '../types';
 
 export const handler = async (
   event: APIGatewayProxyEvent
@@ -32,23 +26,15 @@ export const handler = async (
     const classFilter = event.queryStringParameters?.classes?.split(',') || [];
 
     // Get all students from DynamoDB
-    let students: StudentRecord[] = [];
-    
+    const scanCommand = new ScanCommand({
+      TableName: tableNames.students,
+    });
+    const result = await dynamoDBClient.send(scanCommand);
+    let students = (result.Items as StudentRecord[]) || [];
+
+    // Apply class filter if provided
     if (classFilter.length > 0) {
-      // If class filter is provided, scan and filter by classes
-      const scanCommand = new ScanCommand({
-        TableName: tableNames.students,
-      });
-      const result = await dynamoDBClient.send(scanCommand);
-      students = (result.Items as StudentRecord[])
-        .filter(student => classFilter.includes(student.class));
-    } else {
-      // No filter - get all students (admin access)
-      const scanCommand = new ScanCommand({
-        TableName: tableNames.students,
-      });
-      const result = await dynamoDBClient.send(scanCommand);
-      students = result.Items as StudentRecord[];
+      students = students.filter(student => classFilter.includes(student.class));
     }
 
     // Sort students by class and class_no
@@ -74,51 +60,14 @@ export const handler = async (
     }));
 
     // Create Excel workbook
-    const worksheet = XLSX.utils.json_to_sheet(excelData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Students');
-
-    // Set column widths for better readability
-    worksheet['!cols'] = [
-      { wch: 12 }, // student_id
-      { wch: 20 }, // name_1
-      { wch: 20 }, // name_2
-      { wch: 8 },  // marks
-      { wch: 8 },  // class
-      { wch: 10 }, // class_no
-      { wch: 20 }, // last_login
-      { wch: 20 }, // last_update
-      { wch: 12 }, // teacher_id
-      { wch: 15 }, // password
-    ];
-
-    // Generate Excel file buffer
-    const excelBuffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+    const excelBuffer = createExcelWorkbook(excelData, 'Students', [...STUDENTS_COLUMN_WIDTHS]);
 
     // Return Excel file as response
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'Content-Disposition': `attachment; filename="students_${new Date().toISOString().split('T')[0]}.xlsx"`,
-        'Access-Control-Allow-Origin': '*',
-      },
-      body: excelBuffer.toString('base64'),
-      isBase64Encoded: true,
-    };
+    const filename = `students_${getDateString()}.xlsx`;
+    return createExcelResponse(excelBuffer, filename);
   } catch (error) {
     console.error('Error downloading students:', error);
-    return {
-      statusCode: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-      body: JSON.stringify({ 
-        success: false,
-        message: 'Failed to download student data',
-        error: error instanceof Error ? error.message : 'Unknown error'
-      }),
-    };
+    return createInternalErrorResponse(error as Error);
   }
 };
+

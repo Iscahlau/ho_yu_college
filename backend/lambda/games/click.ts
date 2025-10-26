@@ -8,18 +8,15 @@
 import { UpdateCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
-
-interface ClickRequestBody {
-  student_id?: string;
-  role?: 'student' | 'teacher' | 'admin';
-}
-
-// Mark values based on difficulty
-const MARKS_BY_DIFFICULTY: Record<string, number> = {
-  'Beginner': 5,
-  'Intermediate': 10,
-  'Advanced': 15,
-};
+import {
+  createBadRequestResponse,
+  createNotFoundResponse,
+  createSuccessResponse,
+  createInternalErrorResponse,
+  parseRequestBody,
+} from '../utils/response';
+import { MARKS_BY_DIFFICULTY } from '../constants';
+import type { ClickRequestBody } from '../types';
 
 export const handler = async (
   event: APIGatewayProxyEvent
@@ -28,26 +25,11 @@ export const handler = async (
     const gameId = event.pathParameters?.gameId;
 
     if (!gameId) {
-      return {
-        statusCode: 400,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-        body: JSON.stringify({ message: 'Missing gameId parameter' }),
-      };
+      return createBadRequestResponse('Missing gameId parameter');
     }
 
     // Parse request body for user context
-    let requestBody: ClickRequestBody = {};
-    if (event.body) {
-      try {
-        requestBody = JSON.parse(event.body);
-      } catch (err) {
-        // If body can't be parsed, continue without user context
-        console.log('Could not parse request body, continuing without user context');
-      }
-    }
+    const requestBody = parseRequestBody<ClickRequestBody>(event.body);
 
     // First verify the game exists and get its difficulty
     const getCommand = new GetCommand({
@@ -56,16 +38,9 @@ export const handler = async (
     });
 
     const getResult = await dynamoDBClient.send(getCommand);
-    
+
     if (!getResult.Item) {
-      return {
-        statusCode: 404,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-        body: JSON.stringify({ message: 'Game not found' }),
-      };
+      return createNotFoundResponse('Game not found');
     }
 
     const game = getResult.Item;
@@ -87,50 +62,49 @@ export const handler = async (
     // Update student marks if this is a student clicking
     let updatedMarks: number | undefined;
     if (requestBody.student_id && requestBody.role === 'student' && game.difficulty) {
-      const marksToAdd = MARKS_BY_DIFFICULTY[game.difficulty];
-      
-      if (marksToAdd) {
-        try {
-          const studentUpdateCommand = new UpdateCommand({
-            TableName: tableNames.students,
-            Key: { student_id: requestBody.student_id },
-            UpdateExpression: 'ADD marks :marksIncrement',
-            ExpressionAttributeValues: {
-              ':marksIncrement': marksToAdd,
-            },
-            ReturnValues: 'ALL_NEW',
-          });
-
-          const studentUpdateResult = await dynamoDBClient.send(studentUpdateCommand);
-          updatedMarks = studentUpdateResult.Attributes?.marks;
-        } catch (studentUpdateError) {
-          console.error('Failed to update student marks:', studentUpdateError);
-          // Continue even if mark update fails - don't fail the click tracking
-        }
-      }
+      updatedMarks = await updateStudentMarks(requestBody.student_id, game.difficulty);
     }
 
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-      body: JSON.stringify({
-        success: true,
-        accumulated_click: updateResult.Attributes?.accumulated_click,
-        marks: updatedMarks,
-      }),
-    };
+    return createSuccessResponse({
+      accumulated_click: updateResult.Attributes?.accumulated_click,
+      marks: updatedMarks,
+    });
   } catch (error) {
     console.error('Error incrementing game click:', error);
-    return {
-      statusCode: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
+    return createInternalErrorResponse(error as Error);
+  }
+};
+
+/**
+ * Update student marks based on game difficulty
+ */
+const updateStudentMarks = async (
+  studentId: string,
+  difficulty: string
+): Promise<number | undefined> => {
+  const marksToAdd = MARKS_BY_DIFFICULTY[difficulty];
+
+  if (!marksToAdd) {
+    console.log(`No marks defined for difficulty: ${difficulty}`);
+    return undefined;
+  }
+
+  try {
+    const studentUpdateCommand = new UpdateCommand({
+      TableName: tableNames.students,
+      Key: { student_id: studentId },
+      UpdateExpression: 'ADD marks :marksIncrement',
+      ExpressionAttributeValues: {
+        ':marksIncrement': marksToAdd,
       },
-      body: JSON.stringify({ message: 'Internal server error' }),
-    };
+      ReturnValues: 'ALL_NEW',
+    });
+
+    const studentUpdateResult = await dynamoDBClient.send(studentUpdateCommand);
+    return studentUpdateResult.Attributes?.marks;
+  } catch (error) {
+    console.error('Failed to update student marks:', error);
+    // Don't throw - click tracking should succeed even if mark update fails
+    return undefined;
   }
 };

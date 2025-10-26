@@ -3,80 +3,122 @@
  * Handles student and teacher authentication
  */
 
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, GetCommand } from '@aws-sdk/lib-dynamodb';
+import { GetCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { dynamoDBClient, tableNames } from '../utils/dynamodb-client';
+import {
+  createBadRequestResponse,
+  createUnauthorizedResponse,
+  createSuccessResponse,
+  createInternalErrorResponse,
+  parseRequestBody,
+  getCurrentTimestamp,
+} from '../utils/response';
+import type {
+  LoginRequest,
+  LoginResponse,
+  StudentRecord,
+  TeacherRecord,
+  UserRole,
+} from '../types';
 
-// Create DynamoDB client
-const mode = process.env.DYNAMODB_MODE || 'aws';
-const clientConfig: any = {
-  region: process.env.AWS_REGION || 'us-east-1',
+
+// ===== HELPER FUNCTIONS =====
+
+/**
+ * Fetch student record from DynamoDB
+ */
+const getStudent = async (studentId: string): Promise<StudentRecord | undefined> => {
+  const command = new GetCommand({
+    TableName: tableNames.students,
+    Key: { student_id: studentId },
+  });
+
+  const result = await dynamoDBClient.send(command);
+  return result.Item as StudentRecord | undefined;
 };
 
-if (mode === 'local') {
-  const endpoint = process.env.DYNAMODB_ENDPOINT || 'http://localhost:8002';
-  clientConfig.endpoint = endpoint;
-  clientConfig.credentials = {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'local',
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'local',
-  };
-  console.log(`[DynamoDB] Connecting to local DynamoDB at ${endpoint}`);
-}
+/**
+ * Fetch teacher record from DynamoDB
+ */
+const getTeacher = async (teacherId: string): Promise<TeacherRecord | undefined> => {
+  const command = new GetCommand({
+    TableName: tableNames.teachers,
+    Key: { teacher_id: teacherId },
+  });
 
-const client = new DynamoDBClient(clientConfig);
-const dynamoDBClient = DynamoDBDocumentClient.from(client);
-
-const tableNames = {
-  students: process.env.STUDENTS_TABLE_NAME || 'ho-yu-students',
-  teachers: process.env.TEACHERS_TABLE_NAME || 'ho-yu-teachers',
-  games: process.env.GAMES_TABLE_NAME || 'ho-yu-games',
+  const result = await dynamoDBClient.send(command);
+  return result.Item as TeacherRecord | undefined;
 };
 
-interface LoginRequest {
-  id: string;
-  password: string;
-}
+/**
+ * Update last login timestamp for a user
+ */
+const updateLastLogin = async (id: string, role: UserRole): Promise<void> => {
+  const tableName = role === 'student' ? tableNames.students : tableNames.teachers;
+  const keyField = role === 'student' ? 'student_id' : 'teacher_id';
+  const now = getCurrentTimestamp();
+
+  const command = new UpdateCommand({
+    TableName: tableName,
+    Key: { [keyField]: id },
+    UpdateExpression: 'SET last_login = :now',
+    ExpressionAttributeValues: {
+      ':now': now,
+    },
+  });
+
+  try {
+    await dynamoDBClient.send(command);
+    console.log(`Updated last login for ${role} ${id}`);
+  } catch (error) {
+    console.error(`Failed to update last login for ${role} ${id}:`, error);
+    // Don't throw - login should succeed even if timestamp update fails
+  }
+};
+
+/**
+ * Determine user role based on user record
+ */
+const determineUserRole = (user: StudentRecord | TeacherRecord): UserRole => {
+  if ('is_admin' in user && user.is_admin) {
+    return 'admin';
+  }
+  if ('teacher_id' in user && 'classes' in user) {
+    return 'teacher';
+  }
+  return 'student';
+};
+
+// ===== MAIN HANDLER =====
 
 export const handler = async (
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   try {
-    const body: LoginRequest = JSON.parse(event.body || '{}');
+    const body = parseRequestBody<LoginRequest>(event.body);
     const { id, password } = body;
 
+    // Validate required fields
     if (!id || !password) {
-      return {
-        statusCode: 400,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-        body: JSON.stringify({ message: 'Missing id or password' }),
-      };
+      return createBadRequestResponse('Missing id or password');
     }
 
     // Try to find student first
-    let user = await getStudent(id);
-    let role: 'student' | 'teacher' | 'admin' = 'student';
+    let user: StudentRecord | TeacherRecord | undefined = await getStudent(id);
+    let role: UserRole = 'student';
 
     // If not found, try teacher
     if (!user) {
       user = await getTeacher(id);
       if (user) {
-        role = (user as any).is_admin ? 'admin' : 'teacher';
+        role = determineUserRole(user);
       }
     }
 
     // Verify user exists and password matches (plain text comparison)
     if (!user || user.password !== password) {
-      return {
-        statusCode: 401,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-        },
-        body: JSON.stringify({ message: 'Invalid credentials' }),
-      };
+      return createUnauthorizedResponse('Invalid credentials');
     }
 
     // Update last login timestamp
@@ -85,53 +127,15 @@ export const handler = async (
     // Remove password from response
     const { password: _, ...userWithoutPassword } = user;
 
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-      body: JSON.stringify({
-        success: true,
-        user: userWithoutPassword,
-        role,
-      }),
+    const response: LoginResponse = {
+      success: true,
+      user: userWithoutPassword,
+      role,
     };
+
+    return createSuccessResponse(response);
   } catch (error) {
-    console.error('Error:', error);
-    return {
-      statusCode: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-      body: JSON.stringify({ message: 'Internal server error' }),
-    };
+    console.error('Error in login handler:', error);
+    return createInternalErrorResponse(error as Error);
   }
 };
-
-async function getStudent(studentId: string) {
-  const command = new GetCommand({
-    TableName: tableNames.students,
-    Key: { student_id: studentId },
-  });
-
-  const result = await dynamoDBClient.send(command);
-  return result.Item;
-}
-
-async function getTeacher(teacherId: string) {
-  const command = new GetCommand({
-    TableName: tableNames.teachers,
-    Key: { teacher_id: teacherId },
-  });
-
-  const result = await dynamoDBClient.send(command);
-  return result.Item;
-}
-
-async function updateLastLogin(id: string, role: 'student' | 'teacher' | 'admin') {
-  // Implementation would update the last_login timestamp
-  // This is a placeholder for the actual implementation
-  console.log(`Updating last login for ${role} ${id}`);
-}
