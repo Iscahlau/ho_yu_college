@@ -64,16 +64,18 @@ export async function fetchGameById(gameId: string): Promise<ApiResponse<Game>> 
 }
 
 /**
- * Track game click and update student marks
- * @param gameId - The game ID
- * @param studentId - Optional student ID (only for students)
+ * Track game click and update accumulated click count
+ * @param gameId - The game ID to track
+ * @param studentId - Optional student ID for mark tracking
  * @param role - Optional user role ('student' | 'teacher' | 'admin')
+ * @param timeSpent - Optional time spent in seconds (for mark calculation)
  * @returns Response containing updated click count and marks (if student)
  */
 export async function trackGameClick(
   gameId: string,
   studentId?: string,
-  role?: 'student' | 'teacher' | 'admin'
+  role?: 'student' | 'teacher' | 'admin',
+  timeSpent?: number
 ): Promise<ApiResponse<{ accumulated_click: number; marks?: number }>> {
   return api.apiFetch<{ accumulated_click: number; marks?: number }>(
     `${GAMES_ENDPOINT}/${gameId}/click`,
@@ -82,6 +84,7 @@ export async function trackGameClick(
       body: JSON.stringify({
         student_id: studentId,
         role: role,
+        time_spent: timeSpent,
       }),
     }
   );

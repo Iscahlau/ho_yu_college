@@ -156,7 +156,8 @@ All Lambda functions are located in `../backend/lambda/`:
 - **Login**: `POST /auth/login` - Student and teacher authentication
 
 ### Game Management
-- **Game Click**: `POST /games/{gameId}/click` - Track game plays
+- **Game List**: `GET /games` - List all games with pagination
+- **Game Click**: `POST /games/{gameId}/click` - Track game plays and calculate time-based marks
 
 ### Data Download
 - **Download Students**: `GET /students/download` - Export student data to Excel
@@ -175,7 +176,7 @@ Tables are created automatically by `backend/scripts/init-dynamodb.ts`:
 
 - `ho-yu-students`: Student records
 - `ho-yu-teachers`: Teacher records
-- `ho-yu-games`: Game records with click tracking
+- `ho-yu-games`: Game records with click tracking and difficulty-based scoring
 
 ### Production
 Tables are defined in `lib/backend-stack.ts` and created during CDK deployment.

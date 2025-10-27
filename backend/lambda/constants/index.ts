@@ -107,11 +107,22 @@ export const TEACHERS_REQUIRED_HEADERS = ['teacher_id'] as const;
 
 /**
  * Mark values based on game difficulty level
+ * @deprecated Use DIFFICULTY_MULTIPLIERS with time-based calculation instead
  */
 export const MARKS_BY_DIFFICULTY: Record<string, number> = {
   Beginner: 5,
   Intermediate: 10,
   Advanced: 15,
+} as const;
+
+/**
+ * Difficulty multipliers for time-based mark calculation
+ * Formula: Math.ceil(timeInSeconds / 60) * DIFFICULTY_MULTIPLIERS[difficulty]
+ */
+export const DIFFICULTY_MULTIPLIERS: Record<string, number> = {
+  Beginner: 1,
+  Intermediate: 2,
+  Advanced: 3,
 } as const;
 
 // ===== EXCEL COLUMN WIDTHS =====

@@ -16,7 +16,7 @@ import {
   parseRequestBody,
 } from '../utils/response';
 import { createLambdaLogger } from '../utils/logger';
-import { MARKS_BY_DIFFICULTY } from '../constants';
+import { MARKS_BY_DIFFICULTY, DIFFICULTY_MULTIPLIERS } from '../constants';
 import type { ClickRequestBody } from '../types';
 
 export const handler = async (
@@ -67,7 +67,12 @@ export const handler = async (
     // Update student marks if this is a student clicking
     let updatedMarks: number | undefined;
     if (requestBody.student_id && requestBody.role === 'student' && game.difficulty) {
-      updatedMarks = await updateStudentMarks(requestBody.student_id, game.difficulty, logger);
+      updatedMarks = await updateStudentMarks(
+        requestBody.student_id, 
+        game.difficulty, 
+        requestBody.time_spent,
+        logger
+      );
     }
 
     logger.info(
@@ -86,19 +91,58 @@ export const handler = async (
 };
 
 /**
- * Update student marks based on game difficulty
+ * Update student marks based on game difficulty and time spent
+ * Formula: Math.ceil(timeInSeconds / 60) * DIFFICULTY_MULTIPLIERS[difficulty]
+ * Minimum time is 1 minute (if time < 60 seconds, treat as 1 minute)
  */
 const updateStudentMarks = async (
   studentId: string,
   difficulty: string,
+  timeSpent: number | undefined,
   logger: any
 ): Promise<number | undefined> => {
-  const marksToAdd = MARKS_BY_DIFFICULTY[difficulty];
+  // If no time provided, fall back to old method for backward compatibility
+  if (timeSpent === undefined) {
+    const marksToAdd = MARKS_BY_DIFFICULTY[difficulty];
+    if (!marksToAdd) {
+      logger.info({ difficulty }, 'No marks defined for difficulty');
+      return undefined;
+    }
+    
+    try {
+      const studentUpdateCommand = new UpdateCommand({
+        TableName: tableNames.students,
+        Key: { student_id: studentId },
+        UpdateExpression: 'ADD marks :marksIncrement',
+        ExpressionAttributeValues: {
+          ':marksIncrement': marksToAdd,
+        },
+        ReturnValues: 'ALL_NEW',
+      });
 
-  if (!marksToAdd) {
-    logger.info({ difficulty }, 'No marks defined for difficulty');
+      const studentUpdateResult = await dynamoDBClient.send(studentUpdateCommand);
+      logger.info(
+        { studentId, difficulty, marksAdded: marksToAdd, totalMarks: studentUpdateResult.Attributes?.marks },
+        'Student marks updated (legacy method)'
+      );
+      return studentUpdateResult.Attributes?.marks;
+    } catch (error) {
+      logger.error({ studentId, difficulty, error }, 'Failed to update student marks');
+      return undefined;
+    }
+  }
+
+  // New time-based calculation
+  const difficultyMultiplier = DIFFICULTY_MULTIPLIERS[difficulty];
+  
+  if (!difficultyMultiplier) {
+    logger.info({ difficulty }, 'No multiplier defined for difficulty');
     return undefined;
   }
+
+  // Calculate marks: time in minutes (minimum 1) × difficulty multiplier
+  const timeInMinutes = Math.ceil(timeSpent / 60);
+  const marksToAdd = timeInMinutes * difficultyMultiplier;
 
   try {
     const studentUpdateCommand = new UpdateCommand({

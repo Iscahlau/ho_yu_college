@@ -84,11 +84,91 @@ All API calls are centralized in the `services/` directory:
 ### gamesService
 - `fetchGames()` - Get all games
 - `fetchGameById(id)` - Get single game
-- `incrementGameClick(id)` - Update play count
+- `trackGameClick(gameId, studentId?, role?, timeSpent?)` - Track game plays and calculate time-based marks
+- `incrementGameClick(id)` - **Deprecated** - Use trackGameClick instead
 - `fetchScratchProject(id)` - Get Scratch metadata (title, image, description, etc.)
 - `fetchScratchGameName(id)` - Get game title from Scratch API
 - `fetchScratchThumbnail(id)` - Get thumbnail URL from Scratch API
 - `enrichGameWithScratchData(game)` - Enrich game data with Scratch API metadata
+
+## Time-Based Scoring System
+
+The game page implements a sophisticated time-based scoring system that tracks student play time and calculates marks when they leave the page.
+
+### How It Works
+
+1. **Timer Starts**: When a student loads a game page, timing begins automatically
+2. **Background Tracking**: Play time accumulates while the student interacts with the game
+3. **Score Calculation**: Marks are calculated and submitted when the student leaves the page
+4. **Multiple Triggers**: Score submission is triggered by:
+   - Browser close/refresh (`beforeunload` event)
+   - Tab switching (`visibilitychange` event) 
+   - Navigation to different page (component unmount)
+
+### Scoring Formula
+
+```typescript
+const timeInMinutes = Math.ceil(timeSpent / 60); // Minimum 1 minute
+const marksToAdd = timeInMinutes * DIFFICULTY_MULTIPLIERS[difficulty];
+
+// Difficulty Multipliers:
+// - Beginner: ×1
+// - Intermediate: ×2  
+// - Advanced: ×3
+```
+
+### Implementation Details
+
+```typescript
+// State management
+const [gameStartTime, setGameStartTime] = useState<number | null>(null);
+const [timeSubmitted, setTimeSubmitted] = useState(false);
+
+// Start timing when game loads
+useEffect(() => {
+  if (foundGame && !gameStartTime) {
+    setGameStartTime(Date.now());
+  }
+}, [gameId, games, gameStartTime]);
+
+// Submit score when user leaves
+useEffect(() => {
+  const submitTimeScore = async () => {
+    if (!gameInfo || !gameStartTime || timeSubmitted || user?.role !== 'student') {
+      return;
+    }
+    
+    const timeSpent = Math.floor((Date.now() - gameStartTime) / 1000);
+    if (timeSpent >= 30) { // Minimum 30 seconds
+      await trackGameClick(gameInfo.gameId, user?.id, user?.role, timeSpent);
+    }
+  };
+  
+  // Event listeners for page leave detection
+  window.addEventListener('beforeunload', handleBeforeUnload);
+  window.addEventListener('visibilitychange', handleVisibilityChange);
+  
+  return () => {
+    // Submit final score on component unmount
+    submitTimeScore();
+  };
+}, [gameInfo, gameStartTime, timeSubmitted, user, dispatch]);
+```
+
+### Reliable Submission
+
+For browser close/refresh scenarios, the system uses `navigator.sendBeacon()` to ensure reliable score submission even when the page is unloading:
+
+```typescript
+const success = navigator.sendBeacon(
+  `${API_BASE_URL}/games/${gameInfo.gameId}/click`,
+  JSON.stringify({
+    student_id: user?.id,
+    role: user?.role,
+    time_spent: timeSpent,
+  })
+);
+```
 
 ## Environment Variables
 

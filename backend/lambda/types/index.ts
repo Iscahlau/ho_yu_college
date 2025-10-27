@@ -80,6 +80,7 @@ export interface LoginResponse {
 export interface ClickRequestBody {
   student_id?: string;
   role?: 'student' | 'teacher' | 'admin';
+  time_spent?: number; // Time spent in seconds
 }
 
 /**

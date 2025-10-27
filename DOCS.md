@@ -8,6 +8,7 @@
 
 - **[README.md](README.md)** - Project overview, quick start, and installation
 - **[API.md](API.md)** - Complete REST API reference with all endpoints
+- **[CHANGELOG.md](CHANGELOG.md)** - Version history and feature updates
 - **[DOCS.md](DOCS.md)** - This file - central documentation index
 
 ### Specialized Documentation (docs/)
@@ -203,7 +204,7 @@ Complete reference in [API.md](API.md)
   game_name: string;
   scratch_api: string;     // Full Scratch project URL
   description?: string;
-  difficulty: "easy" | "medium" | "hard";
+  difficulty: "Beginner" | "Intermediate" | "Advanced";
   class?: string;
   clicks: number;          // Total play count
   created_at: string;
@@ -466,13 +467,20 @@ Follow principles from [Clean Code TypeScript](https://github.com/labs42io/clean
 - Display game info (title, thumbnail, description, author)
 - Responsive iframe sizing (485:402 aspect ratio)
 
-### 2. Click Tracking
-- Atomic increment operations (concurrent-safe)
-- Per-game click counter
-- Student marks based on difficulty:
-  - Easy: +5 marks
-  - Medium: +10 marks
-  - Hard: +15 marks
+### 2. Time-Based Scoring & Click Tracking
+- **Atomic increment operations** (concurrent-safe)
+- **Per-game click counter** for engagement statistics
+- **Time-based scoring system** for students:
+  - **Formula**: `Math.ceil(timeInSeconds / 60) × difficultyMultiplier`
+  - **Difficulty Multipliers**: 
+    - Beginner: ×1
+    - Intermediate: ×2
+    - Advanced: ×3
+  - **Minimum time**: 1 minute (times <60s treated as 1 minute)
+  - **Scoring trigger**: When student leaves the game page
+  - **Examples**: 
+    - 15 minutes Intermediate = 15 × 2 = 30 marks
+    - 10m 10s Beginner = 11 × 1 = 11 marks
 
 ### 3. Excel Upload/Download
 - Support for .xlsx, .xls, .csv formats

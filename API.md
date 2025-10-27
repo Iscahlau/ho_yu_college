@@ -88,7 +88,7 @@ Retrieve a list of all games with optional pagination.
         "game_name": "string",
         "scratch_api": "string",        // Scratch project URL
         "description": "string",
-        "difficulty": "easy" | "medium" | "hard",
+        "difficulty": "Beginner" | "Intermediate" | "Advanced",
         "class": "string",              // target class
         "clicks": number,               // total click count
         "created_at": "ISO8601 timestamp",
@@ -116,7 +116,7 @@ curl "http://localhost:3000/games?limit=10&lastKey=<encoded_key>"
 
 #### POST `/games/{gameId}/click`
 
-Record a click (play) event for a specific game. Atomically increments the click counter.
+Record a click (play) event for a specific game and calculate time-based marks for students. Atomically increments the click counter and awards marks based on play time and difficulty.
 
 **Path Parameters:**
 - `gameId`: The game identifier
@@ -124,8 +124,9 @@ Record a click (play) event for a specific game. Atomically increments the click
 **Request Body:**
 ```json
 {
-  "userId": "string",              // student_id or teacher_id
-  "timestamp": "ISO8601 timestamp" // optional, defaults to server time
+  "student_id": "string",          // optional, student identifier for mark tracking
+  "role": "student|teacher|admin", // optional, user role
+  "time_spent": number            // optional, time spent in seconds (for mark calculation)
 }
 ```
 
@@ -134,9 +135,8 @@ Record a click (play) event for a specific game. Atomically increments the click
 {
   "success": true,
   "data": {
-    "gameId": "string",
-    "clicks": number,               // updated click count
-    "message": "Click recorded successfully"
+    "accumulated_click": number,    // updated click count
+    "marks": number                // updated total marks (students only, when time_spent provided)
   }
 }
 ```
@@ -146,13 +146,34 @@ Record a click (play) event for a specific game. Atomically increments the click
 - `404 Not Found`: Game not found
 - `500 Internal Server Error`: Server error
 
-**Example:**
+**Mark Calculation:**
+When `time_spent` is provided for students, marks are calculated using:
+```
+Time in Minutes (minimum 1) × Difficulty Multiplier
+- Beginner: ×1
+- Intermediate: ×2  
+- Advanced: ×3
+```
+
+**Examples:**
 ```bash
+# Initial game click (no marks calculation)
 curl -X POST http://localhost:3000/games/1168960672/click \
   -H "Content-Type: application/json" \
   -d '{
-    "userId": "S001"
+    "student_id": "STU001",
+    "role": "student"
   }'
+
+# Time-based score submission (when student leaves page)
+curl -X POST http://localhost:3000/games/1168960672/click \
+  -H "Content-Type: application/json" \
+  -d '{
+    "student_id": "STU001", 
+    "role": "student",
+    "time_spent": 900
+  }'
+# Result: 15 minutes × 2 (Intermediate) = 30 marks
 ```
 
 ---
@@ -217,7 +238,7 @@ Download all game records as an Excel file.
 - `game_name`: Game name
 - `scratch_api`: Full Scratch project URL
 - `description`: Game description
-- `difficulty`: Difficulty level (easy/medium/hard)
+- `difficulty`: Difficulty level (Beginner/Intermediate/Advanced)
 - `class`: Target class
 - `clicks`: Total click count
 - `created_at`: Record creation timestamp
@@ -350,7 +371,7 @@ Upload game data from an Excel or CSV file.
 - `game_name` (required): Game name/title
 - `scratch_api` (required): Full Scratch project URL (e.g., `https://scratch.mit.edu/projects/1168960672`)
 - `description` (optional): Game description
-- `difficulty` (optional): "easy", "medium", or "hard" (defaults to "medium")
+- `difficulty` (optional): "Beginner", "Intermediate", or "Advanced" (defaults to "Intermediate")
 - `class` (optional): Target class for the game
 
 **Important:** The `game_id` must match the last segment of the `scratch_api` URL. For example:
@@ -388,8 +409,8 @@ curl -X POST http://localhost:3000/upload/games \
 ```
 game_id      | game_name           | scratch_api                                      | difficulty | class | description
 -------------|---------------------|--------------------------------------------------|------------|-------|------------------
-1168960672   | Castle Defender     | https://scratch.mit.edu/projects/1168960672      | medium     | 1A    | Defend your castle
-60917032     | Space Adventure     | https://scratch.mit.edu/projects/60917032        | easy       | 1B    | Explore space
+1168960672   | Castle Defender     | https://scratch.mit.edu/projects/1168960672      | Intermediate | 1A    | Defend your castle
+60917032     | Space Adventure     | https://scratch.mit.edu/projects/60917032        | Beginner     | 1B    | Explore space
 ```
 
 ---
@@ -452,7 +473,7 @@ All error responses follow this format:
   game_name: string;
   scratch_api: string;       // Full Scratch project URL
   description?: string;
-  difficulty: "easy" | "medium" | "hard";
+  difficulty: "Beginner" | "Intermediate" | "Advanced";
   class?: string;            // Target class
   clicks: number;            // Default: 0
   created_at: string;        // ISO8601 timestamp
