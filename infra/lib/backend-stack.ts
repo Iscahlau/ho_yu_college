@@ -83,12 +83,44 @@ export class BackendStack extends cdk.Stack {
       },
     });
 
+    // Lambda function for authentication/login
+    const loginLambda = new lambda.Function(this, 'LoginFunction', {
+      functionName: 'ho-yu-login',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'auth/login.handler',
+      code: lambda.Code.fromAsset('../backend/build/lambda'),
+      environment: {
+        STUDENTS_TABLE_NAME: studentsTable.tableName,
+        TEACHERS_TABLE_NAME: teachersTable.tableName,
+      },
+      timeout: cdk.Duration.seconds(10),
+    });
+
+    // Grant login Lambda permissions to read students and teachers tables
+    studentsTable.grantReadData(loginLambda);
+    teachersTable.grantReadData(loginLambda);
+
+    // Lambda function for listing games
+    const listGamesLambda = new lambda.Function(this, 'ListGamesFunction', {
+      functionName: 'ho-yu-list-games',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'games/list.handler',
+      code: lambda.Code.fromAsset('../backend/build/lambda'),
+      environment: {
+        GAMES_TABLE_NAME: gamesTable.tableName,
+      },
+      timeout: cdk.Duration.seconds(10),
+    });
+
+    // Grant list games Lambda permission to read games table
+    gamesTable.grantReadData(listGamesLambda);
+
     // Lambda function for game click tracking
     const gameClickLambda = new lambda.Function(this, 'GameClickFunction', {
       functionName: 'ho-yu-game-click',
       runtime: lambda.Runtime.NODEJS_20_X,
-      handler: 'click.handler',
-      code: lambda.Code.fromAsset('../backend/lambda/games'),
+      handler: 'games/click.handler',
+      code: lambda.Code.fromAsset('../backend/build/lambda'),
       environment: {
         GAMES_TABLE_NAME: gamesTable.tableName,
         STUDENTS_TABLE_NAME: studentsTable.tableName,
@@ -100,8 +132,132 @@ export class BackendStack extends cdk.Stack {
     gamesTable.grantReadWriteData(gameClickLambda);
     studentsTable.grantReadWriteData(gameClickLambda);
 
+    // Lambda function for downloading students
+    const downloadStudentsLambda = new lambda.Function(this, 'DownloadStudentsFunction', {
+      functionName: 'ho-yu-download-students',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'download/students.handler',
+      code: lambda.Code.fromAsset('../backend/build/lambda'),
+      environment: {
+        STUDENTS_TABLE_NAME: studentsTable.tableName,
+      },
+      timeout: cdk.Duration.seconds(30),
+    });
+
+    // Grant download students Lambda permission to read students table
+    studentsTable.grantReadData(downloadStudentsLambda);
+
+    // Lambda function for downloading teachers
+    const downloadTeachersLambda = new lambda.Function(this, 'DownloadTeachersFunction', {
+      functionName: 'ho-yu-download-teachers',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'download/teachers.handler',
+      code: lambda.Code.fromAsset('../backend/build/lambda'),
+      environment: {
+        TEACHERS_TABLE_NAME: teachersTable.tableName,
+      },
+      timeout: cdk.Duration.seconds(30),
+    });
+
+    // Grant download teachers Lambda permission to read teachers table
+    teachersTable.grantReadData(downloadTeachersLambda);
+
+    // Lambda function for downloading games
+    const downloadGamesLambda = new lambda.Function(this, 'DownloadGamesFunction', {
+      functionName: 'ho-yu-download-games',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'download/games.handler',
+      code: lambda.Code.fromAsset('../backend/build/lambda'),
+      environment: {
+        GAMES_TABLE_NAME: gamesTable.tableName,
+      },
+      timeout: cdk.Duration.seconds(30),
+    });
+
+    // Grant download games Lambda permission to read games table
+    gamesTable.grantReadData(downloadGamesLambda);
+
+    // Lambda function for uploading students
+    const uploadStudentsLambda = new lambda.Function(this, 'UploadStudentsFunction', {
+      functionName: 'ho-yu-upload-students',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'upload/students.handler',
+      code: lambda.Code.fromAsset('../backend/build/lambda'),
+      environment: {
+        STUDENTS_TABLE_NAME: studentsTable.tableName,
+        TEACHERS_TABLE_NAME: teachersTable.tableName,
+      },
+      timeout: cdk.Duration.minutes(5),
+    });
+
+    // Grant upload students Lambda permissions to read/write students and teachers tables
+    studentsTable.grantReadWriteData(uploadStudentsLambda);
+    teachersTable.grantReadData(uploadStudentsLambda);
+
+    // Lambda function for uploading teachers
+    const uploadTeachersLambda = new lambda.Function(this, 'UploadTeachersFunction', {
+      functionName: 'ho-yu-upload-teachers',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'upload/teachers.handler',
+      code: lambda.Code.fromAsset('../backend/build/lambda'),
+      environment: {
+        TEACHERS_TABLE_NAME: teachersTable.tableName,
+      },
+      timeout: cdk.Duration.minutes(5),
+    });
+
+    // Grant upload teachers Lambda permission to read/write teachers table
+    teachersTable.grantReadWriteData(uploadTeachersLambda);
+
+    // Lambda function for uploading games
+    const uploadGamesLambda = new lambda.Function(this, 'UploadGamesFunction', {
+      functionName: 'ho-yu-upload-games',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'upload/games.handler',
+      code: lambda.Code.fromAsset('../backend/build/lambda'),
+      environment: {
+        GAMES_TABLE_NAME: gamesTable.tableName,
+        STUDENTS_TABLE_NAME: studentsTable.tableName,
+        TEACHERS_TABLE_NAME: teachersTable.tableName,
+      },
+      timeout: cdk.Duration.minutes(5),
+    });
+
+    // Grant upload games Lambda permissions to read/write games table and read students/teachers tables
+    gamesTable.grantReadWriteData(uploadGamesLambda);
+    studentsTable.grantReadData(uploadGamesLambda);
+    teachersTable.grantReadData(uploadGamesLambda);
+
     // API Gateway resources and methods
+
+    // Auth resource
+    const authResource = api.root.addResource('auth');
+    
+    // POST /auth/login - User authentication
+    authResource.addResource('login').addMethod(
+      'POST',
+      new apigateway.LambdaIntegration(loginLambda)
+    );
+
+    // Games resource
     const gamesResource = api.root.addResource('games');
+    
+    // GET /games - List all games
+    gamesResource.addMethod(
+      'GET',
+      new apigateway.LambdaIntegration(listGamesLambda)
+    );
+
+    // Games download resource
+    const gamesDownloadResource = gamesResource.addResource('download');
+    
+    // GET /games/download - Download games as Excel
+    gamesDownloadResource.addMethod(
+      'GET',
+      new apigateway.LambdaIntegration(downloadGamesLambda)
+    );
+
+    // Game click tracking
     const gameResource = gamesResource.addResource('{gameId}');
     const clickResource = gameResource.addResource('click');
 
@@ -109,6 +265,60 @@ export class BackendStack extends cdk.Stack {
     clickResource.addMethod(
       'POST',
       new apigateway.LambdaIntegration(gameClickLambda)
+    );
+
+    // Students resource
+    const studentsResource = api.root.addResource('students');
+    
+    // Students download resource
+    const studentsDownloadResource = studentsResource.addResource('download');
+    
+    // GET /students/download - Download students as Excel
+    studentsDownloadResource.addMethod(
+      'GET',
+      new apigateway.LambdaIntegration(downloadStudentsLambda)
+    );
+
+    // Teachers resource
+    const teachersResource = api.root.addResource('teachers');
+    
+    // Teachers download resource
+    const teachersDownloadResource = teachersResource.addResource('download');
+    
+    // GET /teachers/download - Download teachers as Excel
+    teachersDownloadResource.addMethod(
+      'GET',
+      new apigateway.LambdaIntegration(downloadTeachersLambda)
+    );
+
+    // Upload resource
+    const uploadResource = api.root.addResource('upload');
+
+    // Upload students
+    const uploadStudentsResource = uploadResource.addResource('students');
+    
+    // POST /upload/students - Upload students Excel file
+    uploadStudentsResource.addMethod(
+      'POST',
+      new apigateway.LambdaIntegration(uploadStudentsLambda)
+    );
+
+    // Upload teachers
+    const uploadTeachersResource = uploadResource.addResource('teachers');
+    
+    // POST /upload/teachers - Upload teachers Excel file
+    uploadTeachersResource.addMethod(
+      'POST',
+      new apigateway.LambdaIntegration(uploadTeachersLambda)
+    );
+
+    // Upload games
+    const uploadGamesResource = uploadResource.addResource('games');
+    
+    // POST /upload/games - Upload games Excel file
+    uploadGamesResource.addMethod(
+      'POST',
+      new apigateway.LambdaIntegration(uploadGamesLambda)
     );
 
     // Store API URL for later use
