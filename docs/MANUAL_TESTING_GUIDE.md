@@ -364,6 +364,76 @@ curl -X POST http://localhost:3000/upload/games \
 
 5. **Verify click count is still 11** (not reset to 10)
 
+### Time-Based Scoring Testing
+
+**Test the new time-based scoring system:**
+
+1. **Initial Game Click (No Time)**:
+```bash
+# Track initial click without time calculation
+curl -X POST http://localhost:3000/games/1168960672/click \
+  -H "Content-Type: application/json" \
+  -d '{
+    "student_id": "STU001",
+    "role": "student"
+  }'
+```
+**Expected**: Click count incremented, no marks added (backward compatibility)
+
+2. **Time-Based Score Submission**:
+```bash
+# Submit time-based score (15 minutes = 900 seconds)
+curl -X POST http://localhost:3000/games/1168960672/click \
+  -H "Content-Type: application/json" \
+  -d '{
+    "student_id": "STU001",
+    "role": "student", 
+    "time_spent": 900
+  }'
+```
+**Expected Response** (for Intermediate difficulty game):
+```json
+{
+  "success": true,
+  "data": {
+    "accumulated_click": 2,
+    "marks": 180  // Updated total marks for student
+  }
+}
+```
+**Calculation**: 900 seconds = 15 minutes × 2 (Intermediate) = 30 marks added
+
+3. **Test Minimum Time Rule**:
+```bash
+# Test <1 minute (30 seconds)
+curl -X POST http://localhost:3000/games/1207260630/click \
+  -H "Content-Type: application/json" \
+  -d '{
+    "student_id": "STU001",
+    "role": "student",
+    "time_spent": 30
+  }'
+```
+**Expected**: 1 minute × 1 (Beginner) = 1 mark added
+
+4. **Verify in DynamoDB**:
+   - Check `ho-yu-students` table
+   - Verify `STU001` marks increased correctly
+   - Check `ho-yu-games` table for updated click counts
+
+5. **Test Different Difficulty Multipliers**:
+```bash
+# Beginner (×1): 10m 10s = 11 minutes × 1 = 11 marks
+curl -X POST http://localhost:3000/games/1207260630/click \
+  -H "Content-Type: application/json" \
+  -d '{"student_id": "STU002", "role": "student", "time_spent": 610}'
+
+# Advanced (×3): 5 minutes × 3 = 15 marks  
+curl -X POST http://localhost:3000/games/1209989820/click \
+  -H "Content-Type: application/json" \
+  -d '{"student_id": "STU003", "role": "student", "time_spent": 300}'
+```
+
 ## Troubleshooting
 
 ### Upload Returns 500 Error
