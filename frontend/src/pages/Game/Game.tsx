@@ -20,7 +20,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
  * The game is identified by the gameId parameter in the URL route (/game/:gameId)
  * 
  * Usage:
- * - Navigate to /game/{scratchId} where {scratchId} is the Scratch project ID
+ * - Navigate to /game/{gameId} where {gameId} is the Scratch project ID
  * - Example: /game/123456789 will embed https://scratch.mit.edu/projects/123456789/embed
  */
 function GamePage() {
@@ -52,14 +52,12 @@ function GamePage() {
     loadGames();
   }, [games.length, dispatch]);
 
-  // Find game information from Redux store by matching scratchId
+  // Find game information from Redux store by matching gameId
   useEffect(() => {
     if (gameId && games.length > 0) {
       const foundGame = games.find(game => {
-        // Extract scratchId from scratch_api URL
-        const scratchIdMatch = game.scratchApi.match(/\/projects\/(\d+)/);
-        const scratchId = scratchIdMatch ? scratchIdMatch[1] : game.scratchId;
-        return scratchId === gameId;
+        // Use gameId directly (it contains the Scratch project ID)
+        return game.gameId === gameId;
       });
       setGameInfo(foundGame || null);
       
@@ -251,10 +249,10 @@ function GamePage() {
             <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
               <Box>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                  Subject
+                    {t('homepage.filters.subject')}
                 </Typography>
                 <Chip 
-                  label={t(`homepage.subjects.${gameInfo.subject}`)} 
+                  label={t(`homepage.subjects.${gameInfo.subject}`)}
                   color="primary"
                   variant="outlined"
                 />
@@ -262,7 +260,7 @@ function GamePage() {
               
               <Box>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                  Difficulty
+                    {t('homepage.filters.difficulty')}
                 </Typography>
                 <Chip 
                   label={t(`homepage.difficulties.${gameInfo.difficulty}`)} 

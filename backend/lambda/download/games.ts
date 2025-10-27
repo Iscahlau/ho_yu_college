@@ -45,7 +45,6 @@ export const handler = async (
       difficulty: game.difficulty,
       teacher_id: game.teacher_id,
       last_update: game.last_update,
-      scratch_id: game.scratch_id,
       scratch_api: game.scratch_api,
       accumulated_click: game.accumulated_click,
       description: game.description || '',

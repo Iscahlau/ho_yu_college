@@ -253,7 +253,6 @@ export const GAME_SCHEMA_MAPPING = {
   difficulty: { type: 'string', required: false, description: 'Difficulty level (Beginner/Intermediate/Advanced)' },
   teacher_id: { type: 'string', required: false, description: 'Associated teacher ID' },
   last_update: { type: 'date', required: false, description: 'Last update timestamp' },
-  scratch_id: { type: 'string', required: false, description: 'Scratch project ID' },
   scratch_api: { type: 'string', required: false, description: 'Scratch project URL' },
   accumulated_click: { type: 'number', required: false, description: 'Total click count (preserved on update)' },
   created_at: { type: 'date', required: false, description: 'Record creation timestamp (auto-generated)' },

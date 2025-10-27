@@ -21,7 +21,6 @@ function transformGameData(apiGame: any): Game {
     difficulty: apiGame.difficulty,
     teacherId: apiGame.teacher_id,
     lastUpdate: apiGame.last_update,
-    scratchId: apiGame.scratch_id,
     scratchApi: apiGame.scratch_api,
     accumulatedClick: apiGame.accumulated_click,
     description: apiGame.description,
@@ -161,9 +160,9 @@ export async function fetchScratchThumbnail(scratchId: string): Promise<string |
  * const enrichedGame = await enrichGameWithScratchData(game);
  */
 export async function enrichGameWithScratchData(game: Game): Promise<Game> {
-  // Extract Scratch ID from game
+  // Extract Scratch ID from game (use gameId which should match the Scratch project ID)
   const scratchIdMatch = game.scratchApi.match(/\/projects\/(\d+)/);
-  const scratchId = scratchIdMatch ? scratchIdMatch[1] : game.scratchId;
+  const scratchId = scratchIdMatch ? scratchIdMatch[1] : game.gameId;
   
   if (!scratchId) {
     return game;

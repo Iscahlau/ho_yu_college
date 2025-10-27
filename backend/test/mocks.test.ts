@@ -166,7 +166,6 @@ describe('Mock Games Data', () => {
       expect(game).toHaveProperty('difficulty');
       expect(game).toHaveProperty('teacher_id');
       expect(game).toHaveProperty('last_update');
-      expect(game).toHaveProperty('scratch_id');
       expect(game).toHaveProperty('scratch_api');
       expect(game).toHaveProperty('accumulated_click');
     });
@@ -218,12 +217,6 @@ describe('Mock Games Data', () => {
   test('accumulated_click should be non-negative', () => {
     mockGames.forEach((game: any) => {
       expect(game.accumulated_click).toBeGreaterThanOrEqual(0);
-    });
-  });
-
-  test('scratch_id should be numeric string', () => {
-    mockGames.forEach((game: any) => {
-      expect(game.scratch_id).toMatch(/^\d+$/);
     });
   });
 

@@ -11,7 +11,6 @@ export interface Game {
   difficulty: Difficulty;
   teacherId: string;
   lastUpdate: string;
-  scratchId: string;
   scratchApi: string;
   accumulatedClick: number;
   description?: string;

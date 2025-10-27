@@ -87,7 +87,7 @@ describe('Games Upload Handler - Create and Update Tests', () => {
     test('should successfully create a new game record when game_id does not exist', async () => {
       // Prepare test data
       const worksheetData = [
-        ['game_id', 'game_name', 'student_id', 'subject', 'difficulty', 'teacher_id', 'scratch_id', 'scratch_api', 'accumulated_click', 'description'],
+        ['game_id', 'game_name', 'student_id', 'subject', 'difficulty', 'teacher_id', 'scratch_api', 'accumulated_click', 'description'],
         ['GAME001', 'Math Adventure', 'STU001', 'Mathematics', 'Easy', 'TCH001', 'scratch123', 'https://scratch.mit.edu/projects/123', 0, 'A fun math game'],
       ];
 
@@ -135,7 +135,7 @@ describe('Games Upload Handler - Create and Update Tests', () => {
     test('should create multiple new game records in batch', async () => {
       // Prepare test data with 3 new games
       const worksheetData = [
-        ['game_id', 'game_name', 'student_id', 'subject', 'difficulty', 'teacher_id', 'scratch_id', 'scratch_api', 'accumulated_click', 'description'],
+        ['game_id', 'game_name', 'student_id', 'subject', 'difficulty', 'teacher_id', 'scratch_api', 'accumulated_click', 'description'],
         ['GAME001', 'Math Adventure', 'STU001', 'Mathematics', 'Easy', 'TCH001', 'scratch123', 'https://scratch.mit.edu/projects/123', 0, 'Math game'],
         ['GAME002', 'Science Quest', 'STU002', 'Science', 'Medium', 'TCH002', 'scratch456', 'https://scratch.mit.edu/projects/456', 5, 'Science game'],
         ['GAME003', 'English Challenge', 'STU003', 'English', 'Hard', 'TCH003', 'scratch789', 'https://scratch.mit.edu/projects/789', 10, 'English game'],
@@ -180,7 +180,7 @@ describe('Games Upload Handler - Create and Update Tests', () => {
     test('should successfully update an existing game record when game_id exists', async () => {
       // Prepare test data
       const worksheetData = [
-        ['game_id', 'game_name', 'student_id', 'subject', 'difficulty', 'teacher_id', 'scratch_id', 'scratch_api', 'accumulated_click', 'description'],
+        ['game_id', 'game_name', 'student_id', 'subject', 'difficulty', 'teacher_id', 'scratch_api', 'accumulated_click', 'description'],
         ['GAME001', 'Math Adventure Updated', 'STU001', 'Mathematics', 'Medium', 'TCH001', 'scratch123', 'https://scratch.mit.edu/projects/123', 15, 'Updated math game'],
       ];
 
@@ -194,7 +194,6 @@ describe('Games Upload Handler - Create and Update Tests', () => {
         subject: 'Mathematics',
         difficulty: 'Easy',
         teacher_id: 'TCH001',
-        scratch_id: 'scratch123',
         scratch_api: 'https://scratch.mit.edu/projects/123',
         accumulated_click: 10, // Should be preserved
         description: 'A fun math game',
@@ -239,7 +238,7 @@ describe('Games Upload Handler - Create and Update Tests', () => {
     test('should preserve accumulated_click when updating existing record', async () => {
       // Prepare test data
       const worksheetData = [
-        ['game_id', 'game_name', 'student_id', 'subject', 'difficulty', 'teacher_id', 'scratch_id', 'scratch_api', 'accumulated_click', 'description'],
+        ['game_id', 'game_name', 'student_id', 'subject', 'difficulty', 'teacher_id', 'scratch_api', 'accumulated_click', 'description'],
         ['GAME001', 'Updated Game', 'STU001', 'Math', 'Easy', 'TCH001', 'scratch123', 'https://scratch.mit.edu/projects/123', 999, 'Should be ignored'],
       ];
 
@@ -253,7 +252,6 @@ describe('Games Upload Handler - Create and Update Tests', () => {
         subject: 'Math',
         difficulty: 'Easy',
         teacher_id: 'TCH001',
-        scratch_id: 'scratch123',
         scratch_api: 'https://scratch.mit.edu/projects/123',
         accumulated_click: 50, // Should be preserved
         description: 'Original',
@@ -315,7 +313,7 @@ describe('Games Upload Handler - Create and Update Tests', () => {
     test('should handle both creating new records and updating existing ones in same upload', async () => {
       // Prepare test data with mix of new and existing games
       const worksheetData = [
-        ['game_id', 'game_name', 'student_id', 'subject', 'difficulty', 'teacher_id', 'scratch_id', 'scratch_api', 'accumulated_click', 'description'],
+        ['game_id', 'game_name', 'student_id', 'subject', 'difficulty', 'teacher_id', 'scratch_api', 'accumulated_click', 'description'],
         ['GAME001', 'Existing Game Updated', 'STU001', 'Math', 'Easy', 'TCH001', 'scratch123', 'https://scratch.mit.edu/projects/123', 0, 'Updated'],
         ['GAME002', 'New Game', 'STU002', 'Science', 'Medium', 'TCH002', 'scratch456', 'https://scratch.mit.edu/projects/456', 0, 'New'],
         ['GAME003', 'Another Existing Updated', 'STU003', 'English', 'Hard', 'TCH003', 'scratch789', 'https://scratch.mit.edu/projects/789', 0, 'Updated'],
@@ -332,7 +330,6 @@ describe('Games Upload Handler - Create and Update Tests', () => {
           subject: 'Math',
           difficulty: 'Easy',
           teacher_id: 'TCH001',
-          scratch_id: 'scratch123',
           scratch_api: 'https://scratch.mit.edu/projects/123',
           accumulated_click: 25,
           description: 'Original',
@@ -347,7 +344,6 @@ describe('Games Upload Handler - Create and Update Tests', () => {
           subject: 'English',
           difficulty: 'Medium',
           teacher_id: 'TCH003',
-          scratch_id: 'scratch789',
           scratch_api: 'https://scratch.mit.edu/projects/789',
           accumulated_click: 15,
           description: 'Original',
@@ -451,7 +447,6 @@ describe('Games Upload Handler - Create and Update Tests', () => {
           subject: 'Mathematics',
           difficulty: 'Beginner',
           teacher_id: 'TCH002',
-          scratch_id: '567894321',
           scratch_api: 'https://scratch.mit.edu/projects/1144750634',
           accumulated_click: 50,
           description: 'Old description',
@@ -466,7 +461,6 @@ describe('Games Upload Handler - Create and Update Tests', () => {
           subject: 'Science',
           difficulty: 'Beginner',
           teacher_id: 'TCH003',
-          scratch_id: '012349876',
           scratch_api: 'https://scratch.mit.edu/projects/1168960672',
           accumulated_click: 100,
           description: 'Old description',
@@ -481,7 +475,6 @@ describe('Games Upload Handler - Create and Update Tests', () => {
           subject: 'English',
           difficulty: 'Beginner',
           teacher_id: 'TCH002',
-          scratch_id: '678901234',
           scratch_api: 'https://scratch.mit.edu/projects/1225100628',
           accumulated_click: 10,
           description: 'Old description',
@@ -496,7 +489,6 @@ describe('Games Upload Handler - Create and Update Tests', () => {
           subject: 'Geography',
           difficulty: 'Beginner',
           teacher_id: 'TCH001',
-          scratch_id: '890123456',
           scratch_api: 'https://scratch.mit.edu/projects/1225346166',
           accumulated_click: 45,
           description: 'Old description',
@@ -511,7 +503,6 @@ describe('Games Upload Handler - Create and Update Tests', () => {
           subject: 'Science',
           difficulty: 'Advanced',
           teacher_id: 'TCH002',
-          scratch_id: '456789012',
           scratch_api: 'https://scratch.mit.edu/projects/624682780',
           accumulated_click: 60,
           description: 'Old description',

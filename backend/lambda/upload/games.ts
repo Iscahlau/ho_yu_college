@@ -45,13 +45,12 @@ import type {
 /**
  * Checks if game data has changed
  */
-const hasGameDataChanged = (newGame: GameRecord, existingGame: GameRecord): boolean =>
+const hasGameChanged = (newGame: GameRecord, existingGame: GameRecord): boolean =>
     newGame.game_name !== existingGame.game_name ||
     newGame.student_id !== existingGame.student_id ||
     newGame.subject !== existingGame.subject ||
     newGame.difficulty !== existingGame.difficulty ||
     newGame.teacher_id !== existingGame.teacher_id ||
-    newGame.scratch_id !== existingGame.scratch_id ||
     newGame.scratch_api !== existingGame.scratch_api ||
     newGame.description !== existingGame.description;
 
@@ -71,7 +70,6 @@ const createGameRecord = (
         difficulty: record.difficulty ?? '',
         teacher_id: record.teacher_id ?? '',
         last_update: now,
-        scratch_id: record.scratch_id ?? '',
         scratch_api: record.scratch_api ?? '',
         accumulated_click: existingRecord?.accumulated_click ??
             (typeof record.accumulated_click === 'number' ? record.accumulated_click : 0),
@@ -81,7 +79,7 @@ const createGameRecord = (
     };
 
     // Only update timestamps if there are actual changes
-    if (existingRecord && !hasGameDataChanged(gameRecord, existingRecord)) {
+    if (existingRecord && !hasGameChanged(gameRecord, existingRecord)) {
         gameRecord.last_update = existingRecord.last_update;
         gameRecord.updated_at = existingRecord.updated_at;
     }

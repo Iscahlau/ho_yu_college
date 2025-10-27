@@ -54,7 +54,6 @@ export const GAMES_EXPECTED_HEADERS = [
   'subject',
   'difficulty',
   'teacher_id',
-  'scratch_id',
   'scratch_api',
   'accumulated_click',
   'description',
@@ -138,7 +137,6 @@ export const GAMES_COLUMN_WIDTHS = [
   { wch: 15 }, // difficulty
   { wch: 12 }, // teacher_id
   { wch: 20 }, // last_update
-  { wch: 15 }, // scratch_id
   { wch: 40 }, // scratch_api
   { wch: 15 }, // accumulated_click
   { wch: 50 }, // description

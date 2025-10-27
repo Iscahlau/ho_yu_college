@@ -96,11 +96,8 @@ function Homepage() {
     }) : filteredGames;
 
     const handleGameClick = (game: Game) => {
-        // Extract Scratch project ID from scratch_api URL
-        // Format: https://scratch.mit.edu/projects/{scratchId}
-        const scratchIdMatch = game.scratchApi.match(/\/projects\/(\d+)/);
-        const scratchId = scratchIdMatch ? scratchIdMatch[1] : game.scratchId;
-        navigate(`/game/${scratchId}`);
+        // Use gameId directly (it contains the Scratch project ID)
+        navigate(`/game/${game.gameId}`);
     };
 
     return (
@@ -165,10 +162,8 @@ function Homepage() {
                             <Box sx={{p: 4}}>
                                 <Grid container spacing={3}>
                                     {displayGames.map((game: Game) => {
-                                        // Extract Scratch ID for fallback thumbnail
-                                        const scratchIdMatch = game.scratchApi.match(/\/projects\/(\d+)/);
-                                        const scratchId = scratchIdMatch ? scratchIdMatch[1] : game.scratchId;
-                                        const fallbackThumbnail = getDefaultScratchThumbnail(scratchId);
+                                        // Use gameId for fallback thumbnail (it contains the Scratch project ID)
+                                        const fallbackThumbnail = getDefaultScratchThumbnail(game.gameId);
 
                                         return (
                                             <Grid size={{xs: 12, sm: 6, md: 3}} key={game.gameId}>

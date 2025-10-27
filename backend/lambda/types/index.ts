@@ -16,7 +16,6 @@ export interface GameRecord {
   difficulty: string;
   teacher_id: string;
   last_update: string;
-  scratch_id: string;
   scratch_api: string;
   accumulated_click: number;
   description?: string;
