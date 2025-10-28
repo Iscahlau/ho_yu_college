@@ -73,7 +73,7 @@ curl -X POST http://localhost:3000/upload/students \
 ```json
 {
   "success": true,
-  "message": "Successfully processed 10 students (10 inserted, 0 updated)",
+  "message": "Successfully processed",
   "processed": 10,
   "inserted": 10,
   "updated": 0
@@ -98,7 +98,7 @@ STU102     | Test User2 EDIT | 250   | ...
 ```json
 {
   "success": true,
-  "message": "Successfully processed 10 students (0 inserted, 10 updated)",
+  "message": "Successfully processed",
   "processed": 10,
   "inserted": 0,
   "updated": 10
@@ -132,7 +132,7 @@ curl -X POST http://localhost:3000/upload/teachers \
 ```json
 {
   "success": true,
-  "message": "Successfully processed 3 teachers (3 inserted, 0 updated)",
+  "message": "Successfully processed",
   "processed": 3,
   "inserted": 3,
   "updated": 0
@@ -168,7 +168,7 @@ time curl -X POST http://localhost:3000/upload/games \
 ```json
 {
   "success": true,
-  "message": "Successfully processed 100 games (100 inserted, 0 updated)",
+  "message": "Successfully processed",
   "processed": 100,
   "inserted": 100,
   "updated": 0
@@ -200,7 +200,7 @@ STU202     | Valid      | 300
 ```json
 {
   "success": true,
-  "message": "Successfully processed 2 students (2 inserted, 0 updated)",
+  "message": "Successfully processed",
   "processed": 2,
   "inserted": 2,
   "updated": 0,

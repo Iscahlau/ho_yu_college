@@ -74,22 +74,6 @@ async function createStudentsTable(): Promise<void> {
     ],
     AttributeDefinitions: [
       { AttributeName: 'student_id', AttributeType: 'S' },
-      { AttributeName: 'teacher_id', AttributeType: 'S' },
-    ],
-    GlobalSecondaryIndexes: [
-      {
-        IndexName: 'teacher-index',
-        KeySchema: [
-          { AttributeName: 'teacher_id', KeyType: 'HASH' },
-        ],
-        Projection: {
-          ProjectionType: 'ALL',
-        },
-        ProvisionedThroughput: {
-          ReadCapacityUnits: 5,
-          WriteCapacityUnits: 5,
-        },
-      },
     ],
     ProvisionedThroughput: {
       ReadCapacityUnits: 5,

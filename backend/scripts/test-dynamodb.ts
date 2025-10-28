@@ -49,7 +49,6 @@ async function testCreate(): Promise<TestResult> {
       marks: 100,
       class: 'TEST',
       class_no: '01',
-      teacher_id: 'TCH001',
       password: '123',
       last_login: new Date().toISOString(),
       last_update: new Date().toISOString(),

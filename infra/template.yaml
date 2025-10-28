@@ -109,6 +109,7 @@ Resources:
     Properties:
       CodeUri: ../backend/build/lambda/
       Handler: upload/students.handler
+      Timeout: 60  # Increased timeout for file upload operations
       Events:
         UploadStudentsApi:
           Type: Api
@@ -122,6 +123,7 @@ Resources:
     Properties:
       CodeUri: ../backend/build/lambda/
       Handler: upload/teachers.handler
+      Timeout: 60  # Increased timeout for file upload operations
       Events:
         UploadTeachersApi:
           Type: Api
@@ -135,6 +137,7 @@ Resources:
     Properties:
       CodeUri: ../backend/build/lambda/
       Handler: upload/games.handler
+      Timeout: 60  # Increased timeout for file upload operations
       Events:
         UploadGamesApi:
           Type: Api

@@ -35,7 +35,6 @@ export interface StudentRecord {
   class_no: string;
   last_login: string;
   last_update: string;
-  teacher_id: string;
   password: string;
   created_at?: string;
   updated_at?: string;

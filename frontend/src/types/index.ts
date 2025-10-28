@@ -9,7 +9,6 @@ export interface Student {
   class_no: string;
   last_login: string;
   last_update: string;
-  teacher_id: string;
   password: string;
 }
 

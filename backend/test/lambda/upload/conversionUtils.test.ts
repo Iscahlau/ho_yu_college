@@ -362,8 +362,8 @@ describe('Data Conversion Utilities', () => {
 
   describe('Integration Tests - Real-world Scenarios', () => {
     test('should convert student row from Excel to DynamoDB format', () => {
-      const headers = ['student_id', 'name_1', 'marks', 'class', 'teacher_id'];
-      const row = ['STU001', 'John Chan', '150', '1A', 'TCH001'];
+      const headers = ['student_id', 'name_1', 'marks', 'class', 'password'];
+      const row = ['STU001', 'John Chan', '150', '1A', '123'];
       const rawData = mapRowToObject(headers, row);
       
       // Convert to proper types
@@ -372,7 +372,7 @@ describe('Data Conversion Utilities', () => {
         name_1: toString(rawData.name_1),
         marks: toNumber(rawData.marks),
         class: toString(rawData.class),
-        teacher_id: toString(rawData.teacher_id),
+        password: toString(rawData.password),
       };
       
       expect(studentRecord).toEqual({
@@ -380,7 +380,7 @@ describe('Data Conversion Utilities', () => {
         name_1: 'John Chan',
         marks: 150,
         class: '1A',
-        teacher_id: 'TCH001',
+        password: '123',
       });
     });
 

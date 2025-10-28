@@ -36,12 +36,6 @@ export class BackendStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
-    // Add GSI for teacher_id queries
-    studentsTable.addGlobalSecondaryIndex({
-      indexName: 'teacher-index',
-      partitionKey: { name: 'teacher_id', type: dynamodb.AttributeType.STRING },
-    });
-
     // DynamoDB table for teachers
     const teachersTable = new dynamodb.Table(this, 'TeachersTable', {
       tableName: 'ho-yu-teachers',

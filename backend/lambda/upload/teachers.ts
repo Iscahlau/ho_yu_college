@@ -304,7 +304,7 @@ export const handler = async (
       },
       body: JSON.stringify({
         success: true,
-        message: `Successfully processed ${results.processed} teachers (${results.inserted} inserted, ${results.updated} updated)`,
+        message: `Successfully processed`,
         processed: results.processed,
         inserted: results.inserted,
         updated: results.updated,

@@ -27,7 +27,6 @@ describe('Mock Students Data', () => {
       expect(student).toHaveProperty('class_no');
       expect(student).toHaveProperty('last_login');
       expect(student).toHaveProperty('last_update');
-      expect(student).toHaveProperty('teacher_id');
       expect(student).toHaveProperty('password');
     });
   });
@@ -64,11 +63,7 @@ describe('Mock Students Data', () => {
     });
   });
 
-  test('teacher_id should follow TCH### pattern', () => {
-    mockStudents.forEach((student: any) => {
-      expect(student.teacher_id).toMatch(/^TCH\d{3}$/);
-    });
-  });
+
 
   test('last_login and last_update should be valid ISO date strings', () => {
     mockStudents.forEach((student: any) => {
@@ -284,10 +279,12 @@ describe('Mock Data Relationships', () => {
     });
   });
 
-  test('all teacher_ids in students should exist in teachers', () => {
-    const teacherIds = mockTeachers.map((t: any) => t.teacher_id);
-    mockStudents.forEach((student: any) => {
-      expect(teacherIds).toContain(student.teacher_id);
+  test('all student classes should be covered by teacher responsible_class', () => {
+    const studentClasses = [...new Set(mockStudents.map((s: any) => s.class))];
+    const teacherClasses = mockTeachers.flatMap((t: any) => t.responsible_class);
+    
+    studentClasses.forEach((studentClass: string) => {
+      expect(teacherClasses).toContain(studentClass);
     });
   });
 

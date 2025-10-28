@@ -220,7 +220,6 @@ export const STUDENT_SCHEMA_MAPPING = {
   class_no: { type: 'string', required: false, description: 'Class number/position' },
   last_login: { type: 'date', required: false, description: 'Last login timestamp' },
   last_update: { type: 'date', required: false, description: 'Last update timestamp' },
-  teacher_id: { type: 'string', required: false, description: 'Associated teacher ID' },
   password: { type: 'string', required: false, description: 'Hashed password' },
   created_at: { type: 'date', required: false, description: 'Record creation timestamp (auto-generated)' },
   updated_at: { type: 'date', required: false, description: 'Record update timestamp (auto-generated)' },

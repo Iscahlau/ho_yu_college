@@ -390,7 +390,7 @@ export const handler = async (
         }
 
         return createSuccessResponse({
-            message: `Successfully processed ${results.processed} games (${results.inserted} inserted, ${results.updated} updated)`,
+            message: `Successfully processed`,
             processed: results.processed,
             inserted: results.inserted,
             updated: results.updated,

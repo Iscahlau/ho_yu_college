@@ -76,7 +76,6 @@ export const STUDENTS_EXPECTED_HEADERS = [
   'class_no',
   'last_login',
   'last_update',
-  'teacher_id',
   'password',
 ] as const;
 
@@ -154,7 +153,6 @@ export const STUDENTS_COLUMN_WIDTHS = [
   { wch: 10 }, // class_no
   { wch: 20 }, // last_login
   { wch: 20 }, // last_update
-  { wch: 12 }, // teacher_id
   { wch: 15 }, // password
 ] as const;
 

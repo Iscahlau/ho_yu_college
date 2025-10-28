@@ -23,7 +23,6 @@ interface StudentRecord {
   class_no: string;
   last_login: string;
   last_update: string;
-  teacher_id: string;
   password: string;
   created_at?: string;
   updated_at?: string;
@@ -184,7 +183,6 @@ export const handler = async (
             class_no: toString(record.class_no),
             last_login: record.last_login || now,
             last_update: now,
-            teacher_id: record.teacher_id || '',
             password: toString(record.password),
             created_at: existingRecord ? existingRecord.created_at : now,
             updated_at: now,
@@ -199,7 +197,6 @@ export const handler = async (
               studentRecord.marks !== existingRecord.marks ||
               studentRecord.class !== existingRecord.class ||
               studentRecord.class_no !== existingRecord.class_no ||
-              studentRecord.teacher_id !== existingRecord.teacher_id ||
               studentRecord.password !== existingRecord.password
             );
           }
@@ -310,7 +307,7 @@ export const handler = async (
       },
       body: JSON.stringify({
         success: true,
-        message: `Successfully processed ${results.processed} students (${results.inserted} inserted, ${results.updated} updated)`,
+        message: `Successfully processed`,
         processed: results.processed,
         inserted: results.inserted,
         updated: results.updated,

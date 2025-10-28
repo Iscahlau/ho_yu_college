@@ -60,7 +60,6 @@ export const handler = async (
       class_no: student.class_no,
       last_login: student.last_login,
       last_update: student.last_update,
-      teacher_id: student.teacher_id,
       password: student.password,
     }));
 
