@@ -11,6 +11,11 @@
 - **[CHANGELOG.md](CHANGELOG.md)** - Version history and feature updates
 - **[DOCS.md](DOCS.md)** - This file - central documentation index
 
+### User Guides (user-guides/)
+
+- **[student-guide.md](user-guides/student-guide.md)** - Student guide for using the platform
+- **[teacher-guide.md](user-guides/teacher-guide.md)** - Teacher guide for managing students and games
+
 ### Specialized Documentation (docs/)
 
 - **[INFRASTRUCTURE.md](docs/INFRASTRUCTURE.md)** - AWS CDK, SAM Local, deployment

@@ -200,6 +200,10 @@ See [Deployment Guide](docs/DEPLOYMENT.md) for comprehensive deployment instruct
 - **[API.md](API.md)** - 🌐 REST API reference with all endpoints and examples
 - **[README.md](README.md)** - 📄 This file - project overview and quick start
 
+### User Guides
+- **[user-guides/student-guide.md](user-guides/student-guide.md)** - 📚 Student guide for using the platform
+- **[user-guides/teacher-guide.md](user-guides/teacher-guide.md)** - 👨‍🏫 Teacher guide for managing students and games
+
 ### Detailed Guides
 - **[docs/INFRASTRUCTURE.md](docs/INFRASTRUCTURE.md)** - AWS CDK, SAM Local, deployment
 - **[docs/DYNAMODB_LOCAL_GUIDE.md](docs/DYNAMODB_LOCAL_GUIDE.md)** - DynamoDB Local setup
