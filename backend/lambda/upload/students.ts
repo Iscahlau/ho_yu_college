@@ -181,7 +181,7 @@ export const handler = async (
             marks: typeof record.marks === 'number' ? record.marks : 0,
             class: record.class || '',
             class_no: toString(record.class_no),
-            last_login: record.last_login || now,
+            last_login: record.last_login || (existingRecord?.last_login || ''),
             last_update: now,
             password: toString(record.password),
             created_at: existingRecord ? existingRecord.created_at : now,

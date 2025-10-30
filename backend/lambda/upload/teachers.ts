@@ -189,7 +189,7 @@ export const handler = async (
             name: record.name || '',
             password: toString(record.password),
             responsible_class: responsibleClass,
-            last_login: record.last_login || now,
+            last_login: record.last_login || (existingRecord?.last_login || ''),
             is_admin: toBoolean(record.is_admin, false),
           };
 
