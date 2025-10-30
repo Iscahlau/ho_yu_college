@@ -22,7 +22,9 @@ Globals:
       AllowCredentials: false
     BinaryMediaTypes:
       - 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      - 'application/vnd.ms-excel'
       - 'application/octet-stream'
+      - '*/*'
 
 Resources:
   # Lambda function for authentication/login

@@ -40,9 +40,7 @@ export async function downloadStudentData(classFilter?: string[]): Promise<Downl
     
     const response = await fetch(`${API_BASE_URL}${STUDENTS_ENDPOINT}/download${params}`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      // Don't set Content-Type header - let the backend response Content-Type take precedence
     });
 
     if (!response.ok) {
@@ -76,9 +74,7 @@ export async function downloadTeacherData(): Promise<DownloadResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}${TEACHERS_ENDPOINT}/download`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      // Don't set Content-Type header - let the backend response Content-Type take precedence
     });
 
     if (!response.ok) {
@@ -112,9 +108,7 @@ export async function downloadGamesData(): Promise<DownloadResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}${GAMES_ENDPOINT}/download`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      // Don't set Content-Type header - let the backend response Content-Type take precedence
     });
 
     if (!response.ok) {

@@ -51,6 +51,12 @@ export function createApiGateway(
       allowMethods: apigateway.Cors.ALL_METHODS,
       allowHeaders: ['Content-Type', 'Authorization'],
     },
+    // Configure binary media types for Excel files
+    binaryMediaTypes: [
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
+      'application/octet-stream',
+    ],
   });
 
   // Auth resource

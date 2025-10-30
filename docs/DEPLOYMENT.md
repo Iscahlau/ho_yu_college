@@ -267,7 +267,7 @@ To rollback to a previous version:
 cd infra
 
 # List available CloudFormation stack versions
-aws cloudformation list-stack-resources --stack-name BackendStack
+aws cloudformation list-stack-resources --stack-name ApplicationStack
 
 # Rollback is not directly supported by CDK
 # Best practice: Deploy previous Git commit
