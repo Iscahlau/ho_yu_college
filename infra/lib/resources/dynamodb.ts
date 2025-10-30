@@ -38,6 +38,36 @@ export function createDynamoDBTables(
     removalPolicy,
   });
 
+  // Insert sample teacher data using a custom resource
+  const sampleTeacherData = {
+    teacher_id: 'TCH001',
+    name: 'ADMIN',
+    password: 'admin',
+    responsible_class: ['1A'],
+    is_admin: true,
+  };
+
+  // Use AWS SDK via a custom resource to insert the item
+  const awsSdk = require('aws-cdk-lib/custom-resources');
+  new awsSdk.AwsCustomResource(scope, 'InsertSampleTeacher', {
+    onCreate: {
+      service: 'DynamoDB',
+      action: 'putItem',
+      parameters: {
+        TableName: teachersTable.tableName,
+        Item: {
+          teacher_id: { S: sampleTeacherData.teacher_id },
+          name: { S: sampleTeacherData.name },
+          password: { S: sampleTeacherData.password },
+          responsible_class: { SS: sampleTeacherData.responsible_class },
+          is_admin: { BOOL: sampleTeacherData.is_admin },
+        },
+      },
+      physicalResourceId: awsSdk.PhysicalResourceId.of('InsertSampleTeacher'),
+    },
+    policy: awsSdk.AwsCustomResourcePolicy.fromSdkCalls({ resources: [teachersTable.tableArn] }),
+  });
+
   // DynamoDB table for games
   const gamesTable = new dynamodb.Table(scope, buildNameAndId('GamesTable'), {
     tableName: buildNameAndId('games'),

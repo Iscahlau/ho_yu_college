@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Box, Container, Alert, Paper, Typography, Chip, Stack } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -34,6 +34,20 @@ function GamePage() {
   const [gameStartTime, setGameStartTime] = useState<number | null>(null);
   const [timeSubmitted, setTimeSubmitted] = useState(false);
 
+  // Use refs to access latest values in event handlers without re-registering them
+  const gameInfoRef = useRef(gameInfo);
+  const gameStartTimeRef = useRef(gameStartTime);
+  const timeSubmittedRef = useRef(timeSubmitted);
+  const userRef = useRef(user);
+
+  // Keep refs in sync with state
+  useEffect(() => {
+    gameInfoRef.current = gameInfo;
+    gameStartTimeRef.current = gameStartTime;
+    timeSubmittedRef.current = timeSubmitted;
+    userRef.current = user;
+  }, [gameInfo, gameStartTime, timeSubmitted, user]);
+
   // Load games from backend if not already loaded
   useEffect(() => {
     const loadGames = async () => {
@@ -50,7 +64,7 @@ function GamePage() {
     };
 
     loadGames();
-  }, [games.length, dispatch]);
+  }, []); // Run only once on mount - dispatch and games are managed by Redux
 
   // Find game information from Redux store by matching gameId
   useEffect(() => {
@@ -62,11 +76,11 @@ function GamePage() {
       setGameInfo(foundGame || null);
       
       // Start timing when game is found and loaded
-      if (foundGame && !gameStartTime) {
+      if (foundGame) {
         setGameStartTime(Date.now());
       }
     }
-  }, [gameId, games, gameStartTime]);
+  }, [gameId, games]); // Removed gameStartTime from dependencies
 
   // Track initial game click (without time) when game loads
   useEffect(() => {
@@ -93,16 +107,21 @@ function GamePage() {
     };
 
     trackClick();
-  }, [gameInfo, user, clickTracked, dispatch]);
+  }, [gameInfo, user?.id, user?.role, clickTracked]); // Removed dispatch, it's not used
 
   // Submit time-based score ONLY when student leaves the page
   useEffect(() => {
     const submitTimeScore = async () => {
-      if (!gameInfo || !gameStartTime || timeSubmitted || user?.role !== 'student') {
+      const currentGameInfo = gameInfoRef.current;
+      const currentStartTime = gameStartTimeRef.current;
+      const currentTimeSubmitted = timeSubmittedRef.current;
+      const currentUser = userRef.current;
+
+      if (!currentGameInfo || !currentStartTime || currentTimeSubmitted || currentUser?.role !== 'student') {
         return;
       }
 
-      const timeSpent = Math.floor((Date.now() - gameStartTime) / 1000);
+      const timeSpent = Math.floor((Date.now() - currentStartTime) / 1000);
       
       // Only submit if user has played for at least 30 seconds
       if (timeSpent < 30) {
@@ -111,9 +130,9 @@ function GamePage() {
 
       try {
         const response = await trackGameClick(
-          gameInfo.gameId,
-          user?.id,
-          user?.role,
+          currentGameInfo.gameId,
+          currentUser?.id,
+          currentUser?.role,
           timeSpent
         );
 
@@ -134,15 +153,20 @@ function GamePage() {
 
     // Submit score when user leaves the page (browser close/refresh/navigate away)
     const handleBeforeUnload = () => {
-      if (gameInfo && gameStartTime && !timeSubmitted && user?.role === 'student') {
-        const timeSpent = Math.floor((Date.now() - gameStartTime) / 1000);
+      const currentGameInfo = gameInfoRef.current;
+      const currentStartTime = gameStartTimeRef.current;
+      const currentTimeSubmitted = timeSubmittedRef.current;
+      const currentUser = userRef.current;
+
+      if (currentGameInfo && currentStartTime && !currentTimeSubmitted && currentUser?.role === 'student') {
+        const timeSpent = Math.floor((Date.now() - currentStartTime) / 1000);
         if (timeSpent >= 30) {
           // Use sendBeacon for reliable submission on page unload
           const success = navigator.sendBeacon(
-            `${API_BASE_URL}/games/${gameInfo.gameId}/click`,
+            `${API_BASE_URL}/games/${currentGameInfo.gameId}/click`,
             JSON.stringify({
-              student_id: user?.id,
-              role: user?.role,
+              student_id: currentUser?.id,
+              role: currentUser?.role,
               time_spent: timeSpent,
             })
           );
@@ -170,7 +194,7 @@ function GamePage() {
       // Submit final score on component unmount (navigating to different page in app)
       submitTimeScore();
     };
-  }, [gameInfo, gameStartTime, timeSubmitted, user, dispatch]);
+  }, [dispatch]); // Only dispatch in deps since handlers use refs for other values
 
   // If no gameId is provided, show an error message
   if (!gameId) {

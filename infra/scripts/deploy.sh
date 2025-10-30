@@ -91,17 +91,21 @@ if [ ! -f "$BUILD_OUTPUT/cdk-outputs.json" ]; then
 fi
 
 # Extract API URL using jq or node
+# The stack name is 'ho-yu-college-scratch-platform' and outputs are prefixed with camelCase version
+STACK_NAME="ho-yu-college-scratch-platform"
+STACK_PREFIX="hoyucollegescratchplatform"
+
 if command -v jq &> /dev/null; then
-    API_URL=$(jq -r '.BackendStack.ApiUrl' "$BUILD_OUTPUT/cdk-outputs.json")
-    FRONTEND_URL=$(jq -r '.BackendStack.FrontendUrl' "$BUILD_OUTPUT/cdk-outputs.json")
-    DISTRIBUTION_ID=$(jq -r '.BackendStack.DistributionId' "$BUILD_OUTPUT/cdk-outputs.json")
-    BUCKET_NAME=$(jq -r '.BackendStack.FrontendBucketName' "$BUILD_OUTPUT/cdk-outputs.json")
+    API_URL=$(jq -r ".[\"$STACK_NAME\"][\"${STACK_PREFIX}ApiUrl\"]" "$BUILD_OUTPUT/cdk-outputs.json")
+    FRONTEND_URL=$(jq -r ".[\"$STACK_NAME\"][\"${STACK_PREFIX}FrontendUrl\"]" "$BUILD_OUTPUT/cdk-outputs.json")
+    DISTRIBUTION_ID=$(jq -r ".[\"$STACK_NAME\"][\"${STACK_PREFIX}DistributionId\"]" "$BUILD_OUTPUT/cdk-outputs.json")
+    BUCKET_NAME=$(jq -r ".[\"$STACK_NAME\"][\"${STACK_PREFIX}FrontendBucketName\"]" "$BUILD_OUTPUT/cdk-outputs.json")
 else
     # Fallback to node if jq not available
-    API_URL=$(node -p "JSON.parse(require('fs').readFileSync('$BUILD_OUTPUT/cdk-outputs.json', 'utf8')).BackendStack.ApiUrl")
-    FRONTEND_URL=$(node -p "JSON.parse(require('fs').readFileSync('$BUILD_OUTPUT/cdk-outputs.json', 'utf8')).BackendStack.FrontendUrl")
-    DISTRIBUTION_ID=$(node -p "JSON.parse(require('fs').readFileSync('$BUILD_OUTPUT/cdk-outputs.json', 'utf8')).BackendStack.DistributionId")
-    BUCKET_NAME=$(node -p "JSON.parse(require('fs').readFileSync('$BUILD_OUTPUT/cdk-outputs.json', 'utf8')).BackendStack.FrontendBucketName")
+    API_URL=$(node -p "JSON.parse(require('fs').readFileSync('$BUILD_OUTPUT/cdk-outputs.json', 'utf8'))['$STACK_NAME']['${STACK_PREFIX}ApiUrl']")
+    FRONTEND_URL=$(node -p "JSON.parse(require('fs').readFileSync('$BUILD_OUTPUT/cdk-outputs.json', 'utf8'))['$STACK_NAME']['${STACK_PREFIX}FrontendUrl']")
+    DISTRIBUTION_ID=$(node -p "JSON.parse(require('fs').readFileSync('$BUILD_OUTPUT/cdk-outputs.json', 'utf8'))['$STACK_NAME']['${STACK_PREFIX}DistributionId']")
+    BUCKET_NAME=$(node -p "JSON.parse(require('fs').readFileSync('$BUILD_OUTPUT/cdk-outputs.json', 'utf8'))['$STACK_NAME']['${STACK_PREFIX}FrontendBucketName']")
 fi
 
 if [ -z "$API_URL" ] || [ "$API_URL" == "null" ]; then
