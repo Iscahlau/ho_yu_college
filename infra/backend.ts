@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { BackendStack } from './lib/backend-stack';
+import { ApplicationStack } from './lib/application-stack';
+import { getStackName } from './lib/utils/naming';
 
 const app = new cdk.App();
 
@@ -20,7 +21,7 @@ if (isLocal) {
 }
 
 // For production deployment
-new BackendStack(app, 'BackendStack', {
+new ApplicationStack(app, getStackName(), {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: process.env.CDK_DEFAULT_REGION,
