@@ -28,6 +28,59 @@ function downloadBlob(blob: Blob, filename: string) {
 }
 
 /**
+ * Convert response to Excel blob
+ * Handles both binary and base64-encoded responses from API Gateway
+ */
+async function responseToExcelBlob(response: Response): Promise<Blob> {
+  // Get response as text first to detect format
+  const text = await response.text();
+  
+  // Check if it starts with PK (ZIP signature) - Excel files are ZIP archives
+  if (text.length >= 2 && text.charCodeAt(0) === 0x50 && text.charCodeAt(1) === 0x4B) {
+    // Already binary data received as text - convert back to Uint8Array
+    const bytes = new Uint8Array(text.length);
+    for (let i = 0; i < text.length; i++) {
+      bytes[i] = text.charCodeAt(i);
+    }
+    return new Blob([bytes], { 
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    });
+  }
+  
+  // Not binary - must be base64 encoded
+  try {
+    let base64String: string;
+    
+    // Check if response is JSON-wrapped
+    if (text.trim().startsWith('{')) {
+      const json = JSON.parse(text);
+      if (json.body) {
+        base64String = json.body;
+      } else {
+        throw new Error('Invalid JSON response - missing body field');
+      }
+    } else {
+      // Direct base64 string
+      base64String = text;
+    }
+    
+    // Decode base64 to binary
+    const binaryString = atob(base64String);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    
+    return new Blob([bytes], { 
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    });
+  } catch (error) {
+    console.error('Failed to decode Excel file:', error, 'Response preview:', text.substring(0, 100));
+    throw new Error('Failed to decode Excel file from server response');
+  }
+}
+
+/**
  * Download student data as Excel
  * Teachers can only download their own class data
  * @param classFilter - Optional class filter for teachers (e.g., ['1A', '2A'])
@@ -40,7 +93,6 @@ export async function downloadStudentData(classFilter?: string[]): Promise<Downl
     
     const response = await fetch(`${API_BASE_URL}${STUDENTS_ENDPOINT}/download${params}`, {
       method: 'GET',
-      // Don't set Content-Type header - let the backend response Content-Type take precedence
     });
 
     if (!response.ok) {
@@ -51,7 +103,7 @@ export async function downloadStudentData(classFilter?: string[]): Promise<Downl
       };
     }
 
-    const blob = await response.blob();
+    const blob = await responseToExcelBlob(response);
     const filename = `students_${new Date().toISOString().split('T')[0]}.xlsx`;
     downloadBlob(blob, filename);
 
@@ -74,7 +126,6 @@ export async function downloadTeacherData(): Promise<DownloadResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}${TEACHERS_ENDPOINT}/download`, {
       method: 'GET',
-      // Don't set Content-Type header - let the backend response Content-Type take precedence
     });
 
     if (!response.ok) {
@@ -85,7 +136,7 @@ export async function downloadTeacherData(): Promise<DownloadResponse> {
       };
     }
 
-    const blob = await response.blob();
+    const blob = await responseToExcelBlob(response);
     const filename = `teachers_${new Date().toISOString().split('T')[0]}.xlsx`;
     downloadBlob(blob, filename);
 
@@ -108,7 +159,6 @@ export async function downloadGamesData(): Promise<DownloadResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}${GAMES_ENDPOINT}/download`, {
       method: 'GET',
-      // Don't set Content-Type header - let the backend response Content-Type take precedence
     });
 
     if (!response.ok) {
@@ -119,7 +169,7 @@ export async function downloadGamesData(): Promise<DownloadResponse> {
       };
     }
 
-    const blob = await response.blob();
+    const blob = await responseToExcelBlob(response);
     const filename = `games_${new Date().toISOString().split('T')[0]}.xlsx`;
     downloadBlob(blob, filename);
 
