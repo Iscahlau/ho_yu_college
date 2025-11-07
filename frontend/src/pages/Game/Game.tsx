@@ -128,6 +128,10 @@ function GamePage() {
         return;
       }
 
+      // Set flag immediately to prevent duplicate submissions
+      setTimeSubmitted(true);
+      timeSubmittedRef.current = true;
+
       try {
         const response = await trackGameClick(
           currentGameInfo.gameId,
@@ -143,8 +147,6 @@ function GamePage() {
           if (response.data.marks !== undefined) {
             dispatch(updateMarks(response.data.marks));
           }
-          
-          setTimeSubmitted(true);
         }
       } catch (error) {
         console.error('Failed to submit time-based score:', error);
@@ -161,6 +163,9 @@ function GamePage() {
       if (currentGameInfo && currentStartTime && !currentTimeSubmitted && currentUser?.role === 'student') {
         const timeSpent = Math.floor((Date.now() - currentStartTime) / 1000);
         if (timeSpent >= 30) {
+          // Set flag immediately to prevent duplicate submissions
+          timeSubmittedRef.current = true;
+          
           // Use sendBeacon for reliable submission on page unload
           const success = navigator.sendBeacon(
             `${API_BASE_URL}/games/${currentGameInfo.gameId}/click`,
