@@ -88,11 +88,12 @@ function GamePage() {
       if (!gameInfo || clickTracked) return;
 
       try {
-        // Track initial click without time for immediate feedback
+        // Track initial click WITHOUT student info to avoid marking
+        // Only the time-based submission on page leave should add marks
         const response = await trackGameClick(
           gameInfo.gameId,
-          user?.id,
-          user?.role
+          undefined, // Don't pass student_id to avoid legacy mark calculation
+          undefined  // Don't pass role
         );
 
         if (response.success && response.data) {
@@ -107,7 +108,7 @@ function GamePage() {
     };
 
     trackClick();
-  }, [gameInfo, user?.id, user?.role, clickTracked]); // Removed dispatch, it's not used
+  }, [gameInfo, clickTracked]); // Removed user from dependencies since we don't use it
 
   // Submit time-based score ONLY when student leaves the page
   useEffect(() => {
