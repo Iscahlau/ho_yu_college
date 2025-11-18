@@ -63,13 +63,8 @@ export const handler = async (
       }, 'Applied class filter');
     }
 
-    // Sort students by class and class_no
-    students.sort((a, b) => {
-      if (a.class !== b.class) {
-        return a.class.localeCompare(b.class);
-      }
-      return a.class_no.localeCompare(b.class_no);
-    });
+    // Sort students by student_id (ascending: STU001 → STU002 → STU003...)
+    students.sort((a, b) => a.student_id.localeCompare(b.student_id));
 
     // Prepare data for Excel (including password field)
     const excelData = students.map(student => ({
