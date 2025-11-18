@@ -26,9 +26,17 @@ export const handler = async (
   
   try {
     // Get query parameters (optional class filter)
-    const classFilter = event.queryStringParameters?.classes?.split(',') || [];
+    // Trim each class name to handle any whitespace issues
+    const classesParam = event.queryStringParameters?.classes;
+    const classFilter = classesParam 
+      ? classesParam.split(',').map(c => c.trim()).filter(c => c.length > 0)
+      : [];
 
-    logger.info({ classFilter }, 'Starting students download');
+    logger.info({ 
+      classFilter,
+      classFilterLength: classFilter.length,
+      rawQueryString: classesParam 
+    }, 'Starting students download');
 
     // Get all students from DynamoDB
     const scanCommand = new ScanCommand({
@@ -37,9 +45,22 @@ export const handler = async (
     const result = await dynamoDBClient.send(scanCommand);
     let students = (result.Items as StudentRecord[]) || [];
 
+    logger.info({ totalStudents: students.length }, 'Retrieved all students from DynamoDB');
+
     // Apply class filter if provided
     if (classFilter.length > 0) {
-      students = students.filter(student => classFilter.includes(student.class));
+      const beforeFilterCount = students.length;
+      students = students.filter(student => {
+        // Also trim the student's class in case there's whitespace in the database
+        const studentClass = student.class.trim();
+        return classFilter.includes(studentClass);
+      });
+      logger.info({ 
+        beforeFilterCount, 
+        afterFilterCount: students.length,
+        classesIncluded: [...new Set(students.map(s => s.class.trim()))],
+        requestedClasses: classFilter
+      }, 'Applied class filter');
     }
 
     // Sort students by class and class_no
