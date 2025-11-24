@@ -209,18 +209,22 @@ function Homepage() {
                                                             {game.gameName}
                                                         </Typography>
                                                         <Stack direction="column" spacing={1} sx={{mb: 1}}>
-                                                            <Chip
-                                                                label={t(`homepage.subjects.${game.subject}`)}
-                                                                size="small"
-                                                                color="primary"
-                                                                variant="outlined"
-                                                            />
-                                                            <Chip
-                                                                label={t(`homepage.difficulties.${game.difficulty}`)}
-                                                                size="small"
-                                                                color="secondary"
-                                                                variant="outlined"
-                                                            />
+                                                            {game.subject && (
+                                                                <Chip
+                                                                    label={t(`homepage.subjects.${game.subject}`)}
+                                                                    size="small"
+                                                                    color="primary"
+                                                                    variant="outlined"
+                                                                />
+                                                            )}
+                                                            {game.difficulty && (
+                                                                <Chip
+                                                                    label={t(`homepage.difficulties.${game.difficulty}`)}
+                                                                    size="small"
+                                                                    color="secondary"
+                                                                    variant="outlined"
+                                                                />
+                                                            )}
                                                         </Stack>
                                                     </CardContent>
                                                     {isAuthenticated && (

@@ -277,27 +277,31 @@ function GamePage() {
             )}
             
             <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-              <Box>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                    {t('homepage.filters.subject')}
-                </Typography>
-                <Chip 
-                  label={t(`homepage.subjects.${gameInfo.subject}`)}
-                  color="primary"
-                  variant="outlined"
-                />
-              </Box>
+              {gameInfo.subject && (
+                <Box>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                      {t('homepage.filters.subject')}
+                  </Typography>
+                  <Chip 
+                    label={t(`homepage.subjects.${gameInfo.subject}`)}
+                    color="primary"
+                    variant="outlined"
+                  />
+                </Box>
+              )}
               
-              <Box>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                    {t('homepage.filters.difficulty')}
-                </Typography>
-                <Chip 
-                  label={t(`homepage.difficulties.${gameInfo.difficulty}`)} 
-                  color="secondary"
-                  variant="outlined"
-                />
-              </Box>
+              {gameInfo.difficulty && (
+                <Box>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                      {t('homepage.filters.difficulty')}
+                  </Typography>
+                  <Chip 
+                    label={t(`homepage.difficulties.${gameInfo.difficulty}`)} 
+                    color="secondary"
+                    variant="outlined"
+                  />
+                </Box>
+              )}
             </Stack>
           </Paper>
         )}
