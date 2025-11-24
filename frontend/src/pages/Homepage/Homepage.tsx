@@ -88,12 +88,18 @@ function Homepage() {
         }
     }, [games]);
 
-    // Apply filters to enriched games
+    // Apply filters to enriched games and sort by lastUpdate (most recent first)
     const displayGames = enrichedGames.length > 0 ? enrichedGames.filter((game) => {
         const subjectMatch = filters.subject === 'all' || game.subject === filters.subject;
         const difficultyMatch = filters.difficulty === 'all' || game.difficulty === filters.difficulty;
         return subjectMatch && difficultyMatch;
-    }) : filteredGames;
+    }).sort((a, b) => {
+        // Sort by lastUpdate in descending order (most recent first)
+        return new Date(b.lastUpdate).getTime() - new Date(a.lastUpdate).getTime();
+    }) : filteredGames.slice().sort((a, b) => {
+        // Sort by lastUpdate in descending order (most recent first)
+        return new Date(b.lastUpdate).getTime() - new Date(a.lastUpdate).getTime();
+    });
 
     const handleGameClick = (game: Game) => {
         // Use gameId directly (it contains the Scratch project ID)
