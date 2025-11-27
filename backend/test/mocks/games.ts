@@ -16,6 +16,7 @@ export const mockGames = [
     scratch_api: 'https://scratch.mit.edu/projects/1207260630',
     accumulated_click: 15,
     description: 'Match Chinese characters with their meanings in this fun educational game.',
+    is_hide: false,
   },
   {
     game_id: '1194305031',
@@ -28,6 +29,7 @@ export const mockGames = [
     scratch_api: 'https://scratch.mit.edu/projects/1194305031',
     accumulated_click: 28,
     description: 'Build your English vocabulary by learning new words through interactive exercises.',
+    is_hide: false,
   },
   {
     game_id: '1200062991',
@@ -40,6 +42,7 @@ export const mockGames = [
     scratch_api: 'https://scratch.mit.edu/projects/1200062991',
     accumulated_click: 45,
     description: 'Practice basic addition skills with fun animations and challenges.',
+    is_hide: false,
   },
   {
     game_id: '624682780',
@@ -52,6 +55,7 @@ export const mockGames = [
     scratch_api: 'https://scratch.mit.edu/projects/624682780',
     accumulated_click: 62,
     description: 'Explore basic science concepts through interactive experiments and demonstrations.',
+    is_hide: true, // Hidden game for testing
   },
   {
     game_id: '1205555130',
@@ -64,6 +68,7 @@ export const mockGames = [
     scratch_api: 'https://scratch.mit.edu/projects/1205555130',
     accumulated_click: 34,
     description: 'Learn Chinese idioms and their meanings through engaging puzzles and stories.',
+    is_hide: false,
   },
   {
     game_id: '1225100628',
@@ -76,6 +81,7 @@ export const mockGames = [
     scratch_api: 'https://scratch.mit.edu/projects/1225100628',
     accumulated_click: 19,
     description: 'Master English grammar rules through interactive lessons and quizzes.',
+    is_hide: false,
   },
   {
     game_id: '922059032',
@@ -88,6 +94,7 @@ export const mockGames = [
     scratch_api: 'https://scratch.mit.edu/projects/922059032',
     accumulated_click: 78,
     description: 'Test your multiplication skills with timed challenges and level progression.',
+    is_hide: false,
   },
   {
     game_id: '1225346166',
@@ -100,6 +107,7 @@ export const mockGames = [
     scratch_api: 'https://scratch.mit.edu/projects/1225346166',
     accumulated_click: 52,
     description: 'Journey through different countries and learn about world geography and cultures.',
+    is_hide: false,
   },
   {
     game_id: '1209989820',
@@ -112,6 +120,7 @@ export const mockGames = [
     scratch_api: 'https://scratch.mit.edu/projects/1209989820',
     accumulated_click: 89,
     description: 'Explore ancient Chinese poetry and learn about famous poets and their works.',
+    is_hide: true, // Hidden game for testing
   },
   {
     game_id: '1222261862',
@@ -124,6 +133,7 @@ export const mockGames = [
     scratch_api: 'https://scratch.mit.edu/projects/1222261862',
     accumulated_click: 95,
     description: 'Develop advanced essay writing skills with structured guidance and feedback.',
+    is_hide: false,
   },
   {
     game_id: '1222024739',
@@ -136,6 +146,7 @@ export const mockGames = [
     scratch_api: 'https://scratch.mit.edu/projects/1222024739',
     accumulated_click: 103,
     description: 'Master algebraic concepts including equations, variables, and problem-solving techniques.',
+    is_hide: false,
   },
   {
     game_id: '1217195251',
@@ -148,6 +159,7 @@ export const mockGames = [
     scratch_api: 'https://scratch.mit.edu/projects/1217195251',
     accumulated_click: 67,
     description: 'Investigate historical events and solve mysteries through critical thinking and research.',
+    is_hide: false,
   },
   {
     game_id: '1214763139',
@@ -160,6 +172,7 @@ export const mockGames = [
     scratch_api: 'https://scratch.mit.edu/projects/1214763139',
     accumulated_click: 41,
     description: 'Practice pinyin pronunciation and tone recognition for Chinese characters.',
+    is_hide: false,
   },
   {
     game_id: '1213760743',
@@ -171,6 +184,7 @@ export const mockGames = [
     last_update: '2024-01-23T11:15:00.000Z',
     scratch_api: 'https://scratch.mit.edu/projects/1213760743',
     accumulated_click: 56,
+    is_hide: false,
   },
   {
     game_id: '1144750634',
@@ -183,6 +197,7 @@ export const mockGames = [
     scratch_api: 'https://scratch.mit.edu/projects/1144750634',
     accumulated_click: 72,
     description: 'Learn fractions through visual representations and interactive problem solving.',
+    is_hide: false,
   },
   {
     game_id: '1180038290',
@@ -194,6 +209,7 @@ export const mockGames = [
     last_update: '2024-01-25T10:20:00.000Z',
     scratch_api: 'https://scratch.mit.edu/projects/1180038290',
     accumulated_click: 38,
+    is_hide: false,
   },
   {
     game_id: '1212731603',
@@ -206,6 +222,7 @@ export const mockGames = [
     scratch_api: 'https://scratch.mit.edu/projects/1212731603',
     accumulated_click: 84,
     description: 'Study classical Chinese literature and analyze famous literary works.',
+    is_hide: false,
   },
   {
     game_id: '1173211965',
@@ -217,6 +234,7 @@ export const mockGames = [
     last_update: '2024-01-27T09:30:00.000Z',
     scratch_api: 'https://scratch.mit.edu/projects/1173211965',
     accumulated_click: 91,
+    is_hide: false,
   },
   {
     game_id: '1210064381',
@@ -228,6 +246,7 @@ export const mockGames = [
     last_update: '2024-01-28T11:00:00.000Z',
     scratch_api: 'https://scratch.mit.edu/projects/1210064381',
     accumulated_click: 76,
+    is_hide: false,
   },
   {
     game_id: '1168960672',
@@ -239,5 +258,6 @@ export const mockGames = [
     last_update: '2024-01-29T15:30:00.000Z',
     scratch_api: 'https://scratch.mit.edu/projects/1168960672',
     accumulated_click: 110,
+    is_hide: false,
   },
 ];

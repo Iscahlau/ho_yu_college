@@ -19,6 +19,7 @@ export interface GameRecord {
   scratch_api: string;
   accumulated_click: number;
   description?: string;
+  is_hide?: boolean;
   created_at?: string;
   updated_at?: string;
 }

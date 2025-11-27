@@ -57,6 +57,7 @@ export const GAMES_EXPECTED_HEADERS = [
   'scratch_api',
   'accumulated_click',
   'description',
+  'is_hide',
 ] as const;
 
 /**
@@ -139,6 +140,7 @@ export const GAMES_COLUMN_WIDTHS = [
   { wch: 40 }, // scratch_api
   { wch: 15 }, // accumulated_click
   { wch: 50 }, // description
+  { wch: 10 }, // is_hide
 ] as const;
 
 /**

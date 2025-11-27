@@ -48,6 +48,7 @@ export const handler = async (
       scratch_api: game.scratch_api,
       accumulated_click: game.accumulated_click,
       description: game.description || '',
+      is_hide: game.is_hide ?? false,
     }));
 
     // Create Excel workbook

@@ -32,6 +32,7 @@ export interface GameData {
   scratch_api: string;
   accumulated_click: number;
   description?: string;
+  is_hide?: boolean;
 }
 
 // API Types

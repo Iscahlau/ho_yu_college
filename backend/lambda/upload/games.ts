@@ -52,7 +52,8 @@ const hasGameChanged = (newGame: GameRecord, existingGame: GameRecord): boolean 
     newGame.difficulty !== existingGame.difficulty ||
     newGame.teacher_id !== existingGame.teacher_id ||
     newGame.scratch_api !== existingGame.scratch_api ||
-    newGame.description !== existingGame.description;
+    newGame.description !== existingGame.description ||
+    newGame.is_hide !== existingGame.is_hide;
 
 /**
  * Creates game record from row data
@@ -62,6 +63,17 @@ const createGameRecord = (
     existingRecord: GameRecord | undefined,
     now: string
 ): GameRecord => {
+    // Parse is_hide value - handle various Excel/string representations
+    const parseIsHide = (value: any): boolean => {
+        if (typeof value === 'boolean') return value;
+        if (typeof value === 'string') {
+            const lower = value.toLowerCase().trim();
+            return lower === 'true' || lower === 'yes' || lower === '1';
+        }
+        if (typeof value === 'number') return value === 1;
+        return false;
+    };
+
     const gameRecord: GameRecord = {
         game_id: String(record.game_id), // Convert to string to handle numeric IDs from Excel
         game_name: record.game_name ?? '',
@@ -74,6 +86,7 @@ const createGameRecord = (
         accumulated_click: existingRecord?.accumulated_click ??
             (typeof record.accumulated_click === 'number' ? record.accumulated_click : 0),
         description: record.description ?? '',
+        is_hide: record.is_hide !== undefined ? parseIsHide(record.is_hide) : (existingRecord?.is_hide ?? false),
         created_at: existingRecord?.created_at ?? now,
         updated_at: now,
     };

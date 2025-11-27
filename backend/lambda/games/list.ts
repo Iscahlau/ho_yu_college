@@ -37,10 +37,15 @@ export const handler = async (
 
     const result = await dynamoDBClient.send(command);
 
+    // Filter out hidden games (is_hide === true)
+    const visibleGames = (result.Items || []).filter(
+      (game: any) => game.is_hide !== true
+    );
+
     // Build response with pagination metadata
     const response: ListGamesResponse = {
-      items: (result.Items || []) as any,
-      count: result.Items?.length || 0,
+      items: visibleGames as any,
+      count: visibleGames.length,
       hasMore: !!result.LastEvaluatedKey,
     };
 
