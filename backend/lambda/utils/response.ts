@@ -157,3 +157,39 @@ export const getCurrentTimestamp = (): string => new Date().toISOString();
  * @returns Date string in YYYY-MM-DD format
  */
 export const getDateString = (): string => new Date().toISOString().split('T')[0];
+
+/**
+ * Convert ISO timestamp to HKT (Hong Kong Time, UTC+8) formatted string
+ * @param isoTimestamp - ISO 8601 timestamp string (e.g., "2024-01-01T12:00:00.000Z")
+ * @returns HKT formatted string (YYYY-MM-DD HH:mm:ss) or empty string if invalid
+ */
+export const convertToHKT = (isoTimestamp: string | undefined | null): string => {
+  if (!isoTimestamp) {
+    return '';
+  }
+
+  try {
+    const date = new Date(isoTimestamp);
+    
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return '';
+    }
+
+    // Convert to HKT by adding 8 hours
+    const hktDate = new Date(date.getTime() + 8 * 60 * 60 * 1000);
+    
+    // Format as YYYY-MM-DD HH:mm:ss
+    const year = hktDate.getUTCFullYear();
+    const month = String(hktDate.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(hktDate.getUTCDate()).padStart(2, '0');
+    const hours = String(hktDate.getUTCHours()).padStart(2, '0');
+    const minutes = String(hktDate.getUTCMinutes()).padStart(2, '0');
+    const seconds = String(hktDate.getUTCSeconds()).padStart(2, '0');
+    
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  } catch (error) {
+    logger.error({ error, isoTimestamp }, 'Failed to convert timestamp to HKT');
+    return '';
+  }
+};

@@ -12,6 +12,7 @@ import {
   createExcelResponse,
   createInternalErrorResponse,
   getDateString,
+  convertToHKT,
 } from '../utils/response';
 import { createLambdaLogger } from '../utils/logger';
 import { createExcelWorkbook } from '../utils/excel';
@@ -44,7 +45,7 @@ export const handler = async (
       subject: game.subject,
       difficulty: game.difficulty,
       teacher_id: game.teacher_id,
-      last_update: game.last_update,
+      last_update: convertToHKT(game.last_update),
       scratch_api: game.scratch_api,
       accumulated_click: game.accumulated_click,
       description: game.description || '',

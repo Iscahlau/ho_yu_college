@@ -13,6 +13,7 @@ import {
   createExcelResponse,
   createInternalErrorResponse,
   getDateString,
+  convertToHKT,
 } from '../utils/response';
 import { createLambdaLogger } from '../utils/logger';
 import { createExcelWorkbook } from '../utils/excel';
@@ -74,8 +75,8 @@ export const handler = async (
       marks: student.marks,
       class: student.class,
       class_no: student.class_no,
-      last_login: student.last_login,
-      last_update: student.last_update,
+      last_login: convertToHKT(student.last_login),
+      last_update: convertToHKT(student.last_update),
       password: student.password,
     }));
 

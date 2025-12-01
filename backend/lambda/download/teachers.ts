@@ -12,6 +12,7 @@ import {
   createExcelResponse,
   createInternalErrorResponse,
   getDateString,
+  convertToHKT,
 } from '../utils/response';
 import { createLambdaLogger } from '../utils/logger';
 import { createExcelWorkbook } from '../utils/excel';
@@ -43,7 +44,7 @@ export const handler = async (
       password: teacher.password,
       responsible_class: teacher.responsible_class?.join(', ') || '', // Convert array to comma-separated string
       is_admin: teacher.is_admin ? 'Yes' : 'No',
-      last_login: teacher.last_login,
+      last_login: convertToHKT(teacher.last_login),
     }));
 
     // Create Excel workbook

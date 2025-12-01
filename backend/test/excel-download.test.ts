@@ -5,7 +5,7 @@
 
 import * as XLSX from 'xlsx';
 import { createExcelWorkbook } from '../lambda/utils/excel';
-import { createExcelResponse } from '../lambda/utils/response';
+import { createExcelResponse, convertToHKT } from '../lambda/utils/response';
 
 describe('Excel Download', () => {
   it('should create valid Excel file buffer', () => {
@@ -72,5 +72,43 @@ describe('Excel Download', () => {
     const data = XLSX.utils.sheet_to_json(workbook.Sheets['Teachers']);
     expect(data).toHaveLength(1);
     expect(data[0]).toMatchObject({ teacher_id: 'T001', name: 'Teacher 1' });
+  });
+});
+
+describe('HKT Timestamp Conversion', () => {
+  it('should convert UTC timestamp to HKT format', () => {
+    // Test UTC midnight (00:00:00) -> HKT 08:00:00
+    const utcMidnight = '2024-01-01T00:00:00.000Z';
+    expect(convertToHKT(utcMidnight)).toBe('2024-01-01 08:00:00');
+    
+    // Test UTC noon (12:00:00) -> HKT 20:00:00
+    const utcNoon = '2024-01-01T12:00:00.000Z';
+    expect(convertToHKT(utcNoon)).toBe('2024-01-01 20:00:00');
+    
+    // Test UTC late evening (16:00:00) -> HKT next day 00:00:00
+    const utcEvening = '2024-01-01T16:00:00.000Z';
+    expect(convertToHKT(utcEvening)).toBe('2024-01-02 00:00:00');
+  });
+
+  it('should handle edge cases correctly', () => {
+    // End of year
+    const endOfYear = '2023-12-31T20:00:00.000Z';
+    expect(convertToHKT(endOfYear)).toBe('2024-01-01 04:00:00');
+    
+    // End of month
+    const endOfMonth = '2024-01-31T20:00:00.000Z';
+    expect(convertToHKT(endOfMonth)).toBe('2024-02-01 04:00:00');
+  });
+
+  it('should handle invalid inputs', () => {
+    expect(convertToHKT(null)).toBe('');
+    expect(convertToHKT(undefined)).toBe('');
+    expect(convertToHKT('')).toBe('');
+    expect(convertToHKT('invalid-date')).toBe('');
+  });
+
+  it('should preserve time precision', () => {
+    const timestamp = '2024-06-15T14:35:42.123Z';
+    expect(convertToHKT(timestamp)).toBe('2024-06-15 22:35:42');
   });
 });
