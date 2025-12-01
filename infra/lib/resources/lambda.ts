@@ -44,9 +44,10 @@ export function createLambdaFunctions(
     timeout: cdk.Duration.seconds(10),
   });
 
-  // Grant login Lambda permissions to read students and teachers tables
-  studentsTable.grantReadData(loginLambda);
-  teachersTable.grantReadData(loginLambda);
+  // Grant login Lambda permissions to read and write students and teachers tables
+  // Write access is needed to update last_login timestamp
+  studentsTable.grantReadWriteData(loginLambda);
+  teachersTable.grantReadWriteData(loginLambda);
 
   // Lambda function for listing games
   const listGamesLambda = new lambda.Function(scope, buildNameAndId('ListGamesFunction'), {

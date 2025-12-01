@@ -45,6 +45,7 @@ export function createDynamoDBTables(
     password: 'admin',
     responsible_class: ['1A'],
     is_admin: true,
+    last_login: '',
   };
 
   // Use AWS SDK via a custom resource to insert the item
@@ -61,6 +62,7 @@ export function createDynamoDBTables(
           password: { S: sampleTeacherData.password },
           responsible_class: { SS: sampleTeacherData.responsible_class },
           is_admin: { BOOL: sampleTeacherData.is_admin },
+          last_login: { S: sampleTeacherData.last_login },
         },
       },
       physicalResourceId: awsSdk.PhysicalResourceId.of('InsertSampleTeacher'),

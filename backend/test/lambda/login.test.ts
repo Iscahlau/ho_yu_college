@@ -17,22 +17,34 @@ jest.mock('@aws-sdk/lib-dynamodb', () => {
           // Mock implementation to return data based on command
           const tableName = command.input?.TableName;
           const key = command.input?.Key;
+          const updateExpression = command.input?.UpdateExpression;
           
-          if (tableName === process.env.STUDENTS_TABLE_NAME && key?.student_id) {
-            const student = mockStudents.find((s: any) => s.student_id === key.student_id);
-            return Promise.resolve({ Item: student });
+          // Handle GetCommand
+          if (key && !updateExpression) {
+            if (tableName === process.env.STUDENTS_TABLE_NAME && key?.student_id) {
+              const student = mockStudents.find((s: any) => s.student_id === key.student_id);
+              return Promise.resolve({ Item: student });
+            }
+            
+            if (tableName === process.env.TEACHERS_TABLE_NAME && key?.teacher_id) {
+              const teacher = mockTeachers.find((t: any) => t.teacher_id === key.teacher_id);
+              return Promise.resolve({ Item: teacher });
+            }
+            
+            return Promise.resolve({ Item: undefined });
           }
           
-          if (tableName === process.env.TEACHERS_TABLE_NAME && key?.teacher_id) {
-            const teacher = mockTeachers.find((t: any) => t.teacher_id === key.teacher_id);
-            return Promise.resolve({ Item: teacher });
+          // Handle UpdateCommand (for last_login update)
+          if (updateExpression && updateExpression.includes('last_login')) {
+            return Promise.resolve({ Attributes: {} });
           }
           
-          return Promise.resolve({ Item: undefined });
+          return Promise.resolve({});
         }),
       })),
     },
     GetCommand: jest.fn((input: any) => ({ input })),
+    UpdateCommand: jest.fn((input: any) => ({ input })),
   };
 });
 
@@ -62,7 +74,7 @@ describe('Login Lambda Handler', () => {
       const result: APIGatewayProxyResult = await handler(event);
 
       expect(result.statusCode).toBe(400);
-      expect(JSON.parse(result.body)).toEqual({ message: 'Missing id or password' });
+      expect(JSON.parse(result.body)).toEqual({ success: false, message: 'Missing id or password' });
     });
 
     test('should return 400 if password is missing', async () => {
@@ -70,7 +82,7 @@ describe('Login Lambda Handler', () => {
       const result: APIGatewayProxyResult = await handler(event);
 
       expect(result.statusCode).toBe(400);
-      expect(JSON.parse(result.body)).toEqual({ message: 'Missing id or password' });
+      expect(JSON.parse(result.body)).toEqual({ success: false, message: 'Missing id or password' });
     });
 
     test('should return 400 if both id and password are missing', async () => {
@@ -78,7 +90,7 @@ describe('Login Lambda Handler', () => {
       const result: APIGatewayProxyResult = await handler(event);
 
       expect(result.statusCode).toBe(400);
-      expect(JSON.parse(result.body)).toEqual({ message: 'Missing id or password' });
+      expect(JSON.parse(result.body)).toEqual({ success: false, message: 'Missing id or password' });
     });
   });
 
@@ -107,7 +119,7 @@ describe('Login Lambda Handler', () => {
       const result: APIGatewayProxyResult = await handler(event);
 
       expect(result.statusCode).toBe(401);
-      expect(JSON.parse(result.body)).toEqual({ message: 'Invalid credentials' });
+      expect(JSON.parse(result.body)).toEqual({ success: false, message: 'Invalid credentials' });
     });
 
     test('should fail authentication for non-existent student', async () => {
@@ -118,7 +130,7 @@ describe('Login Lambda Handler', () => {
       const result: APIGatewayProxyResult = await handler(event);
 
       expect(result.statusCode).toBe(401);
-      expect(JSON.parse(result.body)).toEqual({ message: 'Invalid credentials' });
+      expect(JSON.parse(result.body)).toEqual({ success: false, message: 'Invalid credentials' });
     });
 
     test('should authenticate multiple students with same password', async () => {
@@ -161,7 +173,7 @@ describe('Login Lambda Handler', () => {
       const result: APIGatewayProxyResult = await handler(event);
 
       expect(result.statusCode).toBe(401);
-      expect(JSON.parse(result.body)).toEqual({ message: 'Invalid credentials' });
+      expect(JSON.parse(result.body)).toEqual({ success: false, message: 'Invalid credentials' });
     });
 
     test('should fail authentication for non-existent teacher', async () => {
@@ -172,7 +184,7 @@ describe('Login Lambda Handler', () => {
       const result: APIGatewayProxyResult = await handler(event);
 
       expect(result.statusCode).toBe(401);
-      expect(JSON.parse(result.body)).toEqual({ message: 'Invalid credentials' });
+      expect(JSON.parse(result.body)).toEqual({ success: false, message: 'Invalid credentials' });
     });
   });
 
@@ -202,7 +214,7 @@ describe('Login Lambda Handler', () => {
       const result: APIGatewayProxyResult = await handler(event);
 
       expect(result.statusCode).toBe(401);
-      expect(JSON.parse(result.body)).toEqual({ message: 'Invalid credentials' });
+      expect(JSON.parse(result.body)).toEqual({ success: false, message: 'Invalid credentials' });
     });
   });
 
@@ -282,7 +294,8 @@ describe('Login Lambda Handler', () => {
       };
       const result: APIGatewayProxyResult = await handler(event);
 
-      expect(result.statusCode).toBe(500);
+      // Malformed JSON is parsed as empty object {}, resulting in missing credentials (400)
+      expect(result.statusCode).toBe(400);
     });
 
     test('should treat empty strings as missing credentials', async () => {
