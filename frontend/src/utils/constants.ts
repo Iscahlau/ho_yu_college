@@ -8,8 +8,10 @@ export const SUBJECTS = [
   'Chinese Language',
   'English Language',
   'Mathematics',
-  'Humanities and Science',
+  'General Studies, Humanities and Science',
 ] as const;
+
+export type SubjectOption = typeof SUBJECTS[number];
 
 // Difficulty levels for game filtering
 export const DIFFICULTIES = ['Beginner', 'Intermediate', 'Advanced'] as const;

@@ -1,13 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import type { SubjectOption } from '../../utils/constants';
 
-export type Subject = 'Chinese Language' | 'English Language' | 'Mathematics' | 'Humanities and Science' | 'all';
+export type Subject = SubjectOption | 'all';
 export type Difficulty = 'Beginner' | 'Intermediate' | 'Advanced' | 'all';
 
 export interface Game {
   gameId: string;
   gameName: string;
   studentId: string;
-  subject: Subject;
+  subject: SubjectOption[];
   difficulty: Difficulty;
   teacherId: string;
   lastUpdate: string;
@@ -73,7 +74,7 @@ const gamesSlice = createSlice({
 
 function applyFilters(state: GamesState) {
   state.filteredGames = state.games.filter((game) => {
-    const subjectMatch = state.filters.subject === 'all' || game.subject === state.filters.subject;
+    const subjectMatch = state.filters.subject === 'all' || game.subject.includes(state.filters.subject);
     const difficultyMatch = state.filters.difficulty === 'all' || game.difficulty === state.filters.difficulty;
     return subjectMatch && difficultyMatch;
   });

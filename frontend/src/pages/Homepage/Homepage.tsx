@@ -90,7 +90,7 @@ function Homepage() {
 
     // Apply filters to enriched games and sort by lastUpdate (most recent first)
     const displayGames = enrichedGames.length > 0 ? enrichedGames.filter((game) => {
-        const subjectMatch = filters.subject === 'all' || game.subject === filters.subject;
+        const subjectMatch = filters.subject === 'all' || game.subject.includes(filters.subject);
         const difficultyMatch = filters.difficulty === 'all' || game.difficulty === filters.difficulty;
         return subjectMatch && difficultyMatch;
     }).sort((a, b) => {
@@ -215,14 +215,15 @@ function Homepage() {
                                                             {game.gameName}
                                                         </Typography>
                                                         <Stack direction="column" spacing={1} sx={{mb: 1}}>
-                                                            {game.subject && (
+                                                            {game.subject.map((subject, index) => (
                                                                 <Chip
-                                                                    label={t(`homepage.subjects.${game.subject}`)}
+                                                                    key={`${subject}-${index}`}
+                                                                    label={t(`homepage.subjects.${subject}`)}
                                                                     size="small"
                                                                     color="primary"
                                                                     variant="outlined"
                                                                 />
-                                                            )}
+                                                            ))}
                                                             {game.difficulty && (
                                                                 <Chip
                                                                     label={t(`homepage.difficulties.${game.difficulty}`)}

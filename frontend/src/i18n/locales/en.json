@@ -30,8 +30,7 @@
       "Chinese Language": "Chinese Language",
       "English Language": "English Language",
       "Mathematics": "Mathematics",
-      "General Studies": "General Studies",
-      "Humanities and Science": "General Studies, Humanities and Science"
+      "General Studies, Humanities and Science": "General Studies, Humanities and Science"
     },
     "difficulties": {
       "Beginner": "Beginner",

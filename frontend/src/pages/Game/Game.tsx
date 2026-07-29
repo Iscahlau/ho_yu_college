@@ -277,16 +277,21 @@ function GamePage() {
             )}
             
             <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-              {gameInfo.subject && (
+              {gameInfo.subject.length > 0 && (
                 <Box>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
                       {t('homepage.filters.subject')}
                   </Typography>
-                  <Chip 
-                    label={t(`homepage.subjects.${gameInfo.subject}`)}
-                    color="primary"
-                    variant="outlined"
-                  />
+                  <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+                    {gameInfo.subject.map((subject, index) => (
+                      <Chip
+                        key={`${subject}-${index}`}
+                        label={t(`homepage.subjects.${subject}`)}
+                        color="primary"
+                        variant="outlined"
+                      />
+                    ))}
+                  </Stack>
                 </Box>
               )}
               

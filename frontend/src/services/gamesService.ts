@@ -6,6 +6,7 @@
 import api, { ApiResponse } from './api';
 import type { Game } from '../store/slices/gamesSlice';
 import type { ScratchProject } from '../types';
+import { normalizeSubjects } from '../utils/subjects';
 
 const GAMES_ENDPOINT = import.meta.env.VITE_GAMES_ENDPOINT || '/games';
 
@@ -17,7 +18,7 @@ function transformGameData(apiGame: any): Game {
     gameId: apiGame.game_id,
     gameName: apiGame.game_name,
     studentId: apiGame.student_id,
-    subject: apiGame.subject,
+    subject: normalizeSubjects(apiGame.subject),
     difficulty: apiGame.difficulty,
     teacherId: apiGame.teacher_id,
     lastUpdate: apiGame.last_update,

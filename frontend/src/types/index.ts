@@ -25,7 +25,7 @@ export interface GameData {
   game_id: string;
   game_name: string;
   student_id: string;
-  subject: 'Chinese Language' | 'English Language' | 'Mathematics' | 'Humanities and Science';
+  subject: 'Chinese Language' | 'English Language' | 'Mathematics' | 'General Studies, Humanities and Science';
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
   teacher_id: string;
   last_update: string;
